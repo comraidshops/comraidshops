@@ -1,0 +1,211 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import StatCard from '@/components/vendor/StatCard';
+import { History, Landmark } from 'lucide-react';
+
+export default function WithdrawalsPage() {
+    const [history, setHistory] = useState<any[]>([]);
+    const [metrics, setMetrics] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        amount: '',
+        bank_name: '',
+        account_number: '',
+        account_name: ''
+    });
+
+    const [status, setStatus] = useState({ type: '', message: '' });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem('access_token');
+                const headers = { 'Authorization': `Bearer ${token}` };
+
+                // Fetch dashboard metrics for balance
+                const metricsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/dashboard/`, { headers });
+                if (metricsRes.ok) setMetrics(await metricsRes.json());
+
+                // Fetch withdrawal history
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/withdrawals/`, { headers });
+                if (res.ok) setHistory(await res.json());
+            } catch (e) { console.error(e); }
+        };
+        fetchData();
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setStatus({ type: '', message: '' });
+
+        try {
+            const token = localStorage.getItem('access_token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/withdrawals/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (res.ok) {
+                setStatus({ type: 'success', message: 'Withdrawal request submitted successfully.' });
+                setFormData({ amount: '', bank_name: '', account_number: '', account_name: '' });
+                // Refresh history
+                const updated = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/withdrawals/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                setHistory(await updated.json());
+            } else {
+                const err = await res.json();
+                setStatus({ type: 'error', message: err.detail || 'Failed to submit request.' });
+            }
+        } catch (e) {
+            setStatus({ type: 'error', message: 'An unexpected error occurred.' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-8 pb-12">
+            <h2 className="text-2xl font-bold uppercase tracking-tighter">Withdrawals</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <StatCard 
+                    title="Available for Payout" 
+                    value={`$${(metrics?.vendor_balance || 0).toLocaleString()}`} 
+                    icon={< Landmark className="w-4 h-4" />} 
+                    description="Cleared funds ready for withdrawal"
+                />
+                <StatCard 
+                    title="Pending Settlement" 
+                    value={`$${(metrics?.pending_payout || 0).toLocaleString()}`} 
+                    icon={<History className="w-4 h-4" />} 
+                    description="Earnings waiting for order completion"
+                />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Withdrawal Form */}
+                <div className="bg-background border border-border p-8">
+                    <div className="flex items-center gap-3 mb-8">
+                        <Landmark className="w-5 h-5 text-secondary" />
+                        <h3 className="text-sm font-bold uppercase tracking-widest">Request Payout</h3>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Amount ($)</label>
+                            <input 
+                                type="number" 
+                                required 
+                                value={formData.amount}
+                                onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                                className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                                placeholder="0.00"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Bank Name</label>
+                                <input 
+                                    type="text" 
+                                    required 
+                                    value={formData.bank_name}
+                                    onChange={(e) => setFormData({...formData, bank_name: e.target.value})}
+                                    className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                                    placeholder="Global Bank"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Account Name</label>
+                                <input 
+                                    type="text" 
+                                    required 
+                                    value={formData.account_name}
+                                    onChange={(e) => setFormData({...formData, account_name: e.target.value})}
+                                    className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                                    placeholder="Full Name"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Account Number</label>
+                            <input 
+                                type="text" 
+                                required 
+                                value={formData.account_number}
+                                onChange={(e) => setFormData({...formData, account_number: e.target.value})}
+                                className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                                placeholder="XXXX-XXXX-XXXX"
+                            />
+                        </div>
+
+                        {status.message && (
+                            <div className={`p-4 text-xs font-bold uppercase tracking-widest ${status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                                {status.message}
+                            </div>
+                        )}
+
+                        <button 
+                            type="submit" 
+                            disabled={loading}
+                            className="w-full bg-primary text-background font-bold uppercase tracking-widest py-4 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                        >
+                            {loading ? 'Submitting...' : 'Request Withdrawal'}
+                        </button>
+                    </form>
+                </div>
+
+                {/* History */}
+                <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                        <History className="w-5 h-5 text-secondary" />
+                        <h3 className="text-sm font-bold uppercase tracking-widest">Withdrawal History</h3>
+                    </div>
+
+                    <div className="bg-background border border-border overflow-hidden">
+                        <table className="w-full text-sm text-left">
+                            <thead className="text-xs text-secondary uppercase tracking-widest border-b border-border bg-secondary/5">
+                                <tr>
+                                    <th className="px-6 py-4">Date</th>
+                                    <th className="px-6 py-4 text-right">Amount</th>
+                                    <th className="px-6 py-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {history.map((h) => (
+                                    <tr key={h.id}>
+                                        <td className="px-6 py-4 whitespace-nowrap">{new Date(h.created_at).toLocaleDateString()}</td>
+                                        <td className="px-6 py-4 text-right font-medium">${parseFloat(h.amount).toFixed(2)}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-widest ${
+                                                h.status === 'paid' ? 'bg-green-100 text-green-700' :
+                                                h.status === 'approved' ? 'bg-blue-100 text-blue-700' :
+                                                h.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                'bg-secondary/10 text-secondary'
+                                            }`}>
+                                                {h.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {history.length === 0 && (
+                                    <tr>
+                                        <td colSpan={3} className="px-6 py-12 text-center text-secondary">No withdrawal history.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
