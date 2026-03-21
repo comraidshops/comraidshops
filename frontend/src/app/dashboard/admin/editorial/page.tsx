@@ -39,7 +39,6 @@ interface EditorialBase {
     established_year?: number;
     origin_country?: string;
     website?: string;
-    website?: string;
     magazine?: number;
     
     // Exhibition nested fields
