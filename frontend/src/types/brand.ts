@@ -48,6 +48,7 @@ export interface Product {
     vendor_name?: string
     brand?: Brand
     category_slug?: string
+    category?: number | string
     variants?: ProductVariant[]
     images?: ProductImage[]
     videos?: string[]
@@ -55,6 +56,8 @@ export interface Product {
     collections?: Collection[]
     features?: ProductFeature[]
     specifications?: ProductSpecification[]
+    meta_title?: string | null
+    meta_description?: string | null
 }
 
 export interface BrandImage {
@@ -74,6 +77,8 @@ export interface Collection {
     products?: Product[];
     is_featured?: boolean;
     order?: number;
+    meta_title?: string | null;
+    meta_description?: string | null;
 }
 
 export interface EditorialRef {
@@ -88,6 +93,8 @@ export interface Brand {
     name: string
     slug: string
     description: string
+    tagline?: string
+    logo?: string | null
     hero_image: string | null
     created_at: string
 
@@ -114,4 +121,8 @@ export interface Brand {
     approved_product_count: number
     total_product_count: number
     featured_products: Product[]
+    is_member?: boolean
+    community_count?: number
+    meta_title?: string | null
+    meta_description?: string | null
 }

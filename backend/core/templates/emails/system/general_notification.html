@@ -1,0 +1,17 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ user.username|default:"Member" }},</p>
+
+<h2>{{ notification_title }}</h2>
+
+<p>{{ notification_body|linebreaksbr }}</p>
+
+{% if action_url %}
+<div class="btn-container">
+    <a href="{{ action_url }}" class="btn">{{ action_text|default:"View Details" }}</a>
+</div>
+{% endif %}
+
+<p>Best regards,<br>The ComraidShops Team</p>
+{% endblock %}

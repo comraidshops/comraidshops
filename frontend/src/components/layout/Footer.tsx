@@ -7,6 +7,7 @@ export default function Footer() {
                 <div>
                     <h3 className="font-bold mb-4 uppercase">Explore</h3>
                     <div className="flex flex-col gap-2">
+                        <Link href="/about" className="text-secondary hover:text-primary transition-colors">About</Link>
                         <Link href="/magazine" className="text-secondary hover:text-primary transition-colors">Magazine</Link>
                         <Link href="/shop" className="text-secondary hover:text-primary transition-colors">Shop</Link>
                         <Link href="/brands" className="text-secondary hover:text-primary transition-colors">Brands</Link>
@@ -15,6 +16,7 @@ export default function Footer() {
 
                 <div className="flex flex-col gap-2">
                     <h3 className="font-bold mb-2">Support</h3>
+                    <Link href="/contact" className="text-secondary hover:text-primary transition-colors">Contact</Link>
                     <Link href="/faq" className="text-secondary hover:text-primary transition-colors">FAQ</Link>
                     <Link href="/shipping" className="text-secondary hover:text-primary transition-colors">Shipping</Link>
                     <Link href="/returns" className="text-secondary hover:text-primary transition-colors">Returns</Link>

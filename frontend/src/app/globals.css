@@ -19,6 +19,15 @@
   --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-inter: var(--font-inter);
+  --font-playfair: var(--font-playfair);
+  
+  --animate-shimmer: shimmer 3s infinite;
+
+  @keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
 }
 
 @media (prefers-color-scheme: dark) {

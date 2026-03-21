@@ -6,17 +6,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingBag, ArrowRight, Package, Clock, CheckCircle, Truck, XCircle } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api';
+import { Order } from '@/types/user';
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-    pending:   { label: 'Pending',   icon: Clock,        color: 'text-amber-500',  bg: 'bg-amber-500/10'  },
-    paid:      { label: 'Confirmed', icon: CheckCircle,  color: 'text-blue-500',   bg: 'bg-blue-500/10'   },
-    shipped:   { label: 'Shipped',   icon: Truck,        color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    completed: { label: 'Delivered', icon: CheckCircle,  color: 'text-green-500',  bg: 'bg-green-500/10'  },
-    cancelled: { label: 'Cancelled', icon: XCircle,      color: 'text-red-500',    bg: 'bg-red-500/10'    },
+    pending:    { label: 'Order Pending', icon: Clock,        color: 'text-amber-500',  bg: 'bg-amber-500/10'  },
+    processing: { label: 'Processing',    icon: Package,      color: 'text-blue-500',   bg: 'bg-blue-500/10'   },
+    shipped:    { label: 'Shipped',       icon: Truck,        color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    delivered:  { label: 'Delivered',     icon: CheckCircle,  color: 'text-green-500',  bg: 'bg-green-500/10'  },
+    cancelled:  { label: 'Cancelled',     icon: XCircle,      color: 'text-red-500',    bg: 'bg-red-500/10'    },
 };
 
 export default function OrdersPage() {
-    const [orders, setOrders] = useState<any[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -31,7 +32,7 @@ export default function OrdersPage() {
                     const data = await res.json();
                     // Sort newest first (API may return paginated or plain list)
                     const list = Array.isArray(data) ? data : data.results ?? [];
-                    setOrders(list.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+                    setOrders(list.sort((a: Order, b: Order) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
                 }
             } finally {
                 setLoading(false);
@@ -79,10 +80,10 @@ export default function OrdersPage() {
 
             <div className="space-y-4">
                 {orders.map((order, i) => {
-                    const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+                    const cfg = STATUS_CONFIG[order.order_status] ?? STATUS_CONFIG.pending;
                     const StatusIcon = cfg.icon;
                     const date = new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                    const firstItem = order.items?.[0];
+                    const totalQty = order.items?.reduce((acc: number, item) => acc + (item.quantity || 1), 0) || 0;
 
                     return (
                         <motion.div
@@ -96,7 +97,7 @@ export default function OrdersPage() {
                                     <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                                         {/* Product thumbnails */}
                                         <div className="flex -space-x-3 flex-shrink-0">
-                                            {order.items?.slice(0, 3).map((item: any, idx: number) => (
+                                            {order.items?.slice(0, 3).map((item, idx: number) => (
                                                 <div
                                                     key={item.id}
                                                     className="relative w-14 h-16 bg-secondary/10 border-2 border-background overflow-hidden flex-shrink-0"
@@ -116,7 +117,7 @@ export default function OrdersPage() {
                                                     )}
                                                 </div>
                                             ))}
-                                            {order.items?.length > 3 && (
+                                            {order.items && order.items.length > 3 && (
                                                 <div className="w-14 h-16 bg-secondary/10 border-2 border-background flex items-center justify-center text-[9px] font-black text-secondary/40 uppercase">
                                                     +{order.items.length - 3}
                                                 </div>
@@ -138,11 +139,11 @@ export default function OrdersPage() {
 
                                             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
                                                 <span className="text-[10px] text-secondary/60 uppercase tracking-widest font-bold">
-                                                    {order.items?.length} item{order.items?.length !== 1 ? 's' : ''}
+                                                    {totalQty} item{totalQty !== 1 ? 's' : ''}
                                                 </span>
                                                 <span className="text-[10px] text-secondary/30 uppercase font-bold">·</span>
                                                 <span className="text-[10px] font-black uppercase tracking-widest">
-                                                    ${Number(order.total_amount).toFixed(2)}
+                                                    ₦{Number(order.total_amount).toLocaleString()}
                                                 </span>
                                             </div>
                                         </div>

@@ -1,31 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React from 'react';
 import Image from 'next/image';
-import { fetchFeaturedProducts } from '@/lib/api';
+import Link from 'next/link';
+import { Product } from '@/lib/types';
+import { useFeaturedProducts } from '@/lib/hooks';
 
-export default function CurrentRotation() {
-    const [products, setProducts] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+interface CurrentRotationProps {
+    initialProducts?: Product[];
+}
 
-    useEffect(() => {
-        async function loadFeatured() {
-            try {
-                const data = await fetchFeaturedProducts();
-                // Ensure we handle pagination if data.results exists
-                const items = Array.isArray(data) ? data : (data.results || []);
-                setProducts(items.slice(0, 3));
-            } catch (error) {
-                console.error("Failed to fetch featured products:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadFeatured();
-    }, []);
+export default function CurrentRotation({ initialProducts }: CurrentRotationProps) {
+    const { data: rotationData, isLoading } = useFeaturedProducts({
+        fallbackData: initialProducts,
+    });
+    
+    // Ensure we handle pagination if data.results exists
+    const products = (rotationData as any)?.results || (Array.isArray(rotationData) ? rotationData : []).slice(0, 3);
 
-    if (loading) {
+    if (isLoading && products.length === 0) {
         return (
             <section className="py-32 px-6 bg-background">
                 <div className="max-w-[1920px] mx-auto">
@@ -55,9 +48,9 @@ export default function CurrentRotation() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-16">
-                    {products.map((product, index) => (
+                    {products.map((product: Product, index: number) => (
                         <div key={product.slug} className={`group ${index === 1 ? 'md:mt-24' : ''}`}>
-                            <Link href={`/shop/${product.slug}`} className="block relative aspect-[2/3] overflow-hidden bg-secondary/5 mb-6">
+                            <Link href={`/products/${product.slug}`} className="block relative aspect-[2/3] overflow-hidden bg-secondary/5 mb-6">
                                 <Image
                                     src={product.image || '/images/placeholder.jpg'}
                                     alt={product.name}

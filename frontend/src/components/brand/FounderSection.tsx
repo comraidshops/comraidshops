@@ -1,6 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
 import Image from "next/image"
+import { API_BASE_URL } from "@/lib/api"
 
 interface FounderSectionProps {
     name?: string;
@@ -27,7 +28,7 @@ export default function FounderSection({ name, bio, story, image, establishedYea
                         className="w-full md:w-1/2 aspect-[3/4] md:aspect-[4/5] relative overflow-hidden group shadow-2xl"
                     >
                         <Image
-                            src={image}
+                            src={image.startsWith('http') ? image : `${API_BASE_URL}${image}`}
                             alt={name || "Founder"}
                             fill
                             className="object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-[1.02] hover:scale-100"

@@ -4,10 +4,21 @@ import React, { useEffect, useState } from 'react';
 import { Camera } from 'lucide-react';
 import Image from 'next/image';
 
+interface BrandFormData {
+    name: string;
+    tagline: string;
+    description: string;
+    philosophy: string;
+    story: string;
+    hero_image: File | null;
+    logo: File | null;
+    social_links: Record<string, string>;
+}
+
 export default function BrandSettingsPage() {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState({ type: '', message: '' });
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<BrandFormData>({
         name: '',
         tagline: '',
         description: '',
@@ -89,7 +100,7 @@ export default function BrandSettingsPage() {
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-4">Brand Logo</label>
                             <div className="relative w-32 h-32 bg-secondary/5 border border-dashed border-border flex items-center justify-center overflow-hidden">
-                                {formData.logo ? (
+                                {formData.logo && typeof window !== 'undefined' ? (
                                     <Image 
                                         src={URL.createObjectURL(formData.logo as unknown as Blob)} 
                                         alt="Logo Preview" 
@@ -102,7 +113,7 @@ export default function BrandSettingsPage() {
                                 <input 
                                     type="file" 
                                     accept="image/*"
-                                    onChange={(e) => setFormData({...formData, logo: e.target.files?.[0] as any})}
+                                    onChange={(e) => setFormData({...formData, logo: e.target.files?.[0] || null})}
                                     className="absolute inset-0 opacity-0 cursor-pointer" 
                                 />
                             </div>
@@ -111,7 +122,7 @@ export default function BrandSettingsPage() {
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-4">Cover Banner</label>
                             <div className="relative h-32 bg-secondary/5 border border-dashed border-border flex items-center justify-center overflow-hidden">
-                                {formData.hero_image ? (
+                                {formData.hero_image && typeof window !== 'undefined' ? (
                                     <Image 
                                         src={URL.createObjectURL(formData.hero_image as unknown as Blob)} 
                                         alt="Banner Preview" 
@@ -124,7 +135,7 @@ export default function BrandSettingsPage() {
                                 <input 
                                     type="file" 
                                     accept="image/*"
-                                    onChange={(e) => setFormData({...formData, hero_image: e.target.files?.[0] as any})}
+                                    onChange={(e) => setFormData({...formData, hero_image: e.target.files?.[0] || null})}
                                     className="absolute inset-0 opacity-0 cursor-pointer" 
                                 />
                             </div>

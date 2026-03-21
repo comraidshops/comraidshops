@@ -1,0 +1,13 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ recipient_name|default:"Member" }},</p>
+
+<h2>{{ email_subject }}</h2>
+
+<div style="margin-top: 20px; line-height: 1.6; color: #cccccc;">
+    {{ email_body|safe }}
+</div>
+
+<p style="margin-top: 40px;">Best regards,<br>The ComraidShops Team</p>
+{% endblock %}

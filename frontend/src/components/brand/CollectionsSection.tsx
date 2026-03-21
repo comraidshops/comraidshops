@@ -1,8 +1,9 @@
 "use client"
 import { motion } from "framer-motion"
-import { Collection } from "@/types/brand"
+import { Collection } from "@/lib/types"
 import Image from "next/image"
 import Link from "next/link"
+import { API_BASE_URL } from "@/lib/api"
 
 export default function CollectionsSection({ collections }: { collections?: Collection[] }) {
     if (!collections || collections.length === 0) return null;
@@ -29,7 +30,7 @@ export default function CollectionsSection({ collections }: { collections?: Coll
                                 <div className="aspect-[4/5] relative overflow-hidden mb-6 bg-secondary/5">
                                     {collection.hero_image ? (
                                         <Image
-                                            src={collection.hero_image}
+                                            src={collection.hero_image.startsWith('http') ? collection.hero_image : `${API_BASE_URL}${collection.hero_image}`}
                                             alt={collection.name}
                                             fill
                                             className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"

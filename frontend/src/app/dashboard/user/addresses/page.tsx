@@ -1,22 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Plus, Trash2, Home, Building2, Globe } from 'lucide-react';
+import { MapPin, Plus, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { API_BASE_URL } from '@/lib/api';
-
-interface Address {
-    id: number;
-    full_name: string;
-    phone_number: string;
-    address_line1: string;
-    address_line2: string;
-    city: string;
-    state: string;
-    zip_code: string;
-    country: string;
-    is_default: boolean;
-}
+import { API_BASE_URL, Address } from '@/lib/api';
 
 export default function AddressesPage() {
     const [addresses, setAddresses] = useState<Address[]>([]);
@@ -47,12 +34,10 @@ export default function AddressesPage() {
     };
 
     useEffect(() => {
-        let isMounted = true;
         const load = async () => {
             await fetchAddresses();
         };
         load();
-        return () => { isMounted = false; };
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {

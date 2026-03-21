@@ -1,0 +1,18 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ user.username }},</p>
+
+<h2>Verify Your Email Address</h2>
+
+<p>Welcome to ComraidShops. To complete your registration and secure your account, please verify your email address by clicking the button below.</p>
+
+<div class="btn-container">
+    <a href="{{ verify_url }}" class="btn">Verify Email</a>
+</div>
+
+<p>If the button doesn't work, copy and paste this link into your browser:<br>
+<a href="{{ verify_url }}" style="color: #cccccc;">{{ verify_url }}</a></p>
+
+<p>Best regards,<br>The ComraidShops Team</p>
+{% endblock %}

@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Package, ShoppingCart, DollarSign, CreditCard } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
+import { Package, ShoppingCart, Banknote, CreditCard, BellRing } from 'lucide-react';
 import StatCard from '@/components/vendor/StatCard';
 import OrdersTable, { Order } from '@/components/vendor/OrdersTable';
 import NotificationsPanel, { Notification } from '@/components/vendor/NotificationsPanel';
+import { useNotification } from '@/context/NotificationContext';
 
 interface DashboardMetrics {
   total_products: number;
@@ -26,7 +28,8 @@ interface BackendOrder {
   id: number;
   customer_name: string;
   total_amount: string;
-  status: string;
+  payment_status: string;
+  order_status: string;
   created_at: string;
   items: Array<{
     product_name: string;
@@ -50,9 +53,15 @@ interface BackendNotification {
 export default function VendorDashboard() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { notify } = useNotification();
+  const lastNotificationId = useRef<number>(0);
 
   useEffect(() => {
-    const fetchMetrics = async () => {
+    let isMounted = true;
+
+    const fetchMetrics = async (isBackground = false) => {
+      if (!isBackground) setLoading(true);
       try {
         const token = localStorage.getItem('access_token');
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/dashboard/`, {
@@ -63,33 +72,53 @@ export default function VendorDashboard() {
         
         if (res.ok) {
           const data = await res.json();
-          setMetrics(data);
+          if (isMounted) {
+            setMetrics(data);
+            setError(null);
+            
+            // Notification toast logic
+            if (data.recent_notifications && data.recent_notifications.length > 0) {
+                const highestId = Math.max(...data.recent_notifications.map((n: BackendNotification) => n.id));
+                if (isBackground && lastNotificationId.current > 0 && highestId > lastNotificationId.current) {
+                    // Find the new unseen notifications
+                    const newAlerts = data.recent_notifications.filter((n: BackendNotification) => n.id > lastNotificationId.current && !n.read);
+                    if (newAlerts.length > 0) {
+                        notify('info', 'New Alert', `You have ${newAlerts.length} new notification${newAlerts.length > 1 ? 's' : ''}.`);
+                    }
+                }
+                lastNotificationId.current = highestId;
+            }
+          }
         } else {
-          // Fallback mock for UI development
-          setMetrics({
-            total_products: 12,
-            pending_products: 3,
-            approved_products: 9,
-            total_variants: 24,
-            total_orders: 85,
-            orders_today: 4,
-            total_revenue: 12450.00,
-            total_commission: 1245.00,
-            vendor_balance: 3500.00,
-            pending_payout: 1200.00,
-            recent_orders: [],
-            recent_notifications: []
-          });
+          try {
+            const errData = await res.json();
+            if (isMounted) setError(errData.error || errData.detail || "Failed to load dashboard metrics.");
+          } catch {
+            if (isMounted) setError(`Failed to load: Error ${res.status}`);
+          }
         }
-      } catch (error) {
-        console.error("Error fetching metrics", error);
+      } catch (err: unknown) {
+        console.error("Error fetching metrics", err);
+        const message = err instanceof Error ? err.message : 'An unexpected error occurred.';
+        if (isMounted) setError(message);
       } finally {
-        setLoading(false);
+        if (isMounted && !isBackground) setLoading(false);
       }
     };
 
-    fetchMetrics();
-  }, []);
+    fetchMetrics(false);
+
+    // Polling every 15 seconds
+    const intervalId = setInterval(() => {
+        fetchMetrics(true);
+    }, 15000);
+
+    return () => {
+        isMounted = false;
+        clearInterval(intervalId);
+    };
+  }, [notify]);
+
 
   const handleMarkRead = async (id: string) => {
     if (metrics) {
@@ -116,6 +145,15 @@ export default function VendorDashboard() {
     return <div className="flex justify-center items-center h-[50vh]"><p className="text-secondary uppercase tracking-widest text-xs">Loading dashboard...</p></div>;
   }
 
+  if (error) {
+    return (
+      <div className="p-8 bg-red-50 border border-red-200">
+        <p className="text-red-800 text-sm font-bold tracking-widest uppercase">Dashboard Error: {error}</p>
+      </div>
+    );
+  }
+
+
   // Map backend order structure to frontend table structure
   const formattedOrders: Order[] = (metrics?.recent_orders || []).map((o: BackendOrder) => ({
     id: o.id.toString(),
@@ -125,7 +163,8 @@ export default function VendorDashboard() {
     total: parseFloat(o.total_amount),
     commission: o.financials?.commission ? Number(o.financials.commission) : 0,
     earnings: o.financials?.net_earning ? Number(o.financials.net_earning) : 0,
-    status: o.status as Order['status'],
+    payment_status: o.payment_status as Order['payment_status'],
+    order_status: o.order_status as Order['order_status'],
     date: new Date(o.created_at).toLocaleDateString()
   }));
 
@@ -139,12 +178,21 @@ export default function VendorDashboard() {
 
   return (
     <div className="space-y-8 pb-12">
+      <div className="flex justify-end">
+        <Link 
+          href="/dashboard/vendor/withdrawals" 
+          className="bg-primary text-background font-bold uppercase tracking-widest text-xs px-6 py-4 rounded-none hover:bg-primary/90 transition-colors shadow-sm w-full md:w-auto text-center"
+        >
+          Request Withdrawal
+        </Link>
+      </div>
+
       {/* Top row: Core sales stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Total Revenue" 
-          value={`$${(metrics?.total_revenue ?? 0).toLocaleString()}`} 
-          icon={<DollarSign className="w-4 h-4" />}
+          value={`₦${(metrics?.total_revenue ?? 0).toLocaleString()}`} 
+          icon={<Banknote className="w-4 h-4" />}
           description="Gross sales across all time"
         />
         <StatCard 
@@ -155,13 +203,13 @@ export default function VendorDashboard() {
         />
         <StatCard 
           title="Vendor Balance" 
-          value={`$${(metrics?.vendor_balance ?? 0).toLocaleString()}`} 
+          value={`₦${(metrics?.vendor_balance ?? 0).toLocaleString()}`} 
           icon={<CreditCard className="w-4 h-4" />}
           description="Available for withdrawal"
         />
         <StatCard 
           title="Pending Payout" 
-          value={`$${(metrics?.pending_payout ?? 0).toLocaleString()}`} 
+          value={`₦${(metrics?.pending_payout ?? 0).toLocaleString()}`} 
           icon={<ClockIcon />}
           description="Currently processing"
         />
@@ -181,7 +229,7 @@ export default function VendorDashboard() {
         />
         <StatCard 
           title="Total Commission Paid" 
-          value={`$${(metrics?.total_commission ?? 0).toLocaleString()}`} 
+          value={`₦${(metrics?.total_commission ?? 0).toLocaleString()}`} 
         />
       </div>
 

@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ vendor.brand_name }},</p>
+
+<h2>Update on Your Product Submission</h2>
+
+<p>Thank you for submitting "<strong>{{ product.name }}</strong>" for review.</p>
+
+<p>Following our editorial guidelines, we are currently unable to approve this piece for live publication. We strive to maintain a specific aesthetic and quality standard throughout the platform.</p>
+
+<p>If you have any questions regarding our curation criteria or wish to re-submit with modifications, please refer to our vendor guidelines or contact support.</p>
+
+<div class="btn-container">
+    <a href="https://comraidshops.com/vendor/products" class="btn">Review Submissions</a>
+</div>
+
+<p>Best regards,<br>ComraidShops Curation Team</p>
+{% endblock %}

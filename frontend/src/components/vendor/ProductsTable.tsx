@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Edit2, ExternalLink, Trash2 } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/constants';
 
 export interface Product {
     id: number;
@@ -39,7 +40,7 @@ export default function ProductsTable({ products, onDelete }: ProductsTableProps
                                     <div className="w-12 h-12 bg-secondary/10 relative overflow-hidden flex-shrink-0">
                                         {product.image && (
                                             <Image 
-                                                src={product.image.startsWith('http') ? product.image : `${process.env.NEXT_PUBLIC_API_URL}${product.image}`}
+                                                src={product.image.startsWith('http') ? product.image : `${API_BASE_URL}${product.image}`}
                                                 alt={product.name}
                                                 fill
                                                 className="object-cover"
@@ -48,13 +49,13 @@ export default function ProductsTable({ products, onDelete }: ProductsTableProps
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="font-medium text-primary line-clamp-1">{product.name}</span>
-                                        <Link href={`/shop/product/${product.slug}`} className="text-[10px] text-secondary hover:text-primary flex items-center gap-1 transition-colors uppercase tracking-widest font-bold">
+                                        <Link href={`/products/${product.slug}`} className="text-[10px] text-secondary hover:text-primary flex items-center gap-1 transition-colors uppercase tracking-widest font-bold">
                                             View in Shop <ExternalLink className="w-2 h-2" />
                                         </Link>
                                     </div>
                                 </div>
                             </td>
-                            <td className="px-6 py-4 text-right">${parseFloat(product.price).toFixed(2)}</td>
+                             <td className="px-6 py-4 text-right">₦{parseFloat(product.price).toLocaleString()}</td>
                             <td className="px-6 py-4 text-right">{product.stock}</td>
                             <td className="px-6 py-4">
                                 <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-widest ${

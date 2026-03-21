@@ -2,10 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bell } from 'lucide-react';
+import { Bell, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import DashboardSidebar from '@/components/vendor/DashboardSidebar';
+import VendorMobileNav from '@/components/vendor/VendorMobileNav';
 import VendorGuard from '@/components/auth/VendorGuard';
+
+interface Notification {
+    id: number;
+    read: boolean;
+    // add other fields if necessary
+}
 
 export default function VendorDashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -13,27 +20,35 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
     const [mounted, setMounted] = useState(false);
     
     useEffect(() => {
-        setMounted(true);
-        const fetchUnreadCount = async () => {
-            try {
-                const token = localStorage.getItem('access_token');
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/notifications/`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    const unread = data.filter((n: any) => !n.read).length;
-                    setUnreadCount(unread);
+        const timer = setTimeout(() => {
+            setMounted(true);
+            const fetchUnreadCount = async () => {
+                try {
+                    const token = localStorage.getItem('access_token');
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/notifications/`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const unread = data.filter((n: Notification) => !n.read).length;
+                        setUnreadCount(unread);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch notifications", error);
                 }
-            } catch (error) {
-                console.error("Failed to fetch notifications", error);
-            }
-        };
-        fetchUnreadCount();
+            };
+            fetchUnreadCount();
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
-    const pageName = pathname.split('/').pop() || 'Dashboard';
+    const pageName = (pathname || '').split('/').pop() || 'Dashboard';
     const formattedPageName = pageName === 'vendor' ? 'Overview' : pageName.charAt(0).toUpperCase() + pageName.slice(1);
+
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.href = '/auth/login';
+    };
 
     return (
         <VendorGuard>
@@ -47,6 +62,13 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
                         </h1>
 
                         <div className="flex items-center gap-4">
+                            <button 
+                                onClick={handleLogout}
+                                className="md:hidden flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-red-500 mr-2"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Logout
+                            </button>
                             <Link href="/dashboard/vendor/notifications" className="relative text-secondary hover:text-primary transition-colors block">
                                 <Bell className="w-5 h-5" />
                                 {mounted && unreadCount > 0 && (
@@ -61,10 +83,12 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
                         </div>
                     </header>
 
-                    <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
+                    <main className="flex-1 p-6 pb-24 md:p-8 max-w-7xl mx-auto w-full">
                         {children}
                     </main>
                 </div>
+                
+                <VendorMobileNav />
             </div>
         </VendorGuard>
     );

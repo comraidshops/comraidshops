@@ -2,18 +2,47 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { Product } from '@/types/brand';
+import { ImageCropperModal } from '@/components/ui/ImageCropperModal';
 
 export default function EditProductPage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
+    const router = useRouter();
+    const params = useParams() as { id: string };
+    const id = params.id;
 
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [product, setProduct] = useState<any>(null);
-  const [commissionRate, setCommissionRate] = useState<number>(0.10);
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [product, setProduct] = useState<Product | null>(null);
+    const [commissionRate, setCommissionRate] = useState<number>(0);
+    const [globalCommissionMode, setGlobalCommissionMode] = useState<'fixed' | 'percentage'>('percentage');
+    const [globalCommissionValue, setGlobalCommissionValue] = useState<number>(0);
+
+    // Image Cropper State
+    const [isCroppingMain, setIsCroppingMain] = useState(false);
+    const [mainImageUrl, setMainImageUrl] = useState('');
+    const [croppedMainFile, setCroppedMainFile] = useState<File | null>(null);
+    const [mainPreviewUrl, setMainPreviewUrl] = useState('');
+
+    const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setCroppedMainFile(file); // Store temporary to retain name
+            setMainImageUrl(URL.createObjectURL(file));
+            setIsCroppingMain(true);
+        }
+        e.target.value = ''; // Reset to allow re-selection
+    };
+
+    const handleMainCropComplete = (croppedBlob: Blob) => {
+        if (!croppedMainFile) return;
+        const finalFile = new File([croppedBlob], croppedMainFile.name, { type: 'image/jpeg' });
+        setCroppedMainFile(finalFile);
+        setMainPreviewUrl(URL.createObjectURL(croppedBlob));
+        setIsCroppingMain(false);
+    };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,8 +72,8 @@ export default function EditProductPage() {
         } else {
           setError("Failed to fetch product details.");
         }
-      } catch (err: any) {
-        setError(err.message || 'Error fetching product');
+      } catch {
+        setError('Error fetching product');
       } finally {
         setLoading(false);
       }
@@ -63,11 +92,25 @@ export default function EditProductPage() {
     // Convert Base Price to Listing Price for the backend
     const basePrice = Number(formData.get('price'));
     const listingPrice = basePrice * (1 + commissionRate);
-    formData.set('price', listingPrice.toString());
+    formData.set('price', listingPrice.toFixed(2));
 
-    const imageFile = formData.get('image') as File | null;
-    if (!imageFile || imageFile.size === 0) {
-      formData.delete('image');
+    if (croppedMainFile) {
+      formData.set('image', croppedMainFile);
+    } else {
+      const imageFile = formData.get('image') as File | null;
+      if (!imageFile || imageFile.size === 0) {
+        formData.delete('image');
+      }
+    }
+
+    const uploadedImages = formData.getAll('uploaded_images') as File[];
+    if (uploadedImages.length === 1 && uploadedImages[0].size === 0) {
+      formData.delete('uploaded_images');
+    }
+
+    const video360File = formData.get('uploaded_video_360') as File | null;
+    if (!video360File || video360File.size === 0) {
+      formData.delete('uploaded_video_360');
     }
 
     try {
@@ -80,14 +123,14 @@ export default function EditProductPage() {
         body: formData,
       });
 
-      if (res.ok) {
+        if (res.ok) {
         router.push('/dashboard/vendor/products');
       } else {
         const data = await res.json();
         setError(JSON.stringify(data));
       }
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+    } catch {
+      setError('An unexpected error occurred.');
     } finally {
       setSubmitting(false);
     }
@@ -164,34 +207,118 @@ export default function EditProductPage() {
           </div>
           <div className="flex justify-between items-end border-t border-border pt-4">
             <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Current Listing Price</span>
-            <span className="text-xl font-bold tracking-tighter">${currentPrice.toFixed(2)}</span>
+            <span className="text-xl font-bold tracking-tighter">₦{Number(currentPrice).toLocaleString()}</span>
           </div>
         </div>
 
         <div className="space-y-2">
           <label htmlFor="short_description" className="block text-xs font-bold uppercase tracking-widest text-secondary">Short Description</label>
-          <input type="text" id="short_description" name="short_description" defaultValue={product.short_description} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" maxLength={300} />
+          <input type="text" id="short_description" name="short_description" defaultValue={product.short_description || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" maxLength={300} />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="description" className="block text-xs font-bold uppercase tracking-widest text-secondary">Full Story & Description</label>
+          <label htmlFor="description" className="block text-xs font-bold uppercase tracking-widest text-secondary">Description</label>
           <textarea id="description" name="description" rows={5} defaultValue={product.description} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors resize-none"></textarea>
+        </div>
+        
+        <div className="space-y-2">
+          <label htmlFor="story" className="block text-xs font-bold uppercase tracking-widest text-secondary">Full Brand Story</label>
+          <textarea id="story" name="story" rows={5} defaultValue={product.story || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors resize-none"></textarea>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label htmlFor="materials" className="block text-xs font-bold uppercase tracking-widest text-secondary">Materials</label>
+            <input type="text" id="materials" name="materials" defaultValue={product.materials || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="fit" className="block text-xs font-bold uppercase tracking-widest text-secondary">Fit & Sizing</label>
+            <input type="text" id="fit" name="fit" defaultValue={product.fit || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label htmlFor="origin_country" className="block text-xs font-bold uppercase tracking-widest text-secondary">Origin Country</label>
+            <input type="text" id="origin_country" name="origin_country" defaultValue={product.origin_country || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="weight" className="block text-xs font-bold uppercase tracking-widest text-secondary">Weight</label>
+            <input type="text" id="weight" name="weight" defaultValue={product.weight || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="care_instructions" className="block text-xs font-bold uppercase tracking-widest text-secondary">Care Instructions</label>
+          <input type="text" id="care_instructions" name="care_instructions" defaultValue={product.care_instructions || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label htmlFor="hero_video" className="block text-xs font-bold uppercase tracking-widest text-secondary">Hero Video URL</label>
+            <input type="url" id="hero_video" name="hero_video" defaultValue={product.hero_video || ''} placeholder="https://youtube.com/..." className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="editorial_quote" className="block text-xs font-bold uppercase tracking-widest text-secondary">Editorial Quote</label>
+            <input type="text" id="editorial_quote" name="editorial_quote" defaultValue={product.editorial_quote || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" />
+          </div>
         </div>
 
         <div className="space-y-4">
-          <label htmlFor="image" className="block text-xs font-bold uppercase tracking-widest text-secondary">Campaign Image</label>
-          {product.image && (
+          <label htmlFor="image" className="block text-xs font-bold uppercase tracking-widest text-secondary">Main Campaign Image</label>
+          {(mainPreviewUrl || product.image) && (
             <div className="relative w-24 h-32 bg-secondary/10 border border-border overflow-hidden">
                <Image 
-                 src={product.image.startsWith('http') ? product.image : `${process.env.NEXT_PUBLIC_API_URL}${product.image}`}
+                 src={mainPreviewUrl ? mainPreviewUrl : (product.image.startsWith('http') ? product.image : `${process.env.NEXT_PUBLIC_API_URL}${product.image}`)}
                  alt="Current product image" 
                  fill
                  className="object-cover" 
                />
             </div>
           )}
-          <input type="file" id="image" name="image" accept="image/*" className="w-full border border-border p-3 bg-secondary/5 focus:outline-none focus:border-primary transition-colors" />
-          <p className="text-[10px] text-secondary uppercase tracking-widest font-bold">Leaving blank keeps current image.</p>
+          <input type="file" id="image" name="image" accept="image/*" onChange={handleMainImageChange} className="w-full border border-border p-3 bg-secondary/5 focus:outline-none focus:border-primary transition-colors" />
+          <p className="text-[10px] text-secondary uppercase tracking-widest font-bold">Leaving blank keeps current main image.</p>
+        </div>
+
+        {isCroppingMain && (
+          <ImageCropperModal
+            isOpen={isCroppingMain}
+            onClose={() => setIsCroppingMain(false)}
+            imageUrl={mainImageUrl}
+            onCropComplete={handleMainCropComplete}
+            aspectRatio={4 / 5}
+          />
+        )}
+
+        <div className="space-y-4">
+          <label htmlFor="uploaded_images" className="block text-xs font-bold uppercase tracking-widest text-secondary">Additional Gallery Images</label>
+          {product.images && product.images.length > 0 && (
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {product.images.map(img => (
+                <div key={img.id} className="relative w-20 h-28 bg-secondary/10 border border-border shrink-0">
+                  <Image src={img.image.startsWith('http') ? img.image : `${process.env.NEXT_PUBLIC_API_URL}${img.image}`} alt="Gallery image" fill className="object-cover" />
+                </div>
+              ))}
+            </div>
+          )}
+          <input type="file" id="uploaded_images" name="uploaded_images" accept="image/*" multiple className="w-full border border-border p-3 bg-secondary/5 focus:outline-none focus:border-primary transition-colors" />
+          <p className="text-[10px] text-secondary uppercase tracking-widest font-bold">Uploading new images will replace the existing gallery.</p>
+        </div>
+
+        <div className="space-y-4">
+          <label htmlFor="uploaded_video_360" className="block text-xs font-bold uppercase tracking-widest text-secondary">360° Video Upload</label>
+          {product.video_360 && (
+            <div className="text-xs font-bold">
+               <span className="text-secondary mr-2">Current Video:</span> 
+               {/* 
+                 Depending on the API format, video_360 can be a string URL or nested object. 
+                 Using { video?: string } to safely read .video or pure string. 
+               */}
+               <a href={typeof product.video_360 === 'string' ? `${process.env.NEXT_PUBLIC_API_URL}${product.video_360}` : (product.video_360 as { video?: string })?.video?.startsWith('http') ? (product.video_360 as { video?: string }).video : `${process.env.NEXT_PUBLIC_API_URL}${(product.video_360 as { video?: string })?.video}`} target="_blank" rel="noreferrer" className="text-primary hover:underline">View 360 Video</a>
+            </div>
+          )}
+          <input type="file" id="uploaded_video_360" name="uploaded_video_360" accept="video/*" className="w-full border border-border p-3 bg-secondary/5 focus:outline-none focus:border-primary transition-colors" />
+          <p className="text-[10px] text-secondary uppercase tracking-widest font-bold">Leaving blank keeps current video.</p>
         </div>
 
         <div className="pt-8 flex justify-end">

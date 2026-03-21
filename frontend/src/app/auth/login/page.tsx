@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowRight, Lock, Mail, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
-import { API_BASE_URL, login } from '@/lib/api';
+import { login } from '@/lib/api';
+import Image from 'next/image';
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 
 function LoginForm() {
     const router = useRouter();
@@ -17,7 +19,7 @@ function LoginForm() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        if (searchParams.get('registered')) {
+        if (searchParams?.get('registered')) {
             setSuccessMessage('Registration successful. Please login to continue.');
         }
     }, [searchParams]);
@@ -29,13 +31,13 @@ function LoginForm() {
         setSuccessMessage(null);
 
         try {
-            const tokens = await login({ username: email, password });
+            const tokens: { access: string; refresh: string } = await login({ username: email, password });
             
             localStorage.setItem('access_token', tokens.access);
             localStorage.setItem('refresh_token', tokens.refresh);
 
             // Redirect to dashboard or previous page
-            const redirectTo = searchParams.get('redirect') || '/dashboard/user';
+            const redirectTo = searchParams?.get('redirect') || '/dashboard/user';
             router.push(redirectTo);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Login failed.';
@@ -116,6 +118,17 @@ function LoginForm() {
                         </>
                     )}
                 </button>
+
+                <div className="relative py-4">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-border"></div>
+                    </div>
+                    <div className="relative flex justify-center text-[8px] font-black uppercase tracking-[0.4em] text-secondary/30 bg-background px-4">
+                        OR SECURE OAUTH
+                    </div>
+                </div>
+
+                <GoogleLoginButton />
             </form>
         </>
     );
@@ -136,9 +149,7 @@ export default function LoginPage() {
 
                 <div className="relative z-10">
                     <Link href="/" className="flex items-center gap-2 mb-12">
-                        <div className="w-8 h-8 bg-background flex items-center justify-center">
-                            <span className="text-primary font-bold text-lg">C</span>
-                        </div>
+                        <Image src="/logo-white.png" alt="ComraidShops Logo" width={64} height={64} className="object-contain" />
                         <span className="text-lg font-bold tracking-tighter uppercase text-white">ComraidShops</span>
                     </Link>
 

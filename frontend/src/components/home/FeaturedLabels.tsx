@@ -1,29 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { fetchFeaturedBrands } from '@/lib/api';
+import { Brand } from '@/lib/types';
+import { useFeaturedBrands } from '@/lib/hooks';
 
-export default function FeaturedLabels() {
-    const [brands, setBrands] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+interface FeaturedLabelsProps {
+    initialBrands?: Brand[];
+}
 
-    useEffect(() => {
-        async function loadFeatured() {
-            try {
-                const data = await fetchFeaturedBrands();
-                setBrands(data);
-            } catch (error) {
-                console.error("Failed to load featured brands:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadFeatured();
-    }, []);
+export default function FeaturedLabels({ initialBrands }: FeaturedLabelsProps) {
+    const { data: brandsData, isLoading } = useFeaturedBrands({
+        fallbackData: initialBrands,
+    });
+    
+    // Support both direct array and paginated response
+    const brands = (brandsData as any)?.results || (Array.isArray(brandsData) ? brandsData : []).slice(0, 8);
 
-    if (loading) {
+    if (isLoading && brands.length === 0) {
         return (
             <section className="py-32 px-6 bg-secondary/5">
                 <div className="max-w-[1920px] mx-auto">
@@ -50,7 +45,7 @@ export default function FeaturedLabels() {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    {brands.map((brand) => (
+                    {brands.map((brand: Brand) => (
                         <Link key={brand.id} href={`/brands/${brand.slug}`} className="group block relative aspect-[3/4] md:aspect-[3/4] overflow-hidden bg-background">
                             <div className="absolute inset-0 z-0 opacity-80 group-hover:opacity-60 transition-opacity duration-500">
                                 {brand.hero_image ? (

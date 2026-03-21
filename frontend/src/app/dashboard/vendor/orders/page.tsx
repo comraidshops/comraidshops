@@ -23,7 +23,8 @@ export default function VendorOrdersPage() {
                     id: number; 
                     total_amount: string; 
                     customer_name: string; 
-                    status: Order['status']; 
+                    payment_status: Order['payment_status']; 
+                    order_status: Order['order_status']; 
                     created_at: string;
                     items: { product_name: string; quantity: number }[];
                     financials?: { commission: string; net_earning: string };
@@ -35,7 +36,8 @@ export default function VendorOrdersPage() {
                     total: parseFloat(o.total_amount),
                     commission: parseFloat(o.financials?.commission || '0'),
                     earnings: parseFloat(o.financials?.net_earning || (parseFloat(o.total_amount) * 0.9).toString()),
-                    status: o.status,
+                    payment_status: o.payment_status,
+                    order_status: o.order_status,
                     date: new Date(o.created_at).toLocaleDateString()
                 }));
                 setOrders(formatted);
@@ -51,8 +53,11 @@ export default function VendorOrdersPage() {
         fetchOrders();
     }, []);
 
-    const handleStatusUpdate = async (orderId: string, newStatus: Order['status']) => {
-        if (!confirm(`Update status of Order #${orderId} to ${newStatus}?`)) return;
+    const handleStatusUpdate = async (orderId: string, newStatus: Order['order_status']) => {
+        // Only confirm for potentially destructive actions (cancelled)
+        if (newStatus === 'cancelled' && !confirm(`Are you sure you want to cancel Order #${orderId}?`)) {
+            return;
+        }
 
         setUpdatingId(orderId);
         try {
@@ -63,7 +68,7 @@ export default function VendorOrdersPage() {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ status: newStatus })
+                body: JSON.stringify({ order_status: newStatus })
             });
 
             if (res.ok) {

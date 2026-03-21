@@ -1,0 +1,16 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Vendor Account Update{% end block %}
+{% block header %}Your Account Status{% end block %}
+
+{% block content %}
+<h2>Hello {{ vendor.brand_name }},</h2>
+<p>There is an update on your ComraidShops vendor account status.</p>
+<p><strong>Status:</strong> {{ status }}</p>
+
+{% if reason %}
+<p><strong>Additional Information:</strong> {{ reason }}</p>
+{% endif %}
+
+<p>If you have any questions, please reply to this email.</p>
+{% end block %}

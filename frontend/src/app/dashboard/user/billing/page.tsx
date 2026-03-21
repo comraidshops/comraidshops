@@ -32,12 +32,10 @@ export default function BillingPage() {
     };
 
     useEffect(() => {
-        let isMounted = true;
         const load = async () => {
             await fetchCards();
         };
         load();
-        return () => { isMounted = false; };
     }, []);
 
     const deleteCard = async (id: number) => {

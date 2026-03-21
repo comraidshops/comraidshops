@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function CartPage() {
-    const { items, removeItem, cartTotal, clearCart } = useCart();
+    const { items, removeItem, updateQuantity, cartTotal, clearCart } = useCart();
 
     if (items.length === 0) {
         return (
@@ -54,11 +54,31 @@ export default function CartPage() {
                                 <div>
                                     <div className="flex justify-between items-start mb-2">
                                         <h3 className="font-bold uppercase tracking-tight">{item.name}</h3>
-                                        <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                                        <span className="font-medium">₦{(item.price * item.quantity).toLocaleString()}</span>
                                     </div>
                                     <p className="text-sm text-secondary uppercase tracking-wider mb-1">{item.vendor}</p>
-                                    <p className="text-sm text-secondary">Variant: {item.variant.replace('Size: ', '')}</p>
-                                    <p className="text-sm text-secondary">Qty: {item.quantity}</p>
+                                    <p className="text-sm text-secondary mb-4">Variant: {item.variant.replace('Size: ', '')}</p>
+                                    
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center border border-border">
+                                            <button 
+                                                onClick={() => updateQuantity(item.id, item.variant, item.quantity - 1)}
+                                                className="px-3 py-1 hover:bg-secondary/10 transition-colors disabled:opacity-50"
+                                                disabled={item.quantity <= 1}
+                                            >
+                                                -
+                                            </button>
+                                            <span className="px-4 py-1 text-sm font-bold min-w-[40px] text-center border-x border-border">
+                                                {item.quantity}
+                                            </span>
+                                            <button 
+                                                onClick={() => updateQuantity(item.id, item.variant, item.quantity + 1)}
+                                                className="px-3 py-1 hover:bg-secondary/10 transition-colors"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <button
@@ -80,7 +100,7 @@ export default function CartPage() {
                     <div className="w-full md:w-auto text-right">
                         <div className="flex justify-between md:justify-end gap-12 mb-6 text-xl font-bold uppercase tracking-tight">
                             <span>Total</span>
-                            <span>${cartTotal.toFixed(2)}</span>
+                            <span>₦{cartTotal.toLocaleString()}</span>
                         </div>
                         <Link
                             href="/checkout"

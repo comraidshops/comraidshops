@@ -22,6 +22,11 @@ const NAV_ITEMS = [
 export default function DashboardSidebar() {
     const pathname = usePathname();
 
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.href = '/auth/login';
+    };
+
     return (
         <aside className="w-64 bg-background border-r border-border fixed h-full hidden md:flex flex-col z-20">
             <div className="h-16 flex items-center px-6 border-b border-border">
@@ -36,8 +41,8 @@ export default function DashboardSidebar() {
                     const Icon = item.icon;
                     // Exact match for Overview, prefix match for others
                     const isActive = item.href === '/dashboard/vendor' 
-                        ? pathname === item.href 
-                        : pathname.startsWith(item.href);
+                        ? (pathname || '') === item.href 
+                        : (pathname || '').startsWith(item.href);
 
                     return (
                         <Link
@@ -56,7 +61,10 @@ export default function DashboardSidebar() {
             </nav>
 
             <div className="p-4 border-t border-border">
-                <button className="flex items-center gap-3 px-2 py-2 text-sm font-medium text-secondary hover:text-red-500 w-full rounded-md hover:bg-red-50 transition-colors">
+                <button 
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 px-2 py-2 text-sm font-medium text-secondary hover:text-red-500 w-full rounded-md hover:bg-red-50 transition-colors"
+                >
                     <LogOut className="w-4 h-4" />
                     Sign Out
                 </button>

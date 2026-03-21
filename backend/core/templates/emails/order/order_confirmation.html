@@ -1,0 +1,31 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ user.username|default:"Customer" }},</p>
+
+<h2>Order Confirmation</h2>
+
+<p>Thank you for your purchase. We have received your order #{{ order.id }} and it is currently being processed.</p>
+
+<p><strong>Order Summary:</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; color: #cccccc;">
+    {% for item in items %}
+    <tr>
+        <td style="padding: 8px 0; border-bottom: 1px solid #333;">{{ item.quantity }}x {{ item.product.name }}</td>
+        <td style="padding: 8px 0; border-bottom: 1px solid #333; text-align: right;">${{ item.price }}</td>
+    </tr>
+    {% endblock %}
+    <tr>
+        <td style="padding: 8px 0; font-weight: bold; color: #ffffff;">Total Amount</td>
+        <td style="padding: 8px 0; font-weight: bold; color: #ffffff; text-align: right;">${{ order.total_amount }}</td>
+    </tr>
+</table>
+
+<p>You will receive another notification once your order has been shipped.</p>
+
+<div class="btn-container">
+    <a href="{{ order_url|default:'https://comraidshops.com/user/orders' }}" class="btn">View Order Details</a>
+</div>
+
+<p>Best regards,<br>The ComraidShops Team</p>
+{% endblock %}

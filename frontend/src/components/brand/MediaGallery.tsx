@@ -1,7 +1,8 @@
 "use client"
 import { motion } from "framer-motion"
-import { BrandImage } from "@/types/brand"
+import { BrandImage } from "@/lib/types"
 import Image from "next/image"
+import { API_BASE_URL } from "@/lib/api"
 
 export default function MediaGallery({ gallery }: { gallery?: BrandImage[] }) {
     if (!gallery || gallery.length === 0) return null;
@@ -26,7 +27,7 @@ export default function MediaGallery({ gallery }: { gallery?: BrandImage[] }) {
                         className="relative flex-none w-[85vw] md:w-[60vw] lg:w-[45vw] aspect-[4/5] md:aspect-[16/10] snap-center group overflow-hidden"
                     >
                         <Image
-                            src={img.image}
+                            src={img.image.startsWith('http') ? img.image : `${API_BASE_URL}${img.image}`}
                             alt={img.caption || "Brand Media"}
                             fill
                             className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-[1.03]"

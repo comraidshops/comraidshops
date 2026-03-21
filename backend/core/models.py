@@ -12,7 +12,7 @@ class User(AbstractUser):
         return self.username
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(unique=True, blank=True)
     
     class Meta:
@@ -29,30 +29,66 @@ class Category(models.Model):
 class Magazine(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
+    excerpt = models.TextField(blank=True, help_text="Short description for the magazine index page")
     thumbnail = models.ImageField(upload_to="editorial/thumbnails/", null=True, blank=True)
     is_featured = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    
+    # SEO Fields
+    meta_title = models.CharField(max_length=255, blank=True, null=True, help_text="SEO override title")
+    meta_description = models.TextField(blank=True, null=True, help_text="SEO override description")
 
     def __str__(self):
         return self.title
+
+class Article(models.Model):
+    magazine = models.OneToOneField(Magazine, on_delete=models.CASCADE, related_name='article')
+    content = models.TextField(blank=True, help_text="Full HTML content of the article")
+    image = models.ImageField(upload_to="articles/images/", null=True, blank=True)
+    products = models.ManyToManyField('Product', related_name='featured_in_articles', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Article for {self.magazine.title}"
 
 class Exhibition(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
     thumbnail = models.ImageField(upload_to="editorial/thumbnails/", null=True, blank=True)
     is_featured = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    
+    # SEO Fields
+    meta_title = models.CharField(max_length=255, blank=True, null=True, help_text="SEO override title")
+    meta_description = models.TextField(blank=True, null=True, help_text="SEO override description")
+    
+    # Curation fields
+    description = models.TextField(blank=True)
+    cover_image = models.ImageField(upload_to="editorial/exhibitions/", null=True, blank=True)
+    curator_note = models.TextField(blank=True)
+    is_published = models.BooleanField(default=True)
+    
+    # Relationships
+    articles = models.ManyToManyField('Article', related_name="exhibitions", blank=True)
+    products = models.ManyToManyField('Product', related_name="exhibitions", blank=True)
+    collections = models.ManyToManyField('Collection', related_name="exhibitions", blank=True)
+    magazines = models.ManyToManyField('Magazine', related_name="exhibitions", blank=True)
 
     def __str__(self):
         return self.title
 
 class Brand(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     tagline = models.CharField(max_length=255, blank=True)
     hero_image = models.ImageField(upload_to="brands/heroes/", null=True, blank=True)
     logo = models.ImageField(upload_to="brands/logos/", null=True, blank=True)
+    
+    # SEO Fields
+    meta_title = models.CharField(max_length=255, blank=True, null=True, help_text="SEO override title")
+    meta_description = models.TextField(blank=True, null=True, help_text="SEO override description")
     
     # Luxury & Editorial fields
     philosophy = models.TextField(blank=True)
@@ -71,9 +107,9 @@ class Brand(models.Model):
     # Editorial relationships
     editorial_refs = models.ManyToManyField(Magazine, related_name='brands', blank=True)
     exhibition_refs = models.ManyToManyField(Exhibition, related_name='brands', blank=True)
-    is_featured = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False, db_index=True)
     
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def __str__(self):
         return self.name
@@ -103,6 +139,10 @@ class Collection(models.Model):
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # SEO Fields
+    meta_title = models.CharField(max_length=255, blank=True, null=True, help_text="SEO override title")
+    meta_description = models.TextField(blank=True, null=True, help_text="SEO override description")
+
     class Meta:
         ordering = ['order']
 
@@ -115,7 +155,7 @@ class Vendor(models.Model):
     brand_name = models.CharField(max_length=100)
     categories = models.ManyToManyField(Category, related_name='vendors')
     commission_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.10) # 10%
-    payout_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    payout_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     
     def __str__(self):
         return self.brand_name
@@ -135,7 +175,7 @@ class Product(models.Model):
     origin_country = models.CharField(max_length=100, blank=True)
     fit = models.CharField(max_length=100, blank=True)
     weight = models.CharField(max_length=50, blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=15, decimal_places=2, db_index=True)
     stock = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     collections = models.ManyToManyField(Collection, related_name='products', blank=True)
@@ -147,10 +187,15 @@ class Product(models.Model):
             ('pending', 'Pending'),
             ('approved', 'Approved')
         ],
-        default='pending'
+        default='pending',
+        db_index=True
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # SEO Fields
+    meta_title = models.CharField(max_length=255, blank=True, null=True, help_text="SEO override title")
+    meta_description = models.TextField(blank=True, null=True, help_text="SEO override description")
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -169,18 +214,37 @@ class ProductVariant(models.Model):
         return f"{self.product.name} - {self.name}"
 
 class Order(models.Model):
-    STATUS_CHOICES = (
+    PAYMENT_STATUS_CHOICES = (
+        ('pending', 'Pending'),        # User initiated checkout
+        ('paid', 'Paid'),              # Paystack webhook confirmed payment
+        ('confirmed', 'Confirmed'),    # Admin verified and confirmed payment
+        ('failed', 'Failed'),          # Payment failed or abandoned
+        ('refunded', 'Refunded'),      # Payment reversed
+    )
+    ORDER_STATUS_CHOICES = (
         ('pending', 'Pending'),
-        ('paid', 'Paid'),
+        ('processing', 'Processing'),
         ('shipped', 'Shipped'),
-        ('completed', 'Completed'),
+        ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
     )
-    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    created_at = models.DateTimeField(auto_now_add=True)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', null=True, blank=True)
+    guest_email = models.EmailField(blank=True, null=True, db_index=True)
+    total_amount = models.DecimalField(max_digits=15, decimal_places=2, db_index=True)
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending', db_index=True)
+    order_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending', db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Shipping Snapshot
+    shipping_full_name = models.CharField(max_length=255, blank=True, null=True)
+    shipping_phone_number = models.CharField(max_length=20, blank=True, null=True)
+    shipping_address_line1 = models.CharField(max_length=255, blank=True, null=True)
+    shipping_address_line2 = models.CharField(max_length=255, blank=True, null=True)
+    shipping_city = models.CharField(max_length=100, blank=True, null=True)
+    shipping_state = models.CharField(max_length=100, blank=True, null=True)
+    shipping_zip_code = models.CharField(max_length=20, blank=True, null=True)
+    shipping_country = models.CharField(max_length=100, default='Nigeria', blank=True, null=True)
     
     def __str__(self):
         return f"Order #{self.id}"
@@ -189,10 +253,63 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    price = models.DecimalField(max_digits=10, decimal_places=2) # Snapshot of price at purchase
+    price = models.DecimalField(max_digits=15, decimal_places=2) # Snapshot of price at purchase
+    status = models.CharField(
+        max_length=20, 
+        choices=Order.ORDER_STATUS_CHOICES, 
+        default='pending',
+        db_index=True
+    )
     
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        # Optimization: Only hit DB for old_status if not new
+        old_status = None
+        if not is_new:
+            # We use .filter().values('status').first() for a minimal query
+            old_status_dict = OrderItem.objects.filter(pk=self.pk).values('status').first()
+            old_status = old_status_dict['status'] if old_status_dict else None
+            
+        super().save(*args, **kwargs)
+        
+        # If status changed, recalculate order status
+        if is_new or old_status != self.status:
+            self.update_order_status()
+
+    def update_order_status(self):
+        order = self.order
+        items = order.items.all()
+        statuses = [item.status for item in items]
+        
+        if not statuses:
+            return
+
+        # Logic: 
+        # 1. If all are 'delivered', order is 'delivered'
+        # 2. If all are 'cancelled', order is 'cancelled'
+        # 3. If any is 'shipped' (and others are delivered/shipped), order is 'shipped'
+        # 4. If any is 'processing', order is 'processing'
+        # 5. Otherwise 'pending'
+        
+        if all(s == 'delivered' for s in statuses):
+            new_status = 'delivered'
+        elif all(s == 'cancelled' for s in statuses):
+            new_status = 'cancelled'
+        elif any(s == 'shipped' for s in statuses) and all(s in ['shipped', 'delivered', 'cancelled'] for s in statuses):
+            new_status = 'shipped'
+        elif any(s == 'processing' for s in statuses):
+            new_status = 'processing'
+        elif any(s == 'shipped' for s in statuses):
+             new_status = 'shipped'
+        else:
+            new_status = 'pending'
+            
+        if order.order_status != new_status:
+            order.order_status = new_status
+            order.save(update_fields=['order_status', 'updated_at'])
+
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
+        return f"{self.quantity} x {self.product.name} ({self.status})"
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
@@ -243,12 +360,20 @@ class ProductSpecification(models.Model):
     def __str__(self):
         return f"{self.product.name} / {self.name}"
 
+class GlobalCommission(models.Model):
+    rate = models.DecimalField(max_digits=5, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Global Commission {self.rate}%"
+
 class Commission(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='commissions')
     order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='commissions')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     commission_rate = models.DecimalField(max_digits=5, decimal_places=2)
-    commission_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    commission_amount = models.DecimalField(max_digits=15, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -261,11 +386,11 @@ class VendorEarning(models.Model):
     )
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='earnings')
     order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='vendor_earnings')
-    gross_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    commission_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    net_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    created_at = models.DateTimeField(auto_now_add=True)
+    gross_amount = models.DecimalField(max_digits=15, decimal_places=2)
+    commission_amount = models.DecimalField(max_digits=15, decimal_places=2)
+    net_amount = models.DecimalField(max_digits=15, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def __str__(self):
         return f"Earning for {self.vendor.brand_name} - Order {self.order.id}"
@@ -278,10 +403,12 @@ class WithdrawalRequest(models.Model):
         ('paid', 'Paid'),
     )
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='withdrawals')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
     bank_name = models.CharField(max_length=100)
     account_number = models.CharField(max_length=50)
     account_name = models.CharField(max_length=100)
+    email = models.EmailField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -330,3 +457,67 @@ class SavedCard(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.card_type} **** {self.last4}"
+
+class FitFrame(models.Model):
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+    cover_image = models.ImageField(upload_to="fitframes/covers/")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_fits")
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name="fit_frames")
+    is_mixed = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+class FitItem(models.Model):
+    fit = models.ForeignKey(FitFrame, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="fit_items")
+    label = models.CharField(max_length=100)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return f"{self.label} in {self.fit.title}"
+
+class SavedFitFrame(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_fits')
+    fitframe = models.ForeignKey(FitFrame, on_delete=models.CASCADE, related_name='saved_by_users')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'fitframe')
+
+
+class HomepageSlide(models.Model):
+    image = models.ImageField(upload_to='homepage/slides/')
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"Slide {self.order} - {'Active' if self.is_active else 'Inactive'}"
+
+class BrandCommunityMember(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='joined_communities')
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='community_members')
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'brand')
+        verbose_name = "Community Member"
+        verbose_name_plural = "Community Members"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.brand.name}"

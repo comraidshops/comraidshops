@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Lock, Bell, Shield, ChevronRight, CheckCircle, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { User, Lock, Bell, Shield, CheckCircle, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api';
 
 /* ─── helpers ─── */

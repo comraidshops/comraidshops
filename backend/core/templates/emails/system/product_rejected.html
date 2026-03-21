@@ -1,0 +1,12 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Product Requires Attention{% end block %}
+{% block header %}Product Requires Attention{% end block %}
+
+{% block content %}
+<h2>Hello {{ vendor.brand_name }},</h2>
+<p>Our curation team has reviewed your product <strong>{{ product.name }}</strong> but it currently does not meet our storefront guidelines.</p>
+<p><strong>Reason for rejection:</strong> {{ reason }}</p>
+<p>Please log in to your dashboard to make the necessary adjustments and resubmit.</p>
+<a href="{{ login_url }}" class="button" style="display:inline-block; padding:12px 24px; background-color:#333; color:#fff; text-decoration:none; border-radius:4px; margin-top:10px;">Access Dashboard</a>
+{% end block %}

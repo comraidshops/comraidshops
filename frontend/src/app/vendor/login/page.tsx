@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowRight, Lock, Mail } from 'lucide-react';
+import Image from 'next/image';
 
 export default function VendorLoginPage() {
     const router = useRouter();
@@ -69,10 +70,14 @@ export default function VendorLoginPage() {
                 <div className="absolute bottom-[-5%] left-[-5%] w-[40%] h-[40%] bg-black/10 rounded-full blur-3xl"></div>
 
                 <div className="relative z-10">
-                    <div className="flex items-center gap-2 mb-12">
-                        <div className="w-8 h-8 bg-background flex items-center justify-center">
-                            <span className="text-primary font-bold text-lg">C</span>
-                        </div>
+                    <div className="flex items-center gap-3 mb-12">
+                        <Image 
+                            src="/logo-white.png" 
+                            alt="ComraidShops Logo" 
+                            width={32} 
+                            height={32} 
+                            className="h-8 w-auto object-contain invert" 
+                        />
                         <span className="text-lg font-bold tracking-tighter uppercase">ComraidShops</span>
                     </div>
 

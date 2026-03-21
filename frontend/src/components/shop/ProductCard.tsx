@@ -12,7 +12,9 @@ interface ProductCardProps {
     slug: string;
 }
 
-export default function ProductCard({ id, name, price, image, vendor, slug }: ProductCardProps) {
+import { memo } from 'react';
+
+function ProductCardComponent({ name, price, image, vendor, slug }: ProductCardProps) {
     return (
         <Link href={`/products/${slug}`} className="group block">
             <div className="relative aspect-[3/4] overflow-hidden bg-secondary/5 mb-6">
@@ -20,6 +22,7 @@ export default function ProductCard({ id, name, price, image, vendor, slug }: Pr
                     src={image}
                     alt={name}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03]"
                 />
                 {/* Subtle overlay */}
@@ -32,9 +35,11 @@ export default function ProductCard({ id, name, price, image, vendor, slug }: Pr
                     <h3 className="text-sm md:text-base font-light tracking-wide group-hover:opacity-70 transition-opacity">
                         {name}
                     </h3>
-                    <span className="text-sm font-light tracking-wider text-secondary/80">${Number(price).toFixed(2)}</span>
+                    <span className="text-sm font-light tracking-wider text-secondary/80">₦{Number(price).toLocaleString()}</span>
                 </div>
             </div>
         </Link>
     );
 }
+
+export default memo(ProductCardComponent);

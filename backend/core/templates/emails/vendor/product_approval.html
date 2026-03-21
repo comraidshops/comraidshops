@@ -1,0 +1,17 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ vendor.brand_name }},</p>
+
+<h2>Product Listing Approved</h2>
+
+<p>Your product submission for "<strong>{{ product.name }}</strong>" has been reviewed by our editorial team and has been <strong>approved</strong> for publication.</p>
+
+<p>The item is now live on the platform and available to our community.</p>
+
+<div class="btn-container">
+    <a href="https://comraidshops.com/product/{{ product.slug }}" class="btn">View Live Product</a>
+</div>
+
+<p>Best regards,<br>ComraidShops Curation Team</p>
+{% endblock %}

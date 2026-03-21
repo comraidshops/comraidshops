@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Category, Brand, Vendor, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Exhibition, Collection, BrandImage, ProductFeature, ProductSpecification
+from .models import User, Category, Brand, Vendor, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, BrandImage, ProductFeature, ProductSpecification, FitFrame, FitItem, HomepageSlide
 
 # Register your models here.
 
@@ -20,11 +20,29 @@ class MagazineAdmin(admin.ModelAdmin):
     list_filter = ('is_featured',)
     prepopulated_fields = {'slug': ('title',)}
 
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ('magazine', 'created_at', 'updated_at')
+    filter_horizontal = ('products',)
+
 @admin.register(Exhibition)
 class ExhibitionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug', 'is_featured', 'created_at')
-    list_filter = ('is_featured',)
+    list_display = ('title', 'slug', 'is_featured', 'is_published', 'created_at')
+    list_filter = ('is_featured', 'is_published')
     prepopulated_fields = {'slug': ('title',)}
+    filter_horizontal = ('articles', 'products', 'collections', 'magazines')
+    
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'slug', 'is_featured', 'thumbnail', 'is_published')
+        }),
+        ('Curation', {
+            'fields': ('description', 'cover_image', 'curator_note')
+        }),
+        ('Relationships', {
+            'fields': ('articles', 'products', 'collections', 'magazines')
+        }),
+    )
 
 class BrandImageInline(admin.TabularInline):
     model = BrandImage
@@ -112,8 +130,8 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer', 'total_amount', 'status', 'created_at')
-    list_filter = ('status', 'created_at')
+    list_display = ('id', 'customer', 'total_amount', 'payment_status', 'order_status', 'created_at')
+    list_filter = ('payment_status', 'order_status', 'created_at')
     search_fields = ('customer__username', 'id')
     inlines = [OrderItemInline]
     readonly_fields = ('total_amount',)
@@ -134,3 +152,20 @@ class ArchivesAdmin(admin.ModelAdmin):
     list_display = ('brand', 'caption', 'order')
     list_filter = ('brand',)
     search_fields = ('brand__name', 'caption')
+
+class FitItemInline(admin.TabularInline):
+    model = FitItem
+    extra = 1
+
+@admin.register(FitFrame)
+class FitFrameAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'brand', 'is_mixed', 'is_featured', 'created_at')
+    list_filter = ('is_mixed', 'is_featured', 'brand')
+    prepopulated_fields = {'slug': ('title',)}
+
+@admin.register(HomepageSlide)
+class HomepageSlideAdmin(admin.ModelAdmin):
+    list_display = ('id', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    list_display_links = ('id',)
+

@@ -1,29 +1,21 @@
 'use client';
 
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import { fetchFeaturedExhibition } from '@/lib/api';
+import Link from 'next/link';
+import { Exhibition } from '@/lib/types';
+import { useFeaturedExhibition } from '@/lib/hooks';
 
-export default function CurrentExhibition() {
-    const [exhibition, setExhibition] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+interface CurrentExhibitionProps {
+    initialExhibition?: Exhibition;
+}
 
-    useEffect(() => {
-        async function loadLatestExhibition() {
-            try {
-                const data = await fetchFeaturedExhibition();
-                setExhibition(data);
-            } catch (error) {
-                console.error("Failed to fetch featured exhibition:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadLatestExhibition();
-    }, []);
+export default function CurrentExhibition({ initialExhibition }: CurrentExhibitionProps) {
+    const { data: exhibition, isLoading } = useFeaturedExhibition({
+        fallbackData: initialExhibition,
+    });
 
-    if (loading) {
+    if (isLoading && !exhibition) {
         return (
             <div className="py-24 px-6 border-b border-border/50 animate-pulse">
                 <div className="max-w-[1920px] mx-auto h-64 bg-secondary/10"></div>
@@ -68,7 +60,7 @@ export default function CurrentExhibition() {
                 </div>
 
                 {/* Right: Immersive Image */}
-                <div className="lg:col-span-12 xl:col-span-7 relative h-[50vh] xl:h-[70vh] w-full bg-secondary/5 overflow-hidden">
+                <div className="lg:col-span-12 xl:col-span-7 relative aspect-[4/3] md:aspect-video xl:h-[70vh] w-full bg-secondary/5 overflow-hidden">
                     {exhibition.thumbnail ? (
                         <Image
                             src={exhibition.thumbnail}

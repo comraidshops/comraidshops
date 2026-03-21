@@ -4,14 +4,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { fetchExhibitions } from '@/lib/api';
-
-interface Exhibition {
-    id: number;
-    title: string;
-    slug: string;
-    thumbnail: string;
-}
+import { fetchExhibitions, Exhibition } from '@/lib/api';
 
 export default function ExhibitionsIndex() {
     const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);

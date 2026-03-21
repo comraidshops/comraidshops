@@ -1,0 +1,36 @@
+{
+  "magazines": [
+    {
+      "title": "The Working Body",
+      "slug": "the-working-body",
+      "is_featured": true
+    },
+    {
+      "title": "Discipline as Form",
+      "slug": "discipline-as-form",
+      "is_featured": false
+    },
+    {
+      "title": "Art of Suffering",
+      "slug": "art-of-suffering",
+      "is_featured": false
+    },
+    {
+      "title": "Emptiness of Hype",
+      "slug": "emptiness-of-hype",
+      "is_featured": false
+    }
+  ],
+  "exhibitions": [
+    {
+      "title": "The Silent Gallery",
+      "slug": "the-silent-gallery",
+      "is_featured": true
+    },
+    {
+      "title": "Kinetic Void",
+      "slug": "kinetic-void",
+      "is_featured": false
+    }
+  ]
+}

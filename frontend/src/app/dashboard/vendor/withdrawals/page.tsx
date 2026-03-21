@@ -4,15 +4,32 @@ import React, { useEffect, useState } from 'react';
 import StatCard from '@/components/vendor/StatCard';
 import { History, Landmark } from 'lucide-react';
 
+interface Withdrawal {
+    id: number;
+    amount: string;
+    status: 'pending' | 'approved' | 'paid' | 'rejected';
+    created_at: string;
+    bank_name: string;
+    account_number: string;
+    account_name: string;
+}
+
+interface VendorMetrics {
+    vendor_balance: number;
+    pending_payout: number;
+}
+
 export default function WithdrawalsPage() {
-    const [history, setHistory] = useState<any[]>([]);
-    const [metrics, setMetrics] = useState<any>(null);
+    const [history, setHistory] = useState<Withdrawal[]>([]);
+    const [metrics, setMetrics] = useState<VendorMetrics | null>(null);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         amount: '',
         bank_name: '',
         account_number: '',
-        account_name: ''
+        account_name: '',
+        email: '',
+        phone_number: ''
     });
 
     const [status, setStatus] = useState({ type: '', message: '' });
@@ -53,7 +70,7 @@ export default function WithdrawalsPage() {
 
             if (res.ok) {
                 setStatus({ type: 'success', message: 'Withdrawal request submitted successfully.' });
-                setFormData({ amount: '', bank_name: '', account_number: '', account_name: '' });
+                setFormData({ amount: '', bank_name: '', account_number: '', account_name: '', email: '', phone_number: '' });
                 // Refresh history
                 const updated = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/withdrawals/`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -63,7 +80,7 @@ export default function WithdrawalsPage() {
                 const err = await res.json();
                 setStatus({ type: 'error', message: err.detail || 'Failed to submit request.' });
             }
-        } catch (e) {
+        } catch {
             setStatus({ type: 'error', message: 'An unexpected error occurred.' });
         } finally {
             setLoading(false);
@@ -77,13 +94,13 @@ export default function WithdrawalsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <StatCard 
                     title="Available for Payout" 
-                    value={`$${(metrics?.vendor_balance || 0).toLocaleString()}`} 
+                    value={`₦${(metrics?.vendor_balance || 0).toLocaleString()}`} 
                     icon={< Landmark className="w-4 h-4" />} 
                     description="Cleared funds ready for withdrawal"
                 />
                 <StatCard 
                     title="Pending Settlement" 
-                    value={`$${(metrics?.pending_payout || 0).toLocaleString()}`} 
+                    value={`₦${(metrics?.pending_payout || 0).toLocaleString()}`} 
                     icon={<History className="w-4 h-4" />} 
                     description="Earnings waiting for order completion"
                 />
@@ -99,7 +116,7 @@ export default function WithdrawalsPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Amount ($)</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Amount (₦)</label>
                             <input 
                                 type="number" 
                                 required 
@@ -131,6 +148,31 @@ export default function WithdrawalsPage() {
                                     onChange={(e) => setFormData({...formData, account_name: e.target.value})}
                                     className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
                                     placeholder="Full Name"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Email Address</label>
+                                <input 
+                                    type="email" 
+                                    required 
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                    className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                                    placeholder="vendor@example.com"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Phone Number</label>
+                                <input 
+                                    type="tel" 
+                                    required 
+                                    value={formData.phone_number}
+                                    onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
+                                    className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                                    placeholder="+234..."
                                 />
                             </div>
                         </div>
@@ -183,7 +225,7 @@ export default function WithdrawalsPage() {
                                 {history.map((h) => (
                                     <tr key={h.id}>
                                         <td className="px-6 py-4 whitespace-nowrap">{new Date(h.created_at).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 text-right font-medium">${parseFloat(h.amount).toFixed(2)}</td>
+                                        <td className="px-6 py-4 text-right font-medium">₦{parseFloat(h.amount).toLocaleString()}</td>
                                         <td className="px-6 py-4">
                                             <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-widest ${
                                                 h.status === 'paid' ? 'bg-green-100 text-green-700' :

@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ user.username }},</p>
+
+<h2>Welcome to ComraidShops.</h2>
+
+<p>Thank you for joining our community. We have created a space dedicated to curated, premium fashion and lifestyle pieces.</p>
+
+<p>Your account has been successfully created. We invite you to explore the latest editorial exhibitions and curated collections.</p>
+
+<div class="btn-container">
+    <a href="{{ login_url|default:'https://comraidshops.com/login' }}" class="btn">Sign In to Your Account</a>
+</div>
+
+<p>If you have any questions or require assistance, our support team is available.</p>
+
+<p>Best regards,<br>The ComraidShops Team</p>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Product Approved{% end block %}
+{% block header %}Your Product is Live!{% end block %}
+
+{% block content %}
+<h2>Great news, {{ vendor.brand_name }}!</h2>
+<p>Your product <strong>{{ product.name }}</strong> has been reviewed and approved by our curation team. It is now live on the ComraidShops storefront.</p>
+<p>Thank you for maintaining our high standards of curation.</p>
+<a href="{{ product_url }}" class="button" style="display:inline-block; padding:12px 24px; background-color:#333; color:#fff; text-decoration:none; border-radius:4px; margin-top:10px;">View Product</a>
+{% end block %}

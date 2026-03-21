@@ -1,5 +1,19 @@
-import { fetchBrand, fetchBrandProducts } from "@/lib/api"
-import { Brand, Product } from "@/types/brand"
+import { fetchBrand, fetchBrandProducts, fetchBrands, PaginatedResponse, Brand, Product } from "@/lib/api"
+
+export async function generateStaticParams() {
+    try {
+        const brandsData = await fetchBrands();
+        const brands = Array.isArray(brandsData) ? brandsData : [];
+        return brands.map((brand: Brand) => ({
+            slug: brand.slug,
+        }));
+    } catch (error) {
+        console.error("Failed to generate static params for brands:", error);
+        return [];
+    }
+}
+
+
 import ProductCard from "@/components/shop/ProductCard"
 
 import HeroSection from "@/components/brand/HeroSection"
@@ -10,19 +24,42 @@ import EditorialSection from "@/components/brand/EditorialSection"
 import MediaGallery from "@/components/brand/MediaGallery"
 import SocialLinks from "@/components/brand/SocialLinks"
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
     try {
         const resolvedParams = await params;
         const brand: Brand = await fetchBrand(resolvedParams.slug);
+        const title = brand.meta_title || `${brand.name} | ComraidShops`;
+        const description = brand.meta_description || brand.tagline || brand.description?.slice(0, 160) || `Explore ${brand.name} at ComraidShops`;
+        const canonicalUrl = `${SITE_URL}/brands/${brand.slug}`;
+        const ogImage = brand.hero_image || brand.logo || `${SITE_URL}/og-default.jpg`;
+
         return {
-            title: `${brand.name} | ComraidShops`,
-            description: brand.description || `Explore ${brand.name} at ComraidShops`,
-        }
-    } catch (error) {
+            title,
+            description,
+            alternates: { canonical: canonicalUrl },
+            openGraph: {
+                type: 'website',
+                url: canonicalUrl,
+                title: `${brand.name} | ComraidShops`,
+                description,
+                siteName: 'ComraidShops',
+                images: [{ url: ogImage, width: 1200, height: 630, alt: `${brand.name} brand image` }],
+            },
+            twitter: {
+                card: 'summary_large_image',
+                site: '@comraidshops',
+                title: `${brand.name} | ComraidShops`,
+                description,
+                images: [ogImage],
+            },
+        };
+    } catch {
         return {
             title: 'Brand Not Found | ComraidShops',
             description: 'The requested brand could not be found.',
-        }
+        };
     }
 }
 
@@ -33,7 +70,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
     console.log("BRAND SLUG RECEIVED:", slug)
 
     let brand: Brand;
-    let productsData: any;
+    let productsData: PaginatedResponse<Product> | Product[] | { results: Product[] } | null = null;
 
     try {
         brand = await fetchBrand(slug);
@@ -56,15 +93,41 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         productsData = { results: [] };
     }
 
-    const products: Product[] = productsData?.results ?? (Array.isArray(productsData) ? productsData : [])
+    let products: Product[] = [];
+    if (productsData) {
+        if (Array.isArray(productsData)) {
+            products = productsData;
+        } else if ('results' in productsData && Array.isArray(productsData.results)) {
+            products = productsData.results;
+        }
+    }
+
+    const brandSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: brand.name,
+        slug: brand.slug,
+        url: `${SITE_URL}/brands/${brand.slug}`,
+        logo: brand.logo,
+        image: brand.hero_image,
+        description: brand.description,
+        sameAs: brand.social_links ? Object.values(brand.social_links) : [],
+    };
 
     return (
         <div className="min-h-screen bg-background text-foreground pb-12">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(brandSchema) }}
+            />
 
             <HeroSection
                 name={brand.name}
                 description={brand.description}
                 heroImage={brand.hero_image}
+                brandSlug={brand.slug}
+                isMember={!!brand.is_member}
+                communityCount={brand.community_count || 0}
             />
 
             <PhilosophySection

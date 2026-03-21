@@ -1,65 +1,99 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { User, ShoppingBag, MapPin, CreditCard, ArrowRight, Bell, Clock, CheckCircle, Truck, Package, XCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { User, ShoppingBag, MapPin, CreditCard, ArrowRight, Bell, Clock, CheckCircle, Truck, XCircle, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/api';
+import { useNotification } from '@/context/NotificationContext';
+import { UserProfile, Order, Notification, OrderItem } from '@/types/user';
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-    pending:   { label: 'Pending',   icon: Clock,       color: 'text-amber-500',  bg: 'bg-amber-500/10'  },
-    paid:      { label: 'Confirmed', icon: CheckCircle, color: 'text-blue-500',   bg: 'bg-blue-500/10'   },
-    shipped:   { label: 'Shipped',   icon: Truck,       color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    completed: { label: 'Delivered', icon: CheckCircle, color: 'text-green-500',  bg: 'bg-green-500/10'  },
-    cancelled: { label: 'Cancelled', icon: XCircle,     color: 'text-red-500',    bg: 'bg-red-500/10'    },
+    pending:    { label: 'Order Pending', icon: Clock,        color: 'text-amber-500',  bg: 'bg-amber-500/10'  },
+    processing: { label: 'Processing',    icon: Package,      color: 'text-blue-500',   bg: 'bg-blue-500/10'   },
+    shipped:    { label: 'Shipped',       icon: Truck,        color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    delivered:  { label: 'Delivered',     icon: CheckCircle,  color: 'text-green-500',  bg: 'bg-green-500/10'  },
+    cancelled:  { label: 'Cancelled',     icon: XCircle,      color: 'text-red-500',    bg: 'bg-red-500/10'    },
 };
 
 export default function UserDashboardPage() {
-    const [profile, setProfile] = useState<any>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
     const [stats, setStats] = useState({ orders: 0, addresses: 0, cards: 0 });
-    const [recentOrders, setRecentOrders] = useState<any[]>([]);
-    const [notifications, setNotifications] = useState<any[]>([]);
+    const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
+    const { notify } = useNotification();
+    const lastNotificationId = useRef<number>(0);
 
     useEffect(() => {
-        const fetchOverview = async () => {
+        let isMounted = true;
+        
+        const fetchOverview = async (isBackground = false) => {
             const token = localStorage.getItem('access_token');
             const headers = { Authorization: `Bearer ${token}` };
 
-            const [pRes, aRes, cRes, oRes, nRes] = await Promise.all([
-                fetch(`${API_BASE_URL}/user/profile/`, { headers }),
-                fetch(`${API_BASE_URL}/addresses/`, { headers }),
-                fetch(`${API_BASE_URL}/saved-cards/`, { headers }),
-                fetch(`${API_BASE_URL}/orders/`, { headers }),
-                fetch(`${API_BASE_URL}/user/notifications/`, { headers }),
-            ]);
+            try {
+                const [pRes, aRes, cRes, oRes, nRes] = await Promise.all([
+                    fetch(`${API_BASE_URL}/user/profile/`, { headers }),
+                    fetch(`${API_BASE_URL}/addresses/`, { headers }),
+                    fetch(`${API_BASE_URL}/saved-cards/`, { headers }),
+                    fetch(`${API_BASE_URL}/orders/`, { headers }),
+                    fetch(`${API_BASE_URL}/user/notifications/`, { headers }),
+                ]);
 
-            if (pRes.ok) setProfile(await pRes.json());
+                if (!isMounted) return;
 
-            if (aRes.ok) {
-                const d = await aRes.json();
-                setStats(s => ({ ...s, addresses: (Array.isArray(d) ? d : d.results ?? []).length }));
-            }
-            if (cRes.ok) {
-                const d = await cRes.json();
-                setStats(s => ({ ...s, cards: (Array.isArray(d) ? d : d.results ?? []).length }));
-            }
-            if (oRes.ok) {
-                const d = await oRes.json();
-                const list: any[] = Array.isArray(d) ? d : d.results ?? [];
-                const sorted = list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-                setStats(s => ({ ...s, orders: sorted.length }));
-                setRecentOrders(sorted.slice(0, 3));
-            }
-            if (nRes.ok) {
-                const d = await nRes.json();
-                const list: any[] = Array.isArray(d) ? d : d.results ?? [];
-                setNotifications(list.slice(0, 4));
-                setUnreadCount(list.filter((n: any) => !n.is_read).length);
+                if (pRes.ok) setProfile(await pRes.json());
+
+                if (aRes.ok) {
+                    const d = await aRes.json();
+                    setStats(s => ({ ...s, addresses: (Array.isArray(d) ? d : d.results ?? []).length }));
+                }
+                if (cRes.ok) {
+                    const d = await cRes.json();
+                    setStats(s => ({ ...s, cards: (Array.isArray(d) ? d : d.results ?? []).length }));
+                }
+                if (oRes.ok) {
+                    const d = await oRes.json();
+                    const list: Order[] = Array.isArray(d) ? d : d.results ?? [];
+                    const sorted = list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                    setStats(s => ({ ...s, orders: sorted.length }));
+                    setRecentOrders(sorted.slice(0, 3));
+                }
+                if (nRes.ok) {
+                    const d = await nRes.json();
+                    const list: Notification[] = Array.isArray(d) ? d : d.results ?? [];
+                    setNotifications(list.slice(0, 4));
+                    setUnreadCount(list.filter((n) => !n.is_read).length);
+                    
+                    if (list.length > 0) {
+                        const highestId = Math.max(...list.map(n => n.id));
+                        if (isBackground && lastNotificationId.current > 0 && highestId > lastNotificationId.current) {
+                            const newAlerts = list.filter(n => n.id > lastNotificationId.current && !n.is_read);
+                            if (newAlerts.length > 0) {
+                                notify('info', 'Comraid Update', `You have ${newAlerts.length} new notification${newAlerts.length > 1 ? 's' : ''}.`);
+                            }
+                        }
+                        lastNotificationId.current = highestId;
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch user dashboard data", err);
             }
         };
-        fetchOverview();
-    }, []);
+
+        fetchOverview(false);
+
+        const pollInterval = setInterval(() => {
+            fetchOverview(true);
+        }, 15000);
+
+        return () => {
+            isMounted = false;
+            clearInterval(pollInterval);
+        };
+    }, [notify]);
+
 
     const markAllRead = async () => {
         const token = localStorage.getItem('access_token');
@@ -135,9 +169,10 @@ export default function UserDashboardPage() {
                     ) : (
                         <div className="divide-y divide-border">
                             {recentOrders.map((order) => {
-                                const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+                                const cfg = STATUS_CONFIG[order.order_status] ?? STATUS_CONFIG.pending;
                                 const StatusIcon = cfg.icon;
                                 const date = new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                                const totalQty = order.items?.reduce((acc: number, item: OrderItem) => acc + (item.quantity || 1), 0) || 0;
                                 return (
                                     <Link key={order.id} href={`/dashboard/user/orders/${order.id}`} className="flex items-center justify-between p-4 hover:bg-secondary/5 transition-colors group">
                                         <div className="flex items-center gap-4">
@@ -146,11 +181,11 @@ export default function UserDashboardPage() {
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold uppercase tracking-tight">Order #{order.id}</p>
-                                                <p className="text-[9px] text-secondary/50 uppercase tracking-widest font-bold">{date} · {order.items?.length} item{order.items?.length !== 1 ? 's' : ''}</p>
+                                                <p className="text-[9px] text-secondary/50 uppercase tracking-widest font-bold">{date} · {totalQty} item{totalQty !== 1 ? 's' : ''}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-bold">${Number(order.total_amount).toFixed(2)}</p>
+                                            <p className="text-xs font-bold">₦{Number(order.total_amount).toLocaleString()}</p>
                                             <span className={`text-[9px] font-black uppercase tracking-widest ${cfg.color}`}>{cfg.label}</span>
                                         </div>
                                     </Link>

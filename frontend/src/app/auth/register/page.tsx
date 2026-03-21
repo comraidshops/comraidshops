@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Lock, Mail, User, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/api';
+import Image from 'next/image';
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -50,7 +52,7 @@ export default function RegisterPage() {
                 const data = await res.json();
                 setError(Object.values(data).flat().join(' ') || 'Registration failed.');
             }
-        } catch (err) {
+        } catch {
             setError('An error occurred. Please try again.');
         } finally {
             setLoading(false);
@@ -71,9 +73,7 @@ export default function RegisterPage() {
 
                 <div className="relative z-10">
                     <Link href="/" className="flex items-center gap-2 mb-12">
-                        <div className="w-8 h-8 bg-background flex items-center justify-center">
-                            <span className="text-primary font-bold text-lg">C</span>
-                        </div>
+                        <Image src="/logo-white.png" alt="ComraidShops Logo" width={64} height={64} className="object-contain" />
                         <span className="text-lg font-bold tracking-tighter uppercase text-white">ComraidShops</span>
                     </Link>
 
@@ -189,19 +189,27 @@ export default function RegisterPage() {
                                 />
                             </div>
                         </div>
-
                         <button 
                             disabled={loading}
-                            type="submit"
-                            className="w-full bg-primary text-background py-5 text-sm font-bold uppercase tracking-[0.2em] hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
+                            type="submit" 
+                            className="w-full bg-primary text-background p-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
                         >
-                            {loading ? 'Processing...' : (
-                                <>
-                                    Establish Account
-                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
+                            <div className="flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                                {loading ? 'Initialising Membership...' : 'Initialise Membership'}
+                                <ArrowRight className="w-4 h-4" />
+                            </div>
                         </button>
+
+                        <div className="relative py-4">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-border"></div>
+                            </div>
+                            <div className="relative flex justify-center text-[8px] font-black uppercase tracking-[0.4em] text-secondary/30 bg-background px-4">
+                                OR QUICK ACCESS
+                            </div>
+                        </div>
+
+                        <GoogleLoginButton text="Register with Google" />
                     </form>
 
                     <div className="pt-8 border-t border-border flex flex-col items-center gap-4">

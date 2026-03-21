@@ -37,11 +37,10 @@ export default function PhilosophySection({ philosophy, awards, manifesto, featu
                         className="mb-24 md:mb-32"
                     >
                         <h2 className="text-xs uppercase tracking-[0.3em] text-secondary mb-12 text-center md:text-left font-semibold">Philosophy</h2>
-                        <div className="space-y-8 text-[18px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90">
-                            {philosophy.split('\n\n').map((paragraph, idx) => (
-                                <p key={idx}>{paragraph}</p>
-                            ))}
-                        </div>
+                        <div 
+                            className="space-y-8 text-[18px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90"
+                            dangerouslySetInnerHTML={{ __html: philosophy }}
+                        />
                     </motion.div>
                 )}
 

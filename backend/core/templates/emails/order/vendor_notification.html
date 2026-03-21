@@ -1,0 +1,26 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ vendor.brand_name }},</p>
+
+<h2>New Order Received</h2>
+
+<p>Great news! A customer has placed a new order containing your products.</p>
+
+<p><strong>Order #{{ order.id }}</strong></p>
+
+<p><strong>Item Details:</strong></p>
+<ul style="color: #cccccc; margin-bottom: 20px; padding-left: 20px;">
+    {% for item in vendor_items %}
+    <li>{{ item.quantity }}x {{ item.product.name }} (Purchased at ${{ item.price }})</li>
+    {% endfor %}
+</ul>
+
+<p>Please prepare these items for dispatch according to platform guidelines.</p>
+
+<div class="btn-container">
+    <a href="https://comraidshops.com/vendor/orders" class="btn">Go to Vendor Dashboard</a>
+</div>
+
+<p>Best regards,<br>ComraidShops Vendor Support</p>
+{% endblock %}

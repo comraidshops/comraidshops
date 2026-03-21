@@ -1,5 +1,5 @@
 import { fetchCollection } from "@/lib/api"
-import { Collection, Product } from "@/types/brand"
+import { Collection, Product } from "@/lib/types"
 import ProductCard from "@/components/shop/ProductCard"
 import Image from "next/image"
 import Link from "next/link"
@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             title: `${collection.name} | ComraidShops`,
             description: collection.description || `Explore the ${collection.name} collection at ComraidShops`,
         }
-    } catch (error) {
+    } catch {
         return {
             title: 'Collection Not Found | ComraidShops',
             description: 'The requested collection could not be found.',

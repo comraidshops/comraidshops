@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { API_BASE_URL } from '@/lib/api';
+import { safeFetch } from '@/lib/api-utils';
 
 export default function UserGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();
@@ -17,17 +17,16 @@ export default function UserGuard({ children }: { children: React.ReactNode }) {
             }
 
             try {
-                const res = await fetch(`${API_BASE_URL}/user/profile/`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (res.ok) {
+                // Use safeFetch which handles token refresh automatically
+                const data = await safeFetch('/user/profile/');
+                if (data) {
                     setAuthorized(true);
                 } else {
                     localStorage.clear();
                     router.push('/auth/login');
                 }
             } catch (err) {
+                console.error("Auth check failed:", err);
                 localStorage.clear();
                 router.push('/auth/login');
             }

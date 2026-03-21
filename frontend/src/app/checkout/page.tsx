@@ -5,29 +5,44 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle, CreditCard, Plus } from 'lucide-react';
-import { API_BASE_URL, initializePayment } from '@/lib/api';
+import { API_BASE_URL, initializePayment, Address } from '@/lib/api';
+import { useNotification } from '@/context/NotificationContext';
 
 export default function CheckoutPage() {
-    const { items, cartTotal, clearCart } = useCart();
+    const { items, cartTotal, clearCart, isMounted } = useCart();
+    const { notify } = useNotification();
     const [step, setStep] = useState(1); // 1: Info, 2: Payment, 3: Success
     const [loading, setLoading] = useState(false);
-    const [addresses, setAddresses] = useState<any[]>([]);
+    const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
     const [saveCard, setSaveCard] = useState(false);
+
+    const [guestEmail, setGuestEmail] = useState('');
+    const [guestName, setGuestName] = useState('');
+    const [guestPhone, setGuestPhone] = useState('');
+    const [guestAddress, setGuestAddress] = useState('');
+    const [guestCity, setGuestCity] = useState('');
+    const [guestState, setGuestState] = useState('');
+    const [guestZip, setGuestZip] = useState('');
+    const [guestCountry, setGuestCountry] = useState('Nigeria');
+    const [isGuest, setIsGuest] = useState(false);
 
     useEffect(() => {
         const fetchAddresses = async () => {
             const token = localStorage.getItem('access_token');
             if (token) {
+                setIsGuest(false);
                 const res = await fetch(`${API_BASE_URL}/addresses/`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
                     const data = await res.json();
                     setAddresses(data);
-                    const def = data.find((a: any) => a.is_default);
+                    const def = data.find((a: Address) => a.is_default);
                     if (def) setSelectedAddress(def.id);
                 }
+            } else {
+                setIsGuest(true);
             }
         };
 
@@ -65,7 +80,8 @@ export default function CheckoutPage() {
             const text = await res.text();
             console.log("Diagnostic Response Body Preview:", text.substring(0, 100));
             alert("Connection Successful! Your browser can reach the backend.");
-        } catch (err: any) {
+        } catch (_err) {
+            const err = _err as Error;
             console.error("--- DIAGNOSTIC FAILURE ---");
             console.error("Error Name:", err.name);
             console.error("Error Message:", err.message);
@@ -91,7 +107,17 @@ export default function CheckoutPage() {
                 items: items.map(i => ({ id: i.id, quantity: i.quantity })),
                 redirect_url: `${window.location.origin}/checkout?status=success`,
                 save_card: saveCard,
-                address_id: selectedAddress
+                address_id: selectedAddress,
+                guest_email: isGuest ? guestEmail : undefined,
+                
+                // Guest Shipping Details
+                shipping_full_name: isGuest ? guestName : undefined,
+                shipping_phone_number: isGuest ? guestPhone : undefined,
+                shipping_address_line1: isGuest ? guestAddress : undefined,
+                shipping_city: isGuest ? guestCity : undefined,
+                shipping_state: isGuest ? guestState : undefined,
+                shipping_zip_code: isGuest ? guestZip : undefined,
+                shipping_country: isGuest ? guestCountry : undefined,
             });
 
             console.log("Paystack Init Response:", paymentData);
@@ -102,19 +128,38 @@ export default function CheckoutPage() {
                 window.location.href = paymentData.authorization_url;
             } else {
                 console.error("Invalid authorization_url:", paymentData.authorization_url);
-                alert(paymentData.error || "Payment initialization failed. Missing or invalid authorization URL.");
+                notify('error', 'Payment Initialization Failed', paymentData.error || "Missing or invalid authorization URL.");
             }
         } catch (error) {
             console.error("Checkout error details:", error);
+            
+            let errorMessage = "An error occurred during checkout. Please check connection and try again.";
+            
             if (error instanceof Error) {
-                alert(`Checkout error: ${error.message}`);
-            } else {
-                alert("An error occurred during checkout. Please check console for details.");
+                // safeFetch throws: `Request failed with status 400: {"error":"..."}`
+                // Let's try to extract the JSON part intelligently.
+                try {
+                    const jsonMatch = error.message.match(/({.*})/);
+                    if (jsonMatch && jsonMatch[1]) {
+                        const parsed = JSON.parse(jsonMatch[1]);
+                        errorMessage = parsed.error || parsed.detail || parsed.message || error.message;
+                    } else {
+                        errorMessage = error.message;
+                    }
+                } catch {
+                    errorMessage = error.message;
+                }
             }
+            
+            notify('error', 'Checkout Failed', errorMessage);
         } finally {
             setLoading(false);
         }
     };
+
+    if (!isMounted) {
+        return null; // Prevents hydration mismatch
+    }
 
     if (step === 3) {
         return (
@@ -169,13 +214,110 @@ export default function CheckoutPage() {
                         </div>
 
                         <form onSubmit={handleCreateOrder} className="space-y-12">
-                            {/* Address Selection */}
+                            {/* Address & Identity Selection */}
                             <div className="space-y-8">
                                 <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/40 border-b border-border pb-4">
-                                    Shipping Destination
+                                    {isGuest ? 'Guest Identity & Destination' : 'Shipping Destination'}
                                 </h2>
                                 
-                                {addresses.length > 0 ? (
+                                {isGuest ? (
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Email Address</label>
+                                                <input 
+                                                    type="email" 
+                                                    required 
+                                                    value={guestEmail}
+                                                    onChange={(e) => setGuestEmail(e.target.value)}
+                                                    placeholder="GUEST@EXAMPLE.COM"
+                                                    className="w-full bg-secondary/5 border border-border p-4 text-xs font-bold uppercase placeholder:text-secondary/20 focus:border-primary outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Full Name</label>
+                                                <input 
+                                                    type="text" 
+                                                    required 
+                                                    value={guestName}
+                                                    onChange={(e) => setGuestName(e.target.value)}
+                                                    placeholder="CURATED IDENTITY"
+                                                    className="w-full bg-secondary/5 border border-border p-4 text-xs font-bold uppercase placeholder:text-secondary/20 focus:border-primary outline-none transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Shipping Address</label>
+                                            <input 
+                                                type="text" 
+                                                required 
+                                                value={guestAddress}
+                                                onChange={(e) => setGuestAddress(e.target.value)}
+                                                placeholder="STREET ADDRESS"
+                                                className="w-full bg-secondary/5 border border-border p-4 text-xs font-bold uppercase placeholder:text-secondary/20 focus:border-primary outline-none transition-all"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">City</label>
+                                                <input 
+                                                    type="text" 
+                                                    required 
+                                                    value={guestCity}
+                                                    onChange={(e) => setGuestCity(e.target.value)}
+                                                    placeholder="METROPOLIS"
+                                                    className="w-full bg-secondary/5 border border-border p-4 text-xs font-bold uppercase placeholder:text-secondary/20 focus:border-primary outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Phone Number</label>
+                                                <input 
+                                                    type="tel" 
+                                                    required 
+                                                    value={guestPhone}
+                                                    onChange={(e) => setGuestPhone(e.target.value)}
+                                                    placeholder="+234 ..."
+                                                    className="w-full bg-secondary/5 border border-border p-4 text-xs font-bold uppercase placeholder:text-secondary/20 focus:border-primary outline-none transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">State</label>
+                                                <input 
+                                                    type="text" 
+                                                    required 
+                                                    value={guestState}
+                                                    onChange={(e) => setGuestState(e.target.value)}
+                                                    placeholder="STATE"
+                                                    className="w-full bg-secondary/5 border border-border p-4 text-xs font-bold uppercase placeholder:text-secondary/20 focus:border-primary outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Zip/Postal Code</label>
+                                                <input 
+                                                    type="text" 
+                                                    required 
+                                                    value={guestZip}
+                                                    onChange={(e) => setGuestZip(e.target.value)}
+                                                    placeholder="100001"
+                                                    className="w-full bg-secondary/5 border border-border p-4 text-xs font-bold uppercase placeholder:text-secondary/20 focus:border-primary outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Country</label>
+                                                <input 
+                                                    type="text" 
+                                                    required 
+                                                    value={guestCountry}
+                                                    onChange={(e) => setGuestCountry(e.target.value)}
+                                                    placeholder="COUNTRY"
+                                                    className="w-full bg-secondary/5 border border-border p-4 text-xs font-bold uppercase placeholder:text-secondary/20 focus:border-primary outline-none transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : addresses.length > 0 ? (
                                     <div className="grid grid-cols-1 gap-4">
                                         {addresses.map((addr) => (
                                             <div 
@@ -241,10 +383,10 @@ export default function CheckoutPage() {
                             <div className="pt-8 block">
                                 <button 
                                     type="submit" 
-                                    disabled={loading || (addresses.length > 0 && !selectedAddress)}
+                                    disabled={loading || (!isGuest && addresses.length > 0 && !selectedAddress) || (isGuest && !guestEmail)}
                                     className="w-full bg-primary text-background py-5 font-bold uppercase tracking-[0.2em] text-sm hover:bg-secondary transition-all disabled:opacity-50"
                                 >
-                                    {loading ? 'Processing Acquisition...' : `Commit Payment $${cartTotal.toFixed(2)}`}
+                                    {loading ? 'Processing Acquisition...' : `Commit Payment ₦${cartTotal.toLocaleString()}`}
                                 </button>
                                 <p className="text-[9px] text-center mt-6 text-secondary/40 uppercase font-black tracking-[0.3em]">
                                     SECURE TLS ENCRYPTED TRANSACTION
@@ -277,7 +419,7 @@ export default function CheckoutPage() {
                                                 <p className="text-[10px] text-secondary font-medium uppercase tracking-widest mt-1">{item.variant}</p>
                                             </div>
                                             <div className="font-bold text-xs">
-                                                ${(item.price * item.quantity).toFixed(2)}
+                                                ₦{(item.price * item.quantity).toLocaleString()}
                                             </div>
                                         </div>
                                     </div>
@@ -286,16 +428,14 @@ export default function CheckoutPage() {
 
                             <div className="border-t border-border mt-12 pt-8 space-y-4">
                                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-secondary/60">
-                                    <span>Subtotal</span>
-                                    <span>${cartTotal.toFixed(2)}</span>
+                                    <span>₦{cartTotal.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-secondary/60">
                                     <span>Shipping</span>
                                     <span>Complimentary</span>
                                 </div>
                                 <div className="flex justify-between font-bold text-foreground text-xl mt-6 pt-6 border-t border-border uppercase tracking-tighter">
-                                    <span>Total Amount</span>
-                                    <span>${cartTotal.toFixed(2)}</span>
+                                    <span>₦{cartTotal.toLocaleString()}</span>
                                 </div>
                             </div>
                         </div>

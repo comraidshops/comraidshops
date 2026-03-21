@@ -56,8 +56,8 @@ export default function ProfilePage() {
             } else {
                 setMessage({ type: 'error', text: 'Update failed. Please try again.' });
             }
-        } catch (err: any) {
-            console.error(err);
+        } catch {
+            console.error("Profile update failed");
             setMessage({ type: 'error', text: 'An error occurred.' });
         } finally {
             setSaving(false);

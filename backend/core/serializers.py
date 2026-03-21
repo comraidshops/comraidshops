@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Vendor, Brand, Category, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Exhibition, Collection, BrandImage, ProductFeature, ProductSpecification, Commission, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard
+from .models import User, Vendor, Brand, Category, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, BrandImage, ProductFeature, ProductSpecification, Commission, GlobalCommission, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,15 +11,58 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'slug']
 
-class MagazineSerializer(serializers.ModelSerializer):
+class ExhibitionArticleSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='magazine.title', read_only=True)
+    slug = serializers.CharField(source='magazine.slug', read_only=True)
+    cover = serializers.ImageField(source='image', read_only=True)
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'slug', 'cover']
+
+class ExhibitionProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'price', 'image', 'slug']
+
+class ExhibitionCollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = ['id', 'name', 'slug']
+
+class ExhibitionMagazineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Magazine
-        fields = ['id', 'title', 'slug', 'thumbnail', 'is_featured', 'created_at']
+        fields = ['id', 'title', 'slug']
 
 class ExhibitionSerializer(serializers.ModelSerializer):
+    articles = ExhibitionArticleSerializer(many=True, read_only=True)
+    products = ExhibitionProductSerializer(many=True, read_only=True)
+    collections = ExhibitionCollectionSerializer(many=True, read_only=True)
+    magazines = ExhibitionMagazineSerializer(many=True, read_only=True)
+
+    article_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, required=False, source='articles', queryset=Article.objects.all()
+    )
+    product_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, required=False, source='products', queryset=Product.objects.all()
+    )
+    collection_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, required=False, source='collections', queryset=Collection.objects.all()
+    )
+    magazine_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, required=False, source='magazines', queryset=Magazine.objects.all()
+    )
+
     class Meta:
         model = Exhibition
-        fields = ['id', 'title', 'slug', 'thumbnail', 'is_featured', 'created_at']
+        fields = [
+            'id', 'title', 'slug', 'thumbnail', 'is_featured', 'created_at',
+            'description', 'cover_image', 'curator_note', 'is_published',
+            'articles', 'products', 'collections', 'magazines',
+            'article_ids', 'product_ids', 'collection_ids', 'magazine_ids',
+            'meta_title', 'meta_description'
+        ]
 
 class BrandImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,12 +74,34 @@ class ProductCardSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'name', 'price', 'image', 'status', 'slug']
 
+class ProductLiteSerializer(serializers.ModelSerializer):
+    brand_name = serializers.CharField(source='vendor.brand_name', read_only=True)
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'price', 'image', 'slug', 'brand_name', 'category_name', 'stock', 'status', 'is_featured']
+
+class ArticleSerializer(serializers.ModelSerializer):
+    products = ProductCardSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Article
+        fields = ['id', 'magazine', 'content', 'image', 'products', 'created_at', 'updated_at']
+
+class MagazineSerializer(serializers.ModelSerializer):
+    article = ArticleSerializer(read_only=True)
+    
+    class Meta:
+        model = Magazine
+        fields = ['id', 'title', 'slug', 'excerpt', 'thumbnail', 'is_featured', 'article', 'created_at', 'meta_title', 'meta_description']
+
 class CollectionSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
 
     class Meta:
         model = Collection
-        fields = ['id', 'name', 'slug', 'season', 'description', 'hero_image', 'products', 'is_featured', 'order']
+        fields = ['id', 'name', 'slug', 'season', 'description', 'hero_image', 'products', 'is_featured', 'order', 'meta_title', 'meta_description']
 
     def get_products(self, obj):
         qs = obj.products.filter(status='approved')
@@ -45,8 +110,13 @@ class CollectionSerializer(serializers.ModelSerializer):
 class BrandSerializer(serializers.ModelSerializer):
     vendor_username = serializers.CharField(source='vendor.user.username', read_only=True)
     vendor_id = serializers.IntegerField(source='vendor.id', read_only=True)
-    approved_product_count = serializers.SerializerMethodField()
-    total_product_count = serializers.SerializerMethodField()
+    
+    # These will be provided via annotations in the ViewSet for performance
+    approved_product_count = serializers.IntegerField(read_only=True)
+    total_product_count = serializers.IntegerField(read_only=True)
+    community_count = serializers.IntegerField(read_only=True)
+    is_member = serializers.BooleanField(read_only=True)
+    
     featured_products = serializers.SerializerMethodField()
     
     gallery = BrandImageSerializer(many=True, read_only=True)
@@ -64,20 +134,17 @@ class BrandSerializer(serializers.ModelSerializer):
             'gallery', 'collections', 'editorial_refs', 'exhibition_refs',
             'is_featured', 'created_at', 'vendor_username', 'vendor_id',
             'approved_product_count', 'total_product_count', 'featured_products',
+            'is_member', 'community_count',
+            'meta_title', 'meta_description',
         ]
 
-    def get_approved_product_count(self, obj):
-        if not hasattr(obj, 'vendor'):
-            return 0
-        return obj.vendor.products.filter(status='approved').count()
-
-    def get_total_product_count(self, obj):
-        if not hasattr(obj, 'vendor'):
-            return 0
-        return obj.vendor.products.count()
-
     def get_featured_products(self, obj):
-        if not hasattr(obj, 'vendor'):
+        # Even here, we can optimize if we've prefetched featured_products_all
+        featured = getattr(obj, 'precomputed_featured_products', None)
+        if featured is not None:
+            return ProductCardSerializer(featured, many=True, context=self.context).data
+            
+        if not hasattr(obj, 'vendor') or not obj.vendor:
             return []
         qs = (
             obj.vendor.products
@@ -86,12 +153,20 @@ class BrandSerializer(serializers.ModelSerializer):
         )
         return ProductCardSerializer(qs, many=True, context=self.context).data
 
+class BrandCommunityMemberSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    joined_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = BrandCommunityMember
+        fields = ['id', 'user', 'username', 'brand', 'joined_at']
+
 class VendorSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     
     class Meta:
         model = Vendor
-        fields = ['id', 'user', 'username', 'brand_name', 'commission_rate', 'categories']
+        fields = ['id', 'user', 'username', 'brand', 'brand_name', 'commission_rate', 'categories']
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -135,7 +210,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 'slug', 'vendor', 'vendor_name', 'brand', 'category', 'category_slug', 'collections', 
             'name', 'description', 'short_description', 'story', 'hero_video', 'editorial_quote', 'materials', 'care_instructions', 
             'origin_country', 'fit', 'weight', 'price', 'stock', 'image', 'is_featured', 'status', 
-            'variants', 'images', 'video_360', 'features', 'specifications', 'related_products', 'created_at'
+            'variants', 'images', 'video_360', 'features', 'specifications', 'related_products', 'created_at',
+            'meta_title', 'meta_description'
         ]
 
     def get_related_products(self, obj):
@@ -167,14 +243,55 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'product_name', 'product_image', 'product_slug', 'brand_name', 'quantity', 'price']
+        fields = ['id', 'product', 'product_name', 'product_image', 'product_slug', 'brand_name', 'quantity', 'price', 'status']
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'total_amount', 'status', 'items', 'created_at']
+        fields = [
+            'id', 'customer', 'total_amount', 'payment_status', 'order_status', 'items', 'created_at',
+            'shipping_full_name', 'shipping_phone_number', 'shipping_address_line1', 'shipping_address_line2',
+            'shipping_city', 'shipping_state', 'shipping_zip_code', 'shipping_country'
+        ]
+        read_only_fields = ['payment_status']
+
+class AdminOrderItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_image = serializers.SerializerMethodField()
+    vendor_brand_name = serializers.CharField(source='product.vendor.brand_name', read_only=True)
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product_name', 'product_image', 'quantity', 'price', 'status', 'vendor_brand_name']
+
+    def get_product_image(self, obj):
+        request = self.context.get('request')
+        img = obj.product.images.filter(is_primary=True).first()
+        if img and img.image:
+            if request:
+                return request.build_absolute_uri(img.image.url)
+            return img.image.url
+        return None
+
+class AdminOrderSerializer(serializers.ModelSerializer):
+    customer_email = serializers.SerializerMethodField()
+    items = AdminOrderItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = [
+            'id', 'customer', 'customer_email', 'total_amount', 'payment_status', 'order_status', 'items', 'created_at',
+            'shipping_full_name', 'shipping_phone_number', 'shipping_address_line1', 'shipping_address_line2',
+            'shipping_city', 'shipping_state', 'shipping_zip_code', 'shipping_country'
+        ]
+        read_only_fields = ['payment_status']
+
+    def get_customer_email(self, obj):
+        if obj.customer:
+            return obj.customer.email
+        return obj.guest_email
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -195,7 +312,7 @@ class VendorProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'slug', 'vendor', 'name', 'short_description', 'description', 
-            'story', 'materials', 'care_instructions', 'origin_country', 'fit', 
+            'story', 'editorial_quote', 'materials', 'care_instructions', 'origin_country', 'fit', 
             'weight', 'price', 'stock', 'category', 'collections', 'image', 'status',
             'images', 'video_360', 'brand', 'commission_rate', 'potential_earnings'
         ]
@@ -203,6 +320,11 @@ class VendorProductSerializer(serializers.ModelSerializer):
     def get_potential_earnings(self, obj):
         rate = obj.vendor.commission_rate
         return obj.price / (1 + rate)
+
+    def create(self, validated_data):
+        # Nested fields are usually popped out
+        # But we handle them in the viewSet _handle_media and custom logic
+        return super().create(validated_data)
 
     def validate_collections(self, collections):
         request = self.context.get('request')
@@ -220,7 +342,7 @@ class VendorProductSerializer(serializers.ModelSerializer):
 
 class CommissionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Commission
+        model = GlobalCommission
         fields = '__all__'
 
 class VendorEarningSerializer(serializers.ModelSerializer):
@@ -246,7 +368,7 @@ class VendorOrderItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'product_name', 'product_image', 'quantity', 'price']
+        fields = ['id', 'product', 'product_name', 'product_image', 'quantity', 'price', 'status']
 
 class VendorOrderSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()
@@ -255,7 +377,12 @@ class VendorOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'customer_name', 'total_amount', 'status', 'items', 'financials', 'created_at']
+        fields = [
+            'id', 'customer', 'customer_name', 'total_amount', 'payment_status', 'order_status', 'items', 'financials', 'created_at',
+            'shipping_full_name', 'shipping_phone_number', 'shipping_address_line1', 'shipping_address_line2',
+            'shipping_city', 'shipping_state', 'shipping_zip_code', 'shipping_country'
+        ]
+        read_only_fields = ['payment_status']
 
     def get_items(self, obj):
         request = self.context.get('request')
@@ -322,6 +449,43 @@ class SavedCardSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
-        read_only_fields = ['username']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_vendor', 'is_customer', 'is_superuser']
+        read_only_fields = ['username', 'is_vendor', 'is_customer', 'is_superuser']
 
+class FitProductSerializer(serializers.ModelSerializer):
+    brand = serializers.CharField(source='vendor.brand.name', read_only=True)
+    
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'price', 'slug', 'brand', 'image', 'stock']
+
+class FitItemSerializer(serializers.ModelSerializer):
+    product = FitProductSerializer(read_only=True)
+    
+    class Meta:
+        model = FitItem
+        fields = ['id', 'label', 'order', 'product']
+
+class FitFrameSerializer(serializers.ModelSerializer):
+    items = FitItemSerializer(many=True, read_only=True)
+    brand = BrandSerializer(read_only=True)
+    
+    class Meta:
+        model = FitFrame
+        fields = ['id', 'title', 'slug', 'cover_image', 'brand', 'is_mixed', 'items']
+
+class SavedFitFrameSerializer(serializers.ModelSerializer):
+    fitframe = FitFrameSerializer(read_only=True)
+    fitframe_id = serializers.PrimaryKeyRelatedField(
+        queryset=FitFrame.objects.all(), source='fitframe', write_only=True
+    )
+    
+    class Meta:
+        model = SavedFitFrame
+        fields = ['id', 'user', 'fitframe', 'fitframe_id', 'created_at']
+        read_only_fields = ['user']
+
+class HomepageSlideSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomepageSlide
+        fields = ['id', 'image', 'order', 'is_active']

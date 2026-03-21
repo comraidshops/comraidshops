@@ -1,10 +1,10 @@
-import React from "react"
-import { fetchProduct } from "@/lib/api"
-import { Product, ProductImage, ProductVariant, ProductFeature, ProductSpecification } from "@/types/brand"
+import { fetchProduct, Product, ProductImage, ProductFeature, ProductSpecification } from "@/lib/api"
 import ProductCard from "@/components/shop/ProductCard"
 import Image from "next/image"
 import Link from "next/link"
 import ProductActions from "@/components/shop/ProductActions"
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
     try {
@@ -13,10 +13,31 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             throw new Error("Invalid or missing slug");
         }
         const product: Product = await fetchProduct(resolvedParams.slug);
-        const title = `${product.name} | ${product.brand?.name || product.vendor_name || 'ComraidShops'}`
+        const brandName = (typeof product.brand === 'object' ? product.brand?.name : product.brand) || product.vendor_name || 'ComraidShops';
+        const title = product.meta_title || `${product.name} by ${brandName} | ComraidShops`;
+        const description = product.meta_description || product.short_description || product.description?.slice(0, 160) || `Buy ${product.name} on ComraidShops`;
+        const canonicalUrl = `${SITE_URL}/products/${product.slug}`;
+        const ogImage = product.image || `${SITE_URL}/og-default.jpg`;
+
         return {
             title,
-            description: product.description || `Buy ${product.name} on ComraidShops`,
+            description,
+            alternates: { canonical: canonicalUrl },
+            openGraph: {
+                type: 'website',
+                url: canonicalUrl,
+                title,
+                description,
+                siteName: 'ComraidShops',
+                images: [{ url: ogImage, width: 1200, height: 630, alt: product.name }],
+            },
+            twitter: {
+                card: 'summary_large_image',
+                site: '@comraidshops',
+                title,
+                description,
+                images: [ogImage],
+            },
         }
     } catch {
         return {
@@ -83,15 +104,16 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         video_360,
         hero_video,
         editorial_quote,
-        variants = [],
         collections = [],
         features = [],
         specifications = [],
         related_products = []
     } = product;
 
-    const brandName = brand?.name || vendor_name || "Unknown Brand";
-    const brandSlug = brand?.slug;
+    const brandName = (typeof brand === 'object' ? brand?.name : brand) || vendor_name || "Unknown Brand";
+    const brandSlug = typeof brand === 'object' ? brand?.slug : undefined;
+    const brandPhilosophy = typeof brand === 'object' ? brand?.philosophy : undefined;
+    const brandDescription = typeof brand === 'object' ? brand?.description : undefined;
     
     // Typecast arrays safely for rendering
     const typedImages = (images as ProductImage[]) || [];
@@ -118,8 +140,31 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         );
     });
 
+    const productSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        image: product.image,
+        description: product.short_description || product.description,
+        brand: {
+            '@type': 'Brand',
+            name: brandName,
+        },
+        offers: {
+            '@type': 'Offer',
+            url: `${SITE_URL}/products/${product.slug}`,
+            priceCurrency: 'NGN',
+            price: product.price,
+            availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        },
+    };
+
     return (
         <div className="min-h-screen bg-background text-foreground pt-24 pb-12">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+            />
 
             {/* HERO SECTION */}
             <div className="max-w-[1400px] mx-auto px-6 md:px-10 lg:px-16 grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 mb-32">
@@ -171,7 +216,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                             {name}
                         </h1>
                         <p className="text-2xl font-light tracking-wider text-secondary mb-12">
-                            ${Number(price).toFixed(2)}
+                            ₦{Number(price).toLocaleString()}
                         </p>
 
                         {/* Short Description */}
@@ -295,9 +340,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         {description && (
                             <div>
                                 <h3 className="text-xs uppercase tracking-[0.4em] text-secondary mb-8">Object Description</h3>
-                                <div className="text-sm text-foreground/80 leading-relaxed font-light whitespace-pre-line max-w-xl">
-                                    {description}
-                                </div>
+                                <div 
+                                    className="text-sm text-foreground/80 leading-relaxed font-light max-w-xl prose prose-invert prose-sm"
+                                    dangerouslySetInnerHTML={{ __html: description }}
+                                />
                             </div>
                         )}
 
@@ -384,10 +430,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 <div>
                                     <h2 className="text-3xl font-light uppercase tracking-tight mb-6">{brandName}</h2>
                                     <p className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md">
-                                        {brand.philosophy || brand.description || "Craftsmanship and heritage redefined for the contemporary era."}
+                                        {brandPhilosophy || brandDescription || "Craftsmanship and heritage redefined for the contemporary era."}
                                     </p>
                                     <Link 
-                                        href={`/brands/${brand.slug}`}
+                                        href={`/brands/${brandSlug || ''}`}
                                         className="text-[10px] uppercase tracking-[0.3em] font-medium border-b border-foreground pb-1 inline-block hover:border-transparent transition-colors"
                                     >
                                         Visit Studio

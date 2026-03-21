@@ -1,0 +1,546 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    FileText, BookOpen, Presentation, 
+    Layers, Plus, Star, Search,
+    Edit3, Trash2
+} from 'lucide-react';
+import { safeFetch, API_BASE_URL } from '@/lib/api';
+import { useNotification } from '@/context/NotificationContext';
+import Image from 'next/image';
+import { AdminModal, AdminInput, AdminTextArea, AdminSelect, AdminRichText, AdminImageUpload, AdminMultiSelect } from '@/components/admin/AdminForms';
+
+type EditorialType = 'magazines' | 'articles' | 'exhibitions' | 'collections' | 'slides' | 'fitframes' | 'brands';
+
+interface EditorialBase {
+    id: number;
+    title?: string;
+    name?: string;
+    slug?: string;
+    created_at: string;
+
+    cover_image?: string | File | null;
+    image?: string | File | null;
+    thumbnail?: string | File | null;
+    hero_image?: string | File | null;
+    logo?: string | File | null;
+    founder_image?: string | File | null;
+    is_featured?: boolean;
+    is_active?: boolean;
+    order?: number;
+    description?: string;
+    content?: string;
+    tagline?: string;
+    philosophy?: string;
+    founder_name?: string;
+    founder_bio?: string;
+    established_year?: number;
+    origin_country?: string;
+    website?: string;
+    website?: string;
+    magazine?: number;
+    
+    // Exhibition nested fields
+    products?: { id: number; name: string }[];
+    collections?: { id: number; name: string }[];
+    magazines?: { id: number; title: string }[];
+    articles?: { id: number; title: string }[];
+    product_ids?: number[];
+    collection_ids?: number[];
+    magazine_ids?: number[];
+    article_ids?: number[];
+}
+
+interface MagazineOption {
+    id: number;
+    title: string;
+}
+
+export default function AdminEditorial() {
+    const [activeTab, setActiveTab] = useState<EditorialType>('magazines');
+    const [items, setItems] = useState<EditorialBase[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Modal State
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [currentItem, setCurrentItem] = useState<Partial<EditorialBase> | null>(null);
+
+    // Helpers for Articles/Exhibitions
+    const [magazines, setMagazines] = useState<MagazineOption[]>([]);
+    const [products, setProducts] = useState<{id: number, name: string}[]>([]);
+    const [collections, setCollections] = useState<{id: number, name: string}[]>([]);
+    const [articles, setArticles] = useState<{id: number, title: string}[]>([]);
+
+    const { notify } = useNotification();
+
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true);
+            try {
+                const data = await safeFetch(`/admin-api/${activeTab}/`);
+                setItems(data);
+            } catch (error) {
+                console.error(`Failed to fetch ${activeTab}:`, error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function fetchMagazines() {
+            try {
+                const data = await safeFetch('/admin-api/magazines/');
+                setMagazines(data);
+            } catch {}
+        }
+
+        async function fetchExhibitionDeps() {
+            try {
+                const [prods, cols, arts] = await Promise.all([
+                    safeFetch('/admin-api/products/'),
+                    safeFetch('/admin-api/collections/'),
+                    safeFetch('/admin-api/articles/')
+                ]);
+                setProducts(prods);
+                setCollections(cols);
+                setArticles(arts);
+            } catch {}
+        }
+
+        fetchData();
+        if (activeTab === 'articles' || activeTab === 'exhibitions') fetchMagazines();
+        if (activeTab === 'exhibitions') fetchExhibitionDeps();
+    }, [activeTab]);
+
+    async function handleCreate(e: React.FormEvent) {
+        e.preventDefault();
+        if (!currentItem) return;
+        setActionLoading(true);
+        try {
+            const formData = new FormData();
+            Object.entries(currentItem).forEach(([key, val]) => {
+                if (Array.isArray(val) && key.endsWith('_ids')) {
+                    val.forEach(v => formData.append(key, v.toString()));
+                } else if (val !== null && val !== undefined && !Array.isArray(val)) {
+                    formData.append(key, val as string | Blob);
+                }
+            });
+
+            const newItem = await safeFetch(`/admin-api/${activeTab}/`, {
+                method: 'POST',
+                body: formData
+            });
+            setItems([newItem, ...items]);
+            setIsCreateModalOpen(false);
+            setCurrentItem(null);
+            notify('success', `${activeTab.slice(0, -1)} Created`, 'Item has been successfully published.');
+        } catch (error: unknown) {
+            notify('error', 'Creation Failed', (error as Error)?.message || "Failed to create item");
+        } finally {
+            setActionLoading(false);
+        }
+    }
+
+    async function handleUpdate(e: React.FormEvent) {
+        e.preventDefault();
+        if (!currentItem?.id) return;
+        setActionLoading(true);
+        try {
+            const formData = new FormData();
+            Object.entries(currentItem).forEach(([key, val]) => {
+                if (Array.isArray(val) && key.endsWith('_ids')) {
+                    val.forEach(v => formData.append(key, v.toString()));
+                } else if (val && (val as any) instanceof File) {
+                    formData.append(key, val as any);
+                } else if (val !== null && val !== undefined && !Array.isArray(val)) {
+                    // Only append if it's not a remote URL string (existing image)
+                    if (typeof val !== 'string' || (!val.startsWith('http') && !val.startsWith('/media/'))) {
+                        formData.append(key, val as string | Blob);
+                    }
+                }
+            });
+
+            const updated = await safeFetch(`/admin-api/${activeTab}/${currentItem.id}/`, {
+                method: 'PATCH',
+                body: formData
+            });
+            setItems(items.map(i => i.id === updated.id ? updated : i));
+            setIsEditModalOpen(false);
+            notify('success', `${activeTab.slice(0, -1)} Updated`, 'Changes have been saved successfully.');
+        } catch (error: unknown) {
+            notify('error', 'Update Failed', (error as Error)?.message || "Failed to update item");
+        } finally {
+            setActionLoading(false);
+        }
+    }
+
+    async function handleDelete() {
+        if (!currentItem?.id) return;
+        setActionLoading(true);
+        try {
+            await safeFetch(`/admin-api/${activeTab}/${currentItem.id}/`, { method: 'DELETE' });
+            setItems(items.filter(i => i.id !== currentItem.id));
+            setIsDeleteModalOpen(false);
+            notify('success', `${activeTab.slice(0, -1)} Archived`, 'Item has been successfully removed.');
+        } catch (error: unknown) {
+            notify('error', 'Delete Failed', (error as Error)?.message || "Failed to delete item");
+        } finally {
+            setActionLoading(false);
+        }
+    }
+
+    async function toggleStatus(item: EditorialBase) {
+        const field = activeTab === 'slides' ? 'is_active' : 'is_featured';
+        const currentValue = activeTab === 'slides' ? item.is_active : item.is_featured;
+
+        try {
+            await safeFetch(`/admin-api/${activeTab}/${item.id}/`, {
+                method: 'PATCH',
+                body: JSON.stringify({ [field]: !currentValue })
+            });
+            setItems(items.map(i => i.id === item.id ? { ...i, [field]: !currentValue } : i));
+            notify('success', 'Status Updated', `Item is now ${!currentValue ? 'Active/Featured' : 'Inactive'}.`);
+        } catch (error: unknown) {
+            notify('error', 'Toggle Failed', (error as Error)?.message || "Failed to toggle status");
+        }
+    }
+
+    const filteredItems = items.filter(item => {
+        const title = item.title || item.name || (activeTab === 'slides' ? `Slide #${item.order}` : '');
+        return title.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    const tabs = [
+        { id: 'magazines', label: 'Magazines', icon: BookOpen },
+        { id: 'articles', label: 'Articles', icon: FileText },
+        { id: 'exhibitions', label: 'Exhibitions', icon: Presentation },
+        { id: 'collections', label: 'Collections', icon: Layers },
+        { id: 'slides', label: 'Hero Slides', icon: Layers },
+        { id: 'fitframes', label: 'FitFrames', icon: Layers },
+        { id: 'brands', label: 'Brands', icon: Star },
+    ];
+
+    return (
+        <div className="space-y-8 lg:space-y-12">
+            <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-2 lg:mb-4 block">Curation Hub</span>
+                    <h1 className="text-4xl lg:text-5xl font-playfair font-medium tracking-tight">Editorial <span className="italic opacity-80">Director.</span></h1>
+                </div>
+
+                <div className="flex gap-4">
+                    <div className="relative w-full lg:w-80">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                        <input 
+                            type="text" 
+                            placeholder={`Search ${activeTab}...`} 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="bg-white/[0.03] border border-white/5 rounded-2xl py-4 pl-12 pr-6 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-primary/50 transition-all w-full"
+                        />
+                    </div>
+                    <button 
+                        onClick={() => {
+                            setCurrentItem({ is_featured: false, is_active: true });
+                            setIsCreateModalOpen(true);
+                        }}
+                        className="bg-primary text-black px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 hover:scale-[1.02] transition-all w-full lg:w-auto justify-center"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Create {activeTab.slice(0, -1)}
+                    </button>
+                </div>
+            </header>
+
+            <div className="flex gap-6 lg:gap-8 border-b border-white/5 pb-6 lg:pb-8 overflow-x-auto no-scrollbar">
+                {tabs.map((tab) => {
+                    const isActive = activeTab === tab.id;
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as EditorialType)}
+                            className={`flex items-center gap-3 lg:gap-4 px-2 lg:px-4 py-4 transition-all relative shrink-0 ${
+                                isActive ? 'text-primary' : 'text-white/40 hover:text-white'
+                            }`}
+                        >
+                            <tab.icon className="w-4 h-4 lg:w-5 lg:h-5" />
+                            <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{tab.label}</span>
+                            {isActive && (
+                                <motion.div 
+                                    layoutId="tab-underline"
+                                    className="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-full shadow-[0_0_10px_#ccf381]"
+                                />
+                            )}
+                        </button>
+                    );
+                })}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <AnimatePresence mode="popLayout">
+                    {filteredItems.map((item, idx) => {
+                        const title = item.title || item.name || (activeTab === 'slides' ? `Hero Slide #${item.order}` : 'Untitled');
+                        const thumb = item.thumbnail || item.image || item.cover_image || item.logo || item.hero_image || '/images/placeholder-editorial.jpg';
+                        const statusActive = activeTab === 'slides' ? item.is_active : item.is_featured;
+                        
+                        return (
+                            <motion.div
+                                key={`${activeTab}-${item.id}`}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ delay: idx * 0.05 }}
+                                className="group relative bg-white/[0.02] border border-white/5 rounded-[32px] overflow-hidden hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500"
+                            >
+                                <div className="aspect-[16/10] relative overflow-hidden">
+                                    <Image 
+                                        src={typeof thumb === 'string' 
+                                            ? (thumb.startsWith('http') || thumb.startsWith('data:') || thumb.startsWith('/') ? thumb : `${API_BASE_URL}${thumb}`)
+                                            : (thumb instanceof File && typeof window !== 'undefined' ? URL.createObjectURL(thumb) : '/images/placeholder-editorial.jpg')
+                                        } 
+                                        alt={title} 
+                                        fill 
+                                        className="object-cover group-hover:scale-110 transition-transform duration-1000" 
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+                                    
+                                    <div className="absolute top-4 lg:top-6 right-4 lg:right-6 flex gap-2">
+                                        <button 
+                                            onClick={() => toggleStatus(item)}
+                                            className={`p-2.5 lg:p-3 rounded-2xl backdrop-blur-md border border-white/10 transition-all ${
+                                                statusActive ? 'bg-primary text-black' : 'bg-black/40 text-white hover:bg-white/10'
+                                            }`}
+                                        >
+                                            <Star className="w-4 h-4" fill={statusActive ? "currentColor" : "none"} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="p-6 lg:p-8">
+                                    <h3 className="text-lg lg:text-xl font-medium tracking-tight mb-4 group-hover:text-primary transition-colors truncate">{title}</h3>
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3 lg:gap-4 text-[8px] font-bold uppercase tracking-widest text-white/40">
+                                            <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                            <span className="w-1 h-1 rounded-full bg-white/10" />
+                                            <span className="text-white/20 truncate max-w-[80px]">{item.slug}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <button 
+                                                onClick={() => {
+                                                    const editItem = { ...item };
+                                                    if (activeTab === 'exhibitions') {
+                                                        editItem.product_ids = item.products?.map(p => p.id) || [];
+                                                        editItem.collection_ids = item.collections?.map(c => c.id) || [];
+                                                        editItem.magazine_ids = item.magazines?.map(m => m.id) || [];
+                                                        editItem.article_ids = item.articles?.map(a => a.id) || [];
+                                                    }
+                                                    setCurrentItem(editItem);
+                                                    setIsEditModalOpen(true);
+                                                }}
+                                                className="p-2.5 lg:p-3 rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                                            >
+                                                <Edit3 className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => {
+                                                    setCurrentItem(item);
+                                                    setIsDeleteModalOpen(true);
+                                                }}
+                                                className="p-2.5 lg:p-3 rounded-xl bg-white/5 text-white/40 hover:text-red-400 hover:bg-red-400/10 transition-all"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        );
+                    })}
+                </AnimatePresence>
+                
+                {filteredItems.length === 0 && !loading && (
+                    <div className="col-span-full p-24 text-center border border-dashed border-white/5 rounded-[40px]">
+                        <Layers className="w-12 h-12 text-white/5 mx-auto mb-6" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">No items found in {activeTab}</p>
+                    </div>
+                )}
+            </div>
+
+            {/* Create/Edit Modal */}
+            <AdminModal
+                isOpen={isCreateModalOpen || isEditModalOpen}
+                onClose={() => {
+                    setIsCreateModalOpen(false);
+                    setIsEditModalOpen(false);
+                    setCurrentItem(null);
+                }}
+                title={`${isCreateModalOpen ? 'New' : 'Edit'} ${activeTab.slice(0, -1)}`}
+                loading={actionLoading}
+            >
+                <form onSubmit={isCreateModalOpen ? handleCreate : handleUpdate} className="space-y-6">
+                    <AdminInput 
+                        label={activeTab === 'slides' ? 'Main Text' : (activeTab === 'magazines' || activeTab === 'brands' ? 'Title' : 'Name')}
+                        value={currentItem?.title || currentItem?.name || ''} 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, [activeTab === 'magazines' || activeTab === 'brands' ? 'title' : 'name']: e.target.value })}
+                    />
+                    
+                    {activeTab !== 'brands' && (
+                        <AdminImageUpload 
+                            label={
+                                activeTab === 'magazines' ? 'Thumbnail' : 
+                                (activeTab === 'articles' || activeTab === 'slides' ? 'Image' : 
+                                (activeTab === 'exhibitions' || activeTab === 'fitframes' ? 'Cover Image' : 'Hero Image'))
+                            }
+                            preview={
+                                currentItem?.thumbnail || currentItem?.image || currentItem?.cover_image || currentItem?.hero_image || undefined
+                            }
+                            onChange={(file: File) => setCurrentItem({ 
+                                ...currentItem, 
+                                [activeTab === 'magazines' || activeTab === 'exhibitions' ? 'thumbnail' : 
+                                 (activeTab === 'articles' || activeTab === 'slides' ? 'image' : 
+                                 (activeTab === 'fitframes' ? 'cover_image' : 'hero_image'))]: file as File
+                            })}
+                        />
+                    )}
+
+                    {activeTab === 'articles' && (
+                        <AdminSelect 
+                            label="Magazine"
+                            value={currentItem?.magazine || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCurrentItem({ ...currentItem, magazine: parseInt(e.target.value) })}
+                            options={[
+                                { value: '', label: 'Select Magazine' },
+                                ...magazines.map(m => ({ value: m.id, label: m.title }))
+                            ]}
+                        />
+                    )}
+
+                    {activeTab === 'articles' && (
+                        <AdminRichText 
+                            label="Article Content"
+                            value={currentItem?.content || ''}
+                            onChange={(content: string) => setCurrentItem({ ...currentItem, content: content })}
+                        />
+                    )}
+
+                    {activeTab === 'brands' && (
+                        <div className="space-y-6">
+                            <AdminInput label="Tagline" value={currentItem?.tagline || ''} onChange={(e) => setCurrentItem({ ...currentItem, tagline: e.target.value })} />
+                            <AdminRichText label="Philosophy" value={currentItem?.philosophy || ''} onChange={(val) => setCurrentItem({ ...currentItem, philosophy: val })} />
+                            <AdminInput label="Founder Name" value={currentItem?.founder_name || ''} onChange={(e) => setCurrentItem({ ...currentItem, founder_name: e.target.value })} />
+                            <AdminTextArea label="Founder Bio" value={currentItem?.founder_bio || ''} onChange={(e) => setCurrentItem({ ...currentItem, founder_bio: e.target.value })} />
+                            <div className="grid grid-cols-2 gap-4">
+                                <AdminInput label="Established Year" type="number" value={currentItem?.established_year || ''} onChange={(e) => setCurrentItem({ ...currentItem, established_year: parseInt(e.target.value) })} />
+                                <AdminInput label="Origin Country" value={currentItem?.origin_country || ''} onChange={(e) => setCurrentItem({ ...currentItem, origin_country: e.target.value })} />
+                            </div>
+                            <AdminInput label="Website" value={currentItem?.website || ''} onChange={(e) => setCurrentItem({ ...currentItem, website: e.target.value })} />
+                            
+                            <AdminImageUpload 
+                                label="Brand Logo"
+                                preview={currentItem?.logo || undefined}
+                                onChange={(file: File) => setCurrentItem({ ...currentItem, logo: file as File })}
+                            />
+                            <AdminImageUpload 
+                                label="Hero Image"
+                                preview={currentItem?.hero_image || undefined}
+                                onChange={(file: File) => setCurrentItem({ ...currentItem, hero_image: file as File })}
+                            />
+                            <AdminImageUpload 
+                                label="Founder Image"
+                                preview={currentItem?.founder_image || undefined}
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                onChange={(file: File) => setCurrentItem({ ...currentItem, founder_image: file as any })}
+                            />
+                        </div>
+                    )}
+                    
+                    {(activeTab === 'exhibitions' || activeTab === 'fitframes') && (
+                        <AdminTextArea 
+                            label="Description"
+                            value={currentItem?.description || ''}
+                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCurrentItem({ ...currentItem, description: e.target.value })}
+                        />
+                    )}
+
+                    {activeTab === 'exhibitions' && (
+                        <>
+                            <AdminMultiSelect 
+                                label="Linked Products"
+                                options={products.map(p => ({ value: p.id, label: p.name }))}
+                                value={currentItem?.product_ids || []}
+                                onChange={(vals) => setCurrentItem({ ...currentItem, product_ids: vals as number[] })}
+                            />
+                            <AdminMultiSelect 
+                                label="Linked Collections"
+                                options={collections.map(c => ({ value: c.id, label: c.name }))}
+                                value={currentItem?.collection_ids || []}
+                                onChange={(vals) => setCurrentItem({ ...currentItem, collection_ids: vals as number[] })}
+                            />
+                            <AdminMultiSelect 
+                                label="Linked Magazines"
+                                options={magazines.map(m => ({ value: m.id, label: m.title }))}
+                                value={currentItem?.magazine_ids || []}
+                                onChange={(vals) => setCurrentItem({ ...currentItem, magazine_ids: vals as number[] })}
+                            />
+                            <AdminMultiSelect 
+                                label="Linked Articles"
+                                options={articles.map(a => ({ value: a.id, label: a.title }))}
+                                value={currentItem?.article_ids || []}
+                                onChange={(vals) => setCurrentItem({ ...currentItem, article_ids: vals as number[] })}
+                            />
+                        </>
+                    )}
+
+                    {activeTab === 'slides' && (
+                        <AdminInput 
+                            label="Display Order"
+                            type="number"
+                            value={currentItem?.order || ''}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, order: parseInt(e.target.value) })}
+                        />
+                    )}
+
+                    <button 
+                        type="submit"
+                        className="w-full bg-primary text-black py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:scale-[1.02] transition-all"
+                    >
+                        {isCreateModalOpen ? 'Publish Content' : 'Save Changes'}
+                    </button>
+                </form>
+            </AdminModal>
+
+            {/* Delete Confirmation */}
+            <AdminModal 
+                isOpen={isDeleteModalOpen} 
+                onClose={() => setIsDeleteModalOpen(false)} 
+                title="Archive Request"
+                loading={actionLoading}
+            >
+                <div className="space-y-8">
+                    <p className="text-white/40 text-[11px] font-bold leading-relaxed uppercase tracking-widest">
+                        Are you certain you wish to archive this {activeTab.slice(0, -1)}? It will be removed from all public viewpoints immediately.
+                    </p>
+                    <div className="flex gap-4">
+                        <button 
+                            onClick={() => setIsDeleteModalOpen(false)}
+                            className="flex-grow bg-white/5 text-white/40 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em]"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={handleDelete}
+                            className="flex-grow bg-red-500 text-white py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em]"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </AdminModal>
+        </div>
+    );
+}

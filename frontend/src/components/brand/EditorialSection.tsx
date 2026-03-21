@@ -1,8 +1,9 @@
 "use client"
 import { motion } from "framer-motion"
-import { EditorialRef } from "@/types/brand"
+import { EditorialRef } from "@/lib/types"
 import Image from "next/image"
 import Link from "next/link"
+import { API_BASE_URL } from "@/lib/api"
 
 export default function EditorialSection({ refs, type }: { refs?: EditorialRef[], type: 'Editorial' | 'Exhibition' }) {
     if (!refs || refs.length === 0) return null;
@@ -31,7 +32,7 @@ export default function EditorialSection({ refs, type }: { refs?: EditorialRef[]
                                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-secondary/5">
                                     {item.thumbnail ? (
                                         <Image
-                                            src={item.thumbnail}
+                                            src={item.thumbnail.startsWith('http') ? item.thumbnail : `${API_BASE_URL}${item.thumbnail}`}
                                             alt={item.title}
                                             fill
                                             unoptimized={true}

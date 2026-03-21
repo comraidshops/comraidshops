@@ -1,14 +1,19 @@
 "use client"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Image from "next/image"
+import { API_BASE_URL } from "@/lib/api"
+import JoinCommunityButton from "./JoinCommunityButton"
 
 interface HeroSectionProps {
     name: string;
     description?: string;
     heroImage?: string | null;
+    brandSlug: string;
+    isMember: boolean;
+    communityCount: number;
 }
 
-export default function HeroSection({ name, description, heroImage }: HeroSectionProps) {
+export default function HeroSection({ name, description, heroImage, brandSlug, isMember, communityCount }: HeroSectionProps) {
     const { scrollY } = useScroll()
     const y1 = useTransform(scrollY, [0, 800], [0, 200])
     const opacity = useTransform(scrollY, [0, 400], [1, 0])
@@ -18,7 +23,7 @@ export default function HeroSection({ name, description, heroImage }: HeroSectio
             {heroImage && typeof heroImage === 'string' && heroImage.length > 0 ? (
                 <motion.div style={{ y: y1 }} className="absolute inset-0 z-0 h-full w-full">
                     <Image
-                        src={heroImage}
+                        src={heroImage.startsWith('http') ? heroImage : `${API_BASE_URL}${heroImage}`}
                         alt={name}
                         fill
                         className="object-cover object-center"
@@ -44,6 +49,14 @@ export default function HeroSection({ name, description, heroImage }: HeroSectio
                         {description}
                     </p>
                 )}
+
+                <div className="mt-12">
+                    <JoinCommunityButton 
+                        brandSlug={brandSlug} 
+                        isInitialMember={isMember} 
+                        communityCount={communityCount} 
+                    />
+                </div>
             </motion.div>
         </section>
     )

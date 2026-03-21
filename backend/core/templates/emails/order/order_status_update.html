@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Hello {{ user.username|default:"Customer" }},</p>
+
+<h2>Order Status Update</h2>
+
+<p>{{ message_body }}</p>
+
+<p><strong>Order #{{ order.id }}</strong></p>
+
+<div class="btn-container">
+    <a href="https://comraidshops.com/user/orders" class="btn">Track Your Order</a>
+</div>
+
+<p>Thank you for shopping with us.</p>
+
+<p>Best regards,<br>The ComraidShops Team</p>
+{% endblock %}

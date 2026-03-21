@@ -4,13 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { fetchMagazines } from '@/lib/api';
-
-interface Magazine {
-    id: number;
-    title: string;
-    slug: string;
-    thumbnail: string;
-}
+import { Magazine } from '@/lib/types';
 
 export default function MagazineIndex() {
     const [magazines, setMagazines] = useState<Magazine[]>([]);
@@ -68,6 +62,8 @@ export default function MagazineIndex() {
                                 alt={featuredMag.title}
                                 fill
                                 className="object-cover"
+                                priority
+                                sizes="(max-width: 768px) 100vw, 66vw"
                             />
                         </div>
                         <div className="md:col-span-4 space-y-6 pt-4">
@@ -78,7 +74,7 @@ export default function MagazineIndex() {
                                 {featuredMag.title}.
                             </h2>
                             <p className="text-lg text-secondary leading-relaxed">
-                                Explore the intersection of philosophy and discipline through our editorial lens.
+                                {featuredMag.excerpt}
                             </p>
                             <Link
                                 href={`/magazine/${featuredMag.slug}`}
@@ -101,6 +97,7 @@ export default function MagazineIndex() {
                                         alt={mag.title}
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                     />
                                 </div>
                                 <div>
@@ -111,7 +108,7 @@ export default function MagazineIndex() {
                                         {mag.title}.
                                     </h3>
                                     <p className="text-sm text-secondary/80 mt-2 leading-relaxed">
-                                        Dive deeper into the architectural precision of form and function.
+                                        {mag.excerpt}
                                     </p>
                                 </div>
                             </article>

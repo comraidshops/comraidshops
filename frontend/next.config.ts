@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "**",
+        pathname: "/**",
       },
       // Keep localhost for local development only
       {

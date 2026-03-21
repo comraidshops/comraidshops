@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useCart } from '@/context/CartContext';
-import { Product, ProductVariant } from '@/types/brand';
+import { Product, ProductVariant } from '@/lib/api';
 
 interface ProductActionsProps {
     product: Product;
@@ -23,9 +23,10 @@ export default function ProductActions({ product }: ProductActionsProps) {
             name: product.name,
             price: Number(product.price),
             image: product.image,
-            vendor: product.brand?.name || product.vendor_name || 'ComraidShops',
+            vendor: (typeof product.brand === 'string' ? product.brand : product.brand?.name) || product.vendor_name || 'ComraidShops',
             slug: product.slug,
-            variant: selectedVariant?.name || 'Standard'
+            variant: selectedVariant?.name || 'Standard',
+            stock: selectedVariant ? selectedVariant.stock : product.stock
         });
 
         setAdded(true);
