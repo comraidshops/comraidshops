@@ -9,7 +9,7 @@ import { API_BASE_URL } from '@/lib/constants';
 import 'react-quill-new/dist/quill.snow.css';
 
 
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false }) as any;
 
 interface ModalProps {
     isOpen: boolean;
