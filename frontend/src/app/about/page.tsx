@@ -17,7 +17,7 @@ export default function AboutPage() {
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-12 pt-8 border-t border-border">
+                <div className="grid md:grid-cols-2 gap-12 pt-8 border-t border-border items-center">
                     <div className="space-y-6">
                         <h2 className="text-3xl font-bold uppercase tracking-tighter">Our Vision</h2>
                         <p className="text-secondary/80 leading-relaxed text-lg">
@@ -27,8 +27,68 @@ export default function AboutPage() {
                             We meticulously curate our roster of designers, ensuring every brand on our platform aligns with our uncompromising standards for quality, design innovation, and subcultural relevance.
                         </p>
                     </div>
+                    <div className="relative aspect-square md:aspect-[4/5] overflow-hidden rounded-3xl group">
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-700 z-10" />
+                        <img 
+                            src="/logo-white.png" 
+                            alt="The Vision"
+                            className="w-full h-full object-cover grayscale opacity-50 contrast-125"
+                        />
+                    </div>
+                </div>
 
-                    <div className="space-y-6">
+                {/* Founder Section - Editorial */}
+                <div className="py-24 border-t border-border">
+                    <div className="grid lg:grid-cols-12 gap-16 items-center">
+                        <div className="lg:col-span-5 space-y-8 order-2 lg:order-1">
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Visionary</span>
+                                <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8]">
+                                    KENNC<br/>OFFICIAL
+                                </h2>
+                            </div>
+                            
+                            <div className="space-y-6">
+                                <p className="text-xl md:text-2xl font-playfair italic leading-relaxed text-foreground">
+                                    "A living archive of thought and form — where code breathes, fabric speaks, and meaning becomes architecture."
+                                </p>
+                                <p className="text-secondary leading-relaxed first-letter:text-5xl first-letter:font-black first-letter:mr-3 first-letter:float-left">
+                                    Founder Kenncofficial doesn't just build platforms; he builds worlds where code meets art. Rooted in the belief that every creation is a quiet conversation between vision and execution, he founded ComraidShops to be more than a marketplace—it is an architecture for the avant-garde.
+                                </p>
+                                <p className="text-secondary leading-relaxed">
+                                    His approach is defined by what he calls the "Silent Logic"—the unseen structure that supports pure creativity. This philosophy permeates every curation on ComraidShops, ensuring we don't just sell fashion; we document a movement.
+                                </p>
+                            </div>
+
+                            <Link 
+                                href="https://kennc.art" 
+                                target="_blank"
+                                className="inline-block text-[10px] font-black uppercase tracking-[0.3em] border-b-2 border-primary pb-1 hover:text-primary transition-colors"
+                            >
+                                Visit the Archive
+                            </Link>
+                        </div>
+                        
+                        <div className="lg:col-span-7 relative order-1 lg:order-2">
+                            <div className="aspect-[4/5] relative overflow-hidden rounded-[40px] shadow-2xl">
+                                <img 
+                                    src="/founder.png" 
+                                    alt="Kenncofficial Editorial"
+                                    className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-1000"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
+                            </div>
+                            
+                            {/* Accent UI Element */}
+                            <div className="absolute -bottom-8 -left-8 bg-primary text-background p-8 rounded-3xl hidden md:block">
+                                <span className="text-4xl font-black uppercase tracking-tighter block mb-2">01/01</span>
+                                <span className="text-[8px] font-bold uppercase tracking-widest block opacity-60">The Architect of Meaning</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-6 pt-12 border-t border-border">
                         <h2 className="text-3xl font-bold uppercase tracking-tighter">The Marketplace</h2>
                         <div className="space-y-8">
                             <div>
@@ -45,7 +105,6 @@ export default function AboutPage() {
                             </div>
                         </div>
                     </div>
-                </div>
 
                 <div className="pt-16 pb-8 border-t border-border text-center">
                     <div className="space-y-6 max-w-xl mx-auto">
