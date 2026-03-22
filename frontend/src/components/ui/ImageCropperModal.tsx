@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import Cropper from 'react-easy-crop';
+import CropperImport from 'react-easy-crop';
+const Cropper = CropperImport as any;
 import { AdminModal } from '@/components/admin/AdminForms';
 
 interface Point {
