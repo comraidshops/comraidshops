@@ -4,9 +4,11 @@
   "engines": {
     "node": ">=22"
   },
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
-    "build": "cd frontend && npm run build",
-    "install": "cd frontend && npm install",
-    "vercel-build": "cd frontend && npm run build"
+    "build": "npm run build --workspace=frontend",
+    "vercel-build": "npm run build --workspace=frontend"
   }
 }
