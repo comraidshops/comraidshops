@@ -50,13 +50,13 @@ export default function AboutPage() {
                             
                             <div className="space-y-6">
                                 <p className="text-xl md:text-2xl font-playfair italic leading-relaxed text-foreground">
-                                    "A living archive of thought and form — where code breathes, fabric speaks, and meaning becomes architecture."
+                                    "Vision without execution is hallucination."
                                 </p>
                                 <p className="text-secondary leading-relaxed first-letter:text-5xl first-letter:font-black first-letter:mr-3 first-letter:float-left">
-                                    Founder Kenncofficial doesn't just build platforms; he builds worlds where code meets art. Rooted in the belief that every creation is a quiet conversation between vision and execution, he founded ComraidShops to be more than a marketplace—it is an architecture for the avant-garde.
+                                    Founder Kenncofficial is a builder obsessed with structure, systems, and scale. He approaches entrepreneurship with precision—turning raw ideas into robust platforms and platforms into leverage.
                                 </p>
                                 <p className="text-secondary leading-relaxed">
-                                    His approach is defined by what he calls the "Silent Logic"—the unseen structure that supports pure creativity. This philosophy permeates every curation on ComraidShops, ensuring we don't just sell fashion; we document a movement.
+                                    This precision defines ComraidShops. Beyond a marketplace, it is a meticulously engineered environment designed to support the next generation of independent talent. Under his vision, we don't just facilitate transactions; we provide the architecture for institutional subcultural impact.
                                 </p>
                             </div>
 
