@@ -5,8 +5,8 @@ import ShopFilterBar from '@/components/shop/ShopFilterBar';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-    title: 'Shop | ComraidShops',
-    description: 'Browse our curated collection of streetwear running gear.',
+    title: 'Curated Labels | ComraidShops Collection',
+    description: 'Discover an uncompromising selection of independent luxury and underground streetwear labels. Curated for the discerning brand-first consumer.',
 };
 
 export default async function ShopPage({

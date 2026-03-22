@@ -3,8 +3,8 @@ import Image from 'next/image';
 import { API_BASE_URL, MEDIA_BASE } from '@/lib/api';
 
 export const metadata = {
-    title: 'Brands | ComraidShops',
-    description: 'Our curated list of vendor partners.',
+    title: 'Partner Labels | ComraidShops Brand Ecosystem',
+    description: 'Discover the architects of modern culture. ComraidShops curates a global roster of independent talent, providing the platform for their stories to be told.',
 };
 
 interface Brand {

@@ -9,8 +9,8 @@ const FeaturedLabels = dynamic(() => import('@/components/home/FeaturedLabels'))
 const ManifestoFragment = dynamic(() => import('@/components/home/ManifestoFragment'));
 
 export const metadata = {
-    title: 'ComraidShops | Curated Streetwear & Editorial Culture',
-    description: 'ComraidShops is a premier destination for independent streetwear, luxury fashion, and digital editorial culture. Discover unique pieces and the stories behind them.',
+    title: 'ComraidShops | A Brand-First Editorial Ecosystem',
+    description: 'Discover the intersection of culture and commerce. ComraidShops curates the world\'s most compelling independent labels through an editorial lens.',
 };
 
 import { getInitialData, API_BASE_URL } from '@/lib/api';

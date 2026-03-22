@@ -32,12 +32,12 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'ComraidShops | Curated Streetwear & Independent Labels',
+    default: 'ComraidShops | The Editorial Authority for Independent Brands & Cultural Curation',
     template: '%s | ComraidShops',
   },
   description:
-    'ComraidShops is the premier destination for independent streetwear and luxury labels. Discover curated collections, authentic brands, and editorial style.',
-  keywords: ['streetwear', 'independent brands', 'comraidshops', 'luxury fashion', 'curated style', 'Nigerian fashion'],
+    'Beyond commerce, ComraidShops is a global cultural ecosystem. Discover an editorial-led curation of independent labels and underground luxury that defines the next era of brand-first fashion.',
+  keywords: ['fashion culture', 'independent brands', 'editorial curation', 'brand-first', 'underground luxury', 'creative director', 'cultural ecosystem', 'streetwear authority', 'luxury streetwear', 'independent labels'],
   authors: [{ name: 'ComraidShops', url: SITE_URL }],
   creator: 'ComraidShops',
   publisher: 'ComraidShops',
@@ -51,9 +51,9 @@ export const metadata: Metadata = {
     siteName: 'ComraidShops',
     locale: 'en_US',
     url: SITE_URL,
-    title: 'ComraidShops | Curated Streetwear & Independent Labels',
+    title: 'ComraidShops | The Editorial Authority for Independent Brands & Cultural Curation',
     description:
-      'The premier destination for independent streetwear and luxury labels. Discover curated collections, authentic brands, and editorial style.',
+      'Beyond commerce, ComraidShops is a global cultural ecosystem. Discover an editorial-led curation of independent labels and underground luxury that defines the next era of brand-first fashion.',
     images: [
       {
         url: '/og-default.jpg',
@@ -66,9 +66,9 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     site: '@comraidshops',
-    title: 'ComraidShops | Curated Streetwear & Independent Labels',
+    title: 'ComraidShops | The Editorial Authority for Independent Brands & Cultural Curation',
     description:
-      'The premier destination for independent streetwear and luxury labels.',
+      'The premier destination for the intersection of independent labels and global fashion culture.',
     images: ['/og-default.jpg'],
   },
   icons: {

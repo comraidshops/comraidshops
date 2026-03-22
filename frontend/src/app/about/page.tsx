@@ -2,8 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 
 export const metadata = {
-    title: 'About | ComraidShops',
-    description: 'Learn about ComraidShops, the curated marketplace for independent streetwear and editorial culture.',
+    title: 'The Architecture of Impact | About ComraidShops',
+    description: 'Discover the vision behind ComraidShops—a brand-first ecosystem providing the editorial architecture for independent luxury labels to thrive.',
 };
 
 export default function AboutPage() {
