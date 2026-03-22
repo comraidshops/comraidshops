@@ -71,6 +71,11 @@ export const metadata: Metadata = {
       'The premier destination for independent streetwear and luxury labels.',
     images: ['/og-default.jpg'],
   },
+  icons: {
+    icon: '/logo-white.png',
+    shortcut: '/logo-white.png',
+    apple: '/logo-white.png',
+  },
 };
 
 export default function RootLayout({

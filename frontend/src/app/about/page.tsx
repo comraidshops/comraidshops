@@ -37,52 +37,63 @@ export default function AboutPage() {
                     </div>
                 </div>
 
-                {/* Founder Section - Editorial */}
-                <div className="py-24 border-t border-border">
-                    <div className="grid lg:grid-cols-12 gap-16 items-center">
-                        <div className="lg:col-span-5 space-y-8 order-2 lg:order-1">
-                            <div className="space-y-2">
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Visionary</span>
-                                <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8]">
-                                    KENNC<br/>OFFICIAL
-                                </h2>
-                            </div>
-                            
-                            <div className="space-y-6">
-                                <p className="text-xl md:text-2xl font-playfair italic leading-relaxed text-foreground">
-                                    "Vision without execution is hallucination."
-                                </p>
-                                <p className="text-secondary leading-relaxed first-letter:text-5xl first-letter:font-black first-letter:mr-3 first-letter:float-left">
-                                    Founder Kenncofficial is a builder obsessed with structure, systems, and scale. He approaches entrepreneurship with precision—turning raw ideas into robust platforms and platforms into leverage.
-                                </p>
-                                <p className="text-secondary leading-relaxed">
-                                    This precision defines ComraidShops. Beyond a marketplace, it is a meticulously engineered environment designed to support the next generation of independent talent. Under his vision, we don't just facilitate transactions; we provide the architecture for institutional subcultural impact.
-                                </p>
-                            </div>
+                {/* Founder Section - Editorial - Black Background */}
+                <div className="py-32 -mx-4 md:-mx-24 px-4 md:px-24 bg-black text-white rounded-[40px] md:rounded-[80px]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid lg:grid-cols-12 gap-16 items-center">
+                            <div className="lg:col-span-6 space-y-12 order-2 lg:order-1">
+                                <div className="space-y-4">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">The Visionary</span>
+                                    <h2 className="text-7xl md:text-9xl font-black uppercase tracking-tighter leading-[0.75]">
+                                        KENNC<br/>OFFICIAL
+                                    </h2>
+                                </div>
+                                
+                                <div className="space-y-8 max-w-xl">
+                                    <p className="text-2xl md:text-3xl font-playfair italic leading-relaxed text-white/90">
+                                        "Vision without execution is hallucination."
+                                    </p>
+                                    <div className="space-y-6 text-white/60 text-lg leading-relaxed">
+                                        <p className="first-letter:text-6xl first-letter:font-black first-letter:mr-4 first-letter:float-left first-letter:text-primary">
+                                            Founder Kenncofficial is a builder obsessed with structure, systems, and scale. He approaches entrepreneurship with precision—turning raw ideas into robust platforms and platforms into leverage.
+                                        </p>
+                                        <p>
+                                            This precision defines ComraidShops. Beyond a marketplace, it is a meticulously engineered environment designed to support the next generation of independent talent. Under his vision, we don't just facilitate transactions; we provide the architecture for institutional subcultural impact.
+                                        </p>
+                                    </div>
+                                </div>
 
-                            <Link 
-                                href="https://kennc.art" 
-                                target="_blank"
-                                className="inline-block text-[10px] font-black uppercase tracking-[0.3em] border-b-2 border-primary pb-1 hover:text-primary transition-colors"
-                            >
-                                Visit the Archive
-                            </Link>
-                        </div>
-                        
-                        <div className="lg:col-span-7 relative order-1 lg:order-2">
-                            <div className="aspect-[4/5] relative overflow-hidden rounded-[40px] shadow-2xl">
-                                <img 
-                                    src="/founder.png" 
-                                    alt="Kenncofficial Editorial"
-                                    className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-1000"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
+                                <div className="pt-4">
+                                    <Link 
+                                        href="https://kennc.art" 
+                                        target="_blank"
+                                        className="inline-block text-[10px] font-black uppercase tracking-[0.3em] border-b-2 border-primary pb-2 hover:translate-x-2 transition-all"
+                                    >
+                                        Visit the Archive
+                                    </Link>
+                                </div>
                             </div>
                             
-                            {/* Accent UI Element */}
-                            <div className="absolute -bottom-8 -left-8 bg-primary text-background p-8 rounded-3xl hidden md:block">
-                                <span className="text-4xl font-black uppercase tracking-tighter block mb-2">01/01</span>
-                                <span className="text-[8px] font-bold uppercase tracking-widest block opacity-60">The Architect of Meaning</span>
+                            <div className="lg:col-span-6 relative order-1 lg:order-2">
+                                <div className="relative group">
+                                    {/* Abstract Decorative Element */}
+                                    <div className="absolute -inset-4 bg-primary/10 rounded-[60px] blur-3xl group-hover:bg-primary/20 transition-all duration-1000" />
+                                    
+                                    <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-[40px] border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)]">
+                                        <img 
+                                            src="/founder.png" 
+                                            alt="Kenncofficial Editorial Collage"
+                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+                                    </div>
+
+                                    {/* Accent UI Element - Floating */}
+                                    <div className="absolute -bottom-6 -right-6 md:-bottom-12 md:-right-12 bg-primary text-black p-6 md:p-10 rounded-full w-32 h-32 md:w-48 md:h-48 flex flex-col justify-center items-center shadow-2xl rotate-12 hover:rotate-0 transition-transform duration-500">
+                                        <span className="text-3xl md:text-5xl font-black uppercase tracking-tighter">01</span>
+                                        <span className="text-[7px] md:text-[9px] font-bold uppercase tracking-widest text-center leading-tight">Master Architect</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
