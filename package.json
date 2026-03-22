@@ -1,0 +1,12 @@
+{
+  "name": "comraidshops-root",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "install": "cd frontend && npm install",
+    "vercel-build": "cd frontend && npm run build"
+  }
+}
