@@ -8,6 +8,7 @@ import {
     LucideIcon
 } from 'lucide-react';
 import { safeFetch } from '@/lib/api';
+import { formatCurrency } from '@/lib/format';
 
 interface Stats {
     total_orders: number;
@@ -74,7 +75,7 @@ export default function AdminDashboard() {
         // Background polling every 15 seconds
         const pollInterval = setInterval(() => {
             getStats(true);
-        }, 15000);
+        }, 30000); // Increased to 30s to reduce load
 
         return () => {
             isMounted = false;
@@ -89,7 +90,7 @@ export default function AdminDashboard() {
     );
 
     const cards = [
-        { title: 'Total Revenue', value: stats ? `₦${stats.total_revenue.toLocaleString()}` : '0', icon: TrendingUp, color: 'primary', delay: 0 },
+        { title: 'Total Revenue', value: stats ? formatCurrency(stats.total_revenue) : '₦0.00', icon: TrendingUp, color: 'primary', delay: 0 },
         { title: 'Total Orders', value: stats?.total_orders || 0, icon: ShoppingBag, color: 'blue-400', delay: 0.1 },
         { title: 'Active Vendors', value: stats?.active_vendors || 0, icon: Users, color: 'purple-400', delay: 0.2 },
         { title: 'Total Products', value: stats?.total_products || 0, icon: Package, color: 'orange-400', delay: 0.3 },

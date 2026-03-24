@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { Package, ShoppingCart, Banknote, CreditCard, BellRing } from 'lucide-react';
+import { Package, ShoppingCart, Banknote, CreditCard } from 'lucide-react';
 import StatCard from '@/components/vendor/StatCard';
 import OrdersTable, { Order } from '@/components/vendor/OrdersTable';
 import NotificationsPanel, { Notification } from '@/components/vendor/NotificationsPanel';
 import { useNotification } from '@/context/NotificationContext';
+import { formatCurrency } from '@/lib/format';
 
 interface DashboardMetrics {
   total_products: number;
@@ -111,7 +112,7 @@ export default function VendorDashboard() {
     // Polling every 15 seconds
     const intervalId = setInterval(() => {
         fetchMetrics(true);
-    }, 15000);
+    }, 30000); // Increased to 30s to reduce load
 
     return () => {
         isMounted = false;
@@ -191,7 +192,7 @@ export default function VendorDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Total Revenue" 
-          value={`₦${(metrics?.total_revenue ?? 0).toLocaleString()}`} 
+          value={formatCurrency(metrics?.total_revenue)} 
           icon={<Banknote className="w-4 h-4" />}
           description="Gross sales across all time"
         />
@@ -203,13 +204,13 @@ export default function VendorDashboard() {
         />
         <StatCard 
           title="Vendor Balance" 
-          value={`₦${(metrics?.vendor_balance ?? 0).toLocaleString()}`} 
+          value={formatCurrency(metrics?.vendor_balance)} 
           icon={<CreditCard className="w-4 h-4" />}
           description="Available for withdrawal"
         />
         <StatCard 
           title="Pending Payout" 
-          value={`₦${(metrics?.pending_payout ?? 0).toLocaleString()}`} 
+          value={formatCurrency(metrics?.pending_payout)} 
           icon={<ClockIcon />}
           description="Currently processing"
         />
@@ -229,7 +230,7 @@ export default function VendorDashboard() {
         />
         <StatCard 
           title="Total Commission Paid" 
-          value={`₦${(metrics?.total_commission ?? 0).toLocaleString()}`} 
+          value={formatCurrency(metrics?.total_commission)} 
         />
       </div>
 

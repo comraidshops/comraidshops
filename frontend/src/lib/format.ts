@@ -1,7 +1,8 @@
 /**
  * Utility for formatting currency in Naira (₦)
  */
-export function formatCurrency(amount: number | string): string {
+export function formatCurrency(amount: number | string | undefined | null): string {
+    if (amount === undefined || amount === null) return '₦0.00';
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
     if (isNaN(numericAmount)) return '₦0.00';
     
@@ -9,5 +10,6 @@ export function formatCurrency(amount: number | string): string {
         style: 'currency',
         currency: 'NGN',
         minimumFractionDigits: 2,
-    }).format(numericAmount).replace('NGN', '₦');
+        maximumFractionDigits: 2,
+    }).format(numericAmount).replace('NGN', '₦').trim();
 }

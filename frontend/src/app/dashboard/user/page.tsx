@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
 import { UserProfile, Order, Notification, OrderItem } from '@/types/user';
+import { formatCurrency } from '@/lib/format';
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string }> = {
     pending:    { label: 'Order Pending', icon: Clock,        color: 'text-amber-500',  bg: 'bg-amber-500/10'  },
@@ -86,7 +87,7 @@ export default function UserDashboardPage() {
 
         const pollInterval = setInterval(() => {
             fetchOverview(true);
-        }, 15000);
+        }, 30000); // Increased to 30s to reduce load
 
         return () => {
             isMounted = false;
@@ -185,7 +186,7 @@ export default function UserDashboardPage() {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-bold">₦{Number(order.total_amount).toLocaleString()}</p>
+                                            <p className="text-xs font-bold">{formatCurrency(order.total_amount)}</p>
                                             <span className={`text-[9px] font-black uppercase tracking-widest ${cfg.color}`}>{cfg.label}</span>
                                         </div>
                                     </Link>

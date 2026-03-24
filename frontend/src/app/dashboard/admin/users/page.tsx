@@ -9,6 +9,7 @@ import {
 import { safeFetch } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
 import { AdminModal, AdminInput, AdminSelect } from '@/components/admin/AdminForms';
+import { useDebounce } from '@/lib/hooks';
 
 interface User {
     id: number;
@@ -26,6 +27,7 @@ export default function AdminUsers() {
     const [users, setUsers] = useState<User[]>([]);
     const [actionLoading, setActionLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const [filter, setFilter] = useState<'all' | 'vendors' | 'pending'>('all');
     
     // Modal State
@@ -98,8 +100,8 @@ export default function AdminUsers() {
     }
 
     const filteredUsers = users.filter(user => {
-        const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                             user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = user.username.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || 
+                             user.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
         const matchesFilter = filter === 'all' || 
                              (filter === 'vendors' && user.is_vendor) || 
                              (filter === 'pending' && user.is_vendor && !user.is_vendor_approved);

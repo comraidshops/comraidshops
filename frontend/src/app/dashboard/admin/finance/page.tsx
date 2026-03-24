@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { safeFetch } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
+import { formatCurrency } from '@/lib/format';
 import { AdminModal, AdminInput } from '@/components/admin/AdminForms';
 
 interface Withdrawal {
@@ -162,14 +163,14 @@ export default function AdminFinance() {
                         <div>
                             <span className="block text-[8px] font-bold uppercase tracking-widest text-white/40 mb-1">Total Payouts</span>
                             <span className="text-xl lg:text-2xl font-bold tracking-tight">
-                                ₦{stats ? (stats.total_payouts >= 1000000 ? `${(stats.total_payouts / 1000000).toFixed(1)}M` : stats.total_payouts.toLocaleString()) : '...'}
+                                {stats ? formatCurrency(stats.total_payouts) : '...'}
                             </span>
                         </div>
                         <div className="w-px h-8 bg-white/5" />
                         <div>
                             <span className="block text-[8px] font-bold uppercase tracking-widest text-white/40 mb-1">Platform</span>
                             <span className="text-xl lg:text-2xl font-bold tracking-tight text-primary">
-                                ₦{stats ? (stats.platform_commission >= 1000 ? `${(stats.platform_commission / 1000).toFixed(0)}K` : stats.platform_commission.toLocaleString()) : '...'}
+                                {stats ? formatCurrency(stats.platform_commission) : '...'}
                             </span>
                         </div>
                     </div>
@@ -230,7 +231,7 @@ export default function AdminFinance() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6 font-bold text-lg">₦{parseFloat(w.amount).toLocaleString()}</td>
+                                        <td className="px-8 py-6 font-bold text-lg">{formatCurrency(w.amount)}</td>
                                         <td className="px-8 py-6">
                                             <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
                                                 w.status === 'paid' ? 'bg-primary/10 text-primary' : 
@@ -287,8 +288,8 @@ export default function AdminFinance() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="text-sm font-bold">₦{parseFloat(e.net_amount).toLocaleString()}</div>
-                                            <div className="text-[8px] text-primary font-black uppercase tracking-widest">+₦{parseFloat(e.commission_amount).toLocaleString()} Fee</div>
+                                            <div className="text-sm font-bold">{formatCurrency(e.net_amount)}</div>
+                                            <div className="text-[8px] text-primary font-black uppercase tracking-widest">+{formatCurrency(e.commission_amount)} Fee</div>
                                         </td>
                                         <td className="px-8 py-6 text-[8px] font-black uppercase tracking-widest text-white/40">{e.status}</td>
                                         <td className="px-8 py-6 text-[10px] font-bold text-white/40">{new Date(e.created_at).toLocaleDateString()}</td>
@@ -330,7 +331,7 @@ export default function AdminFinance() {
                                         {w.status}
                                     </span>
                                 </div>
-                                <div className="text-xl font-bold">₦{parseFloat(w.amount).toLocaleString()}</div>
+                                <div className="text-xl font-bold">{formatCurrency(w.amount)}</div>
                                 <div className="flex items-center justify-between pt-4 border-t border-white/5">
                                     <span className="text-[10px] text-white/20 font-bold">{new Date(w.created_at).toLocaleDateString()}</span>
                                     <div className="flex gap-2">
@@ -360,8 +361,8 @@ export default function AdminFinance() {
                                     <span className="text-[8px] font-black uppercase tracking-widest text-white/40">{e.status}</span>
                                 </div>
                                 <div>
-                                    <div className="text-xl font-bold">₦{parseFloat(e.net_amount).toLocaleString()}</div>
-                                    <div className="text-[8px] text-primary font-black uppercase tracking-widest">+₦{parseFloat(e.commission_amount).toLocaleString()} Commission</div>
+                                    <div className="text-xl font-bold">{formatCurrency(e.net_amount)}</div>
+                                    <div className="text-[8px] text-primary font-black uppercase tracking-widest">+{formatCurrency(e.commission_amount)} Commission</div>
                                 </div>
                                 <div className="flex items-center justify-between pt-4 border-t border-white/5">
                                     <span className="text-[10px] text-white/20 font-bold">{new Date(e.created_at).toLocaleDateString()}</span>
