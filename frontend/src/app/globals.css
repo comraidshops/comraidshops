@@ -59,7 +59,13 @@ body {
     font-family: var(--font-inter), sans-serif;
   }
   
-  .editorial-content p {
+  .editorial-content p,
+  .editorial-content span,
+  .editorial-content li,
+  .editorial-content div,
+  .editorial-content em,
+  .editorial-content u,
+  .editorial-content b {
     margin-bottom: 2rem;
     line-height: 1.8;
     color: var(--foreground) !important;
