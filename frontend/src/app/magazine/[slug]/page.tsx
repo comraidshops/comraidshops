@@ -89,7 +89,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
     };
 
     return (
-        <div className="min-h-screen bg-background pt-32 pb-24 px-6 md:px-12">
+        <div className="min-h-screen bg-background pt-24 md:pt-32 pb-24 px-4 md:px-12 overflow-x-hidden">
             <ReadingProgressBar />
             <SocialShare title={magazine.title} />
             
@@ -98,15 +98,15 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
             />
             
-            <header className="max-w-4xl mx-auto mb-20 text-center">
-                <div className="flex flex-col items-center gap-6 mb-12">
-                    <Link href="/magazine" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] text-secondary hover:text-foreground transition-all">
+            <header className="max-w-4xl mx-auto mb-16 md:mb-20 text-center">
+                <div className="flex flex-col items-center gap-6 mb-8 md:mb-12">
+                    <Link href="/magazine" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] md:tracking-[0.4em] text-secondary hover:text-foreground transition-all">
                         <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Magazine
                     </Link>
                     
-                    <div className="h-[1px] w-12 bg-border/50"></div>
+                    <div className="h-[1px] w-8 md:w-12 bg-border/50"></div>
                     
-                    <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.3em] text-secondary/60">
+                    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.1em] md:tracking-[0.3em] text-secondary/60">
                         <span>Volume 01</span>
                         <span className="w-1 h-1 rounded-full bg-border"></span>
                         <span>Philosophy</span>
@@ -119,7 +119,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                     </div>
                 </div>
                 
-                <h1 className="text-4xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-12 text-balance font-playfair">
+                <h1 className="text-4xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.95] md:leading-[0.9] mb-8 md:mb-12 text-balance font-playfair break-words px-2">
                     {magazine.title}.
                 </h1>
 
