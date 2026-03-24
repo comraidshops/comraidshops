@@ -23,14 +23,14 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
         <section className="py-24 px-6 bg-background overflow-hidden">
             <div className="max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-12 items-center gap-12">
                 {/* Visual - Left */}
-                <div className="md:col-span-7 relative aspect-[16/10] bg-secondary/5 overflow-hidden group">
+                <div className="md:col-span-7 relative aspect-[4/5] bg-secondary/5 overflow-hidden group">
                     <Image
                         src={magazine.thumbnail || '/images/placeholder.jpg'}
                         alt={magazine.title}
                         fill
-                        className="object-contain transition-transform duration-1000 group-hover:scale-[1.02]"
+                        className="object-cover object-top transition-transform duration-1000 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-black/[0.02] group-hover:bg-transparent transition-colors duration-500"></div>
+                    <div className="absolute inset-0 bg-black/[0.03] group-hover:bg-transparent transition-colors duration-500"></div>
                 </div>
 
                 {/* Content - Offset */}
