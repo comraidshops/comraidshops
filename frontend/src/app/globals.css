@@ -53,4 +53,19 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  
+  .editorial-content {
+    color: var(--foreground) !important;
+  }
+  
+  .editorial-content p, 
+  .editorial-content span, 
+  .editorial-content h1, 
+  .editorial-content h2, 
+  .editorial-content h3, 
+  .editorial-content h4, 
+  .editorial-content li,
+  .editorial-content div {
+    color: var(--foreground) !important;
+  }
 }

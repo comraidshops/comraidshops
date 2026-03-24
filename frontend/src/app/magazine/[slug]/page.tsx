@@ -113,7 +113,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                 <div className="max-w-none mb-24">
                     {hasContent ? (
                         <div
-                            className="space-y-8 text-lg md:text-xl text-foreground/80 leading-relaxed font-light"
+                            className="space-y-8 text-lg md:text-xl text-foreground/80 leading-relaxed font-light editorial-content"
                             dangerouslySetInnerHTML={{ __html: magazine.article?.content || '' }}
                         />
                     ) : (
