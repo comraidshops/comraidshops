@@ -501,10 +501,30 @@ class FitItemSerializer(serializers.ModelSerializer):
 class FitFrameSerializer(serializers.ModelSerializer):
     items = FitItemSerializer(many=True, read_only=True)
     brand = BrandSerializer(read_only=True)
+    product_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, required=False, queryset=Product.objects.all()
+    )
     
     class Meta:
         model = FitFrame
-        fields = ['id', 'title', 'slug', 'cover_image', 'brand', 'is_mixed', 'items']
+        fields = ['id', 'title', 'slug', 'cover_image', 'brand', 'is_mixed', 'is_featured', 'items', 'product_ids']
+        extra_kwargs = {'slug': {'required': False}}
+
+    def create(self, validated_data):
+        product_ids = validated_data.pop('product_ids', [])
+        fit_frame = FitFrame.objects.create(**validated_data)
+        for i, product in enumerate(product_ids):
+            FitItem.objects.create(fit=fit_frame, product=product, label=product.name, order=i)
+        return fit_frame
+
+    def update(self, instance, validated_data):
+        product_ids = validated_data.pop('product_ids', None)
+        instance = super().update(instance, validated_data)
+        if product_ids is not None:
+            instance.items.all().delete()
+            for i, product in enumerate(product_ids):
+                FitItem.objects.create(fit=instance, product=product, label=product.name, order=i)
+        return instance
 
 class SavedFitFrameSerializer(serializers.ModelSerializer):
     fitframe = FitFrameSerializer(read_only=True)

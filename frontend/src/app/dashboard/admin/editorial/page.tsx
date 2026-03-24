@@ -346,11 +346,13 @@ export default function AdminEditorial() {
                                                     if (activeTab === 'magazines' && item.article) {
                                                         editItem.content = item.article.content;
                                                     }
-                                                    if (activeTab === 'exhibitions') {
-                                                        editItem.product_ids = item.products?.map(p => p.id) || [];
-                                                        editItem.collection_ids = item.collections?.map(c => c.id) || [];
-                                                        editItem.magazine_ids = item.magazines?.map(m => m.id) || [];
-                                                        editItem.article_ids = item.articles?.map(a => a.id) || [];
+                                                    if (activeTab === 'exhibitions' || activeTab === 'fitframes') {
+                                                        editItem.product_ids = item.items?.map((i: any) => i.product.id) || item.products?.map((p: any) => p.id) || [];
+                                                        if (activeTab === 'exhibitions') {
+                                                            editItem.collection_ids = item.collections?.map((c: any) => c.id) || [];
+                                                            editItem.magazine_ids = item.magazines?.map((m: any) => m.id) || [];
+                                                            editItem.article_ids = item.articles?.map((a: any) => a.id) || [];
+                                                        }
                                                     }
                                                     setCurrentItem(editItem);
                                                     setIsEditModalOpen(true);
@@ -481,11 +483,20 @@ export default function AdminEditorial() {
                     )}
                     
                     {(activeTab === 'exhibitions' || activeTab === 'fitframes') && (
-                        <AdminTextArea 
-                            label="Description"
-                            value={currentItem?.description || ''}
-                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCurrentItem({ ...currentItem, description: e.target.value })}
-                        />
+                        <>
+                            <AdminTextArea 
+                                label="Description"
+                                value={currentItem?.description || ''}
+                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCurrentItem({ ...currentItem, description: e.target.value })}
+                            />
+                            
+                            <AdminMultiSelect 
+                                label="Linked Products"
+                                options={products.map(p => ({ value: p.id, label: p.name }))}
+                                value={currentItem?.product_ids || []}
+                                onChange={(vals) => setCurrentItem({ ...currentItem, product_ids: vals as number[] })}
+                            />
+                        </>
                     )}
 
                     {activeTab === 'exhibitions' && (
