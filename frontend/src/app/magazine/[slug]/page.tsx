@@ -119,7 +119,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                     </div>
                 </div>
                 
-                <h1 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-12 text-balance font-playfair">
+                <h1 className="text-4xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-12 text-balance font-playfair">
                     {magazine.title}.
                 </h1>
 

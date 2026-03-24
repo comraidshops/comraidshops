@@ -66,16 +66,45 @@ body {
   .editorial-content em,
   .editorial-content u,
   .editorial-content b {
-    margin-bottom: 2rem;
-    line-height: 1.8;
+    margin-bottom: 1.5rem; /* Reduced for mobile-first */
+    line-height: 1.7; /* Tighter for mobile */
     color: var(--foreground) !important;
-    font-size: 1.125rem;
+    font-size: 1.05rem; /* Slightly smaller for mobile */
   }
 
   @media (min-width: 768px) {
-    .editorial-content p {
+    .editorial-content p,
+    .editorial-content span,
+    .editorial-content li,
+    .editorial-content div,
+    .editorial-content em,
+    .editorial-content u,
+    .editorial-content b {
+      margin-bottom: 2rem;
+      line-height: 1.8;
       font-size: 1.25rem;
     }
+  }
+
+  /* Preview Styles - Clean and Compact */
+  .editorial-content-preview p,
+  .editorial-content-preview span,
+  .editorial-content-preview div {
+    margin-bottom: 0.75rem !important;
+    line-height: 1.6 !important;
+    font-size: 1rem !important;
+    color: var(--secondary) !important;
+  }
+
+  .editorial-content-preview p:first-of-type::first-letter {
+    float: none !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    padding: 0 !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+    text-transform: none !important;
   }
 
   /* First paragraph drop cap */

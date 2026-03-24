@@ -46,7 +46,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                         {magazine.article?.title || magazine.title}
                     </h2>
                     <div 
-                        className="text-lg text-secondary mb-8 leading-relaxed max-w-md editorial-content-preview line-clamp-6 editorial-content"
+                        className="text-lg text-secondary mb-8 leading-relaxed max-w-md editorial-content-preview line-clamp-6"
                         dangerouslySetInnerHTML={{ 
                             __html: magazine.article?.content || magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial." 
                         }}
