@@ -40,6 +40,7 @@ interface EditorialBase {
     origin_country?: string;
     website?: string;
     magazine?: number;
+    article?: { content: string };
     
     // Exhibition nested fields
     products?: { id: number; name: string }[];
@@ -123,10 +124,15 @@ export default function AdminEditorial() {
         try {
             const formData = new FormData();
             Object.entries(currentItem).forEach(([key, val]) => {
+                let finalKey = key;
+                if (activeTab === 'magazines' && key === 'content') {
+                    finalKey = 'article_content';
+                }
+                
                 if (Array.isArray(val) && key.endsWith('_ids')) {
-                    val.forEach(v => formData.append(key, v.toString()));
+                    val.forEach(v => formData.append(finalKey, v.toString()));
                 } else if (val !== null && val !== undefined && !Array.isArray(val)) {
-                    formData.append(key, val as string | Blob);
+                    formData.append(finalKey, val as string | Blob);
                 }
             });
 
@@ -152,14 +158,19 @@ export default function AdminEditorial() {
         try {
             const formData = new FormData();
             Object.entries(currentItem).forEach(([key, val]) => {
+                let finalKey = key;
+                if (activeTab === 'magazines' && key === 'content') {
+                    finalKey = 'article_content';
+                }
+
                 if (Array.isArray(val) && key.endsWith('_ids')) {
-                    val.forEach(v => formData.append(key, v.toString()));
+                    val.forEach(v => formData.append(finalKey, v.toString()));
                 } else if (val && (val as any) instanceof File) {
-                    formData.append(key, val as any);
+                    formData.append(finalKey, val as any);
                 } else if (val !== null && val !== undefined && !Array.isArray(val)) {
                     // Only append if it's not a remote URL string (existing image)
                     if (typeof val !== 'string' || (!val.startsWith('http') && !val.startsWith('/media/'))) {
-                        formData.append(key, val as string | Blob);
+                        formData.append(finalKey, val as string | Blob);
                     }
                 }
             });
@@ -332,6 +343,9 @@ export default function AdminEditorial() {
                                             <button 
                                                 onClick={() => {
                                                     const editItem = { ...item };
+                                                    if (activeTab === 'magazines' && item.article) {
+                                                        editItem.content = item.article.content;
+                                                    }
                                                     if (activeTab === 'exhibitions') {
                                                         editItem.product_ids = item.products?.map(p => p.id) || [];
                                                         editItem.collection_ids = item.collections?.map(c => c.id) || [];
@@ -388,6 +402,14 @@ export default function AdminEditorial() {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, [activeTab === 'magazines' || activeTab === 'brands' ? 'title' : 'name']: e.target.value })}
                     />
                     
+                    {activeTab === 'magazines' && (
+                        <AdminRichText 
+                            label="Magazine Article Content"
+                            value={currentItem?.content || ''}
+                            onChange={(content: string) => setCurrentItem({ ...currentItem, content: content })}
+                        />
+                    )}
+
                     {activeTab !== 'brands' && (
                         <AdminImageUpload 
                             label={

@@ -84,17 +84,38 @@ class ProductLiteSerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
     products = ProductCardSerializer(many=True, read_only=True)
+    product_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, required=False, source='products', queryset=Product.objects.all()
+    )
     
     class Meta:
         model = Article
-        fields = ['id', 'magazine', 'content', 'image', 'products', 'created_at', 'updated_at']
+        fields = ['id', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at']
 
 class MagazineSerializer(serializers.ModelSerializer):
     article = ArticleSerializer(read_only=True)
+    article_content = serializers.CharField(write_only=True, required=False)
     
     class Meta:
         model = Magazine
-        fields = ['id', 'title', 'slug', 'excerpt', 'thumbnail', 'is_featured', 'article', 'created_at', 'meta_title', 'meta_description']
+        fields = ['id', 'title', 'slug', 'excerpt', 'thumbnail', 'is_featured', 'article', 'article_content', 'created_at', 'meta_title', 'meta_description']
+        extra_kwargs = {'slug': {'required': False}}
+
+    def create(self, validated_data):
+        article_content = validated_data.pop('article_content', None)
+        magazine = Magazine.objects.create(**validated_data)
+        if article_content:
+            Article.objects.create(magazine=magazine, content=article_content)
+        return magazine
+
+    def update(self, instance, validated_data):
+        article_content = validated_data.pop('article_content', None)
+        instance = super().update(instance, validated_data)
+        if article_content:
+            article, created = Article.objects.get_or_create(magazine=instance)
+            article.content = article_content
+            article.save()
+        return instance
 
 class CollectionSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
@@ -108,8 +129,8 @@ class CollectionSerializer(serializers.ModelSerializer):
         return ProductCardSerializer(qs, many=True, context=self.context).data
 
 class BrandSerializer(serializers.ModelSerializer):
-    vendor_username = serializers.CharField(source='vendor.user.username', read_only=True)
-    vendor_id = serializers.IntegerField(source='vendor.id', read_only=True)
+    vendor_username = serializers.SerializerMethodField()
+    vendor_id = serializers.SerializerMethodField()
     
     # These will be provided via annotations in the ViewSet for performance
     approved_product_count = serializers.IntegerField(read_only=True)
@@ -137,6 +158,17 @@ class BrandSerializer(serializers.ModelSerializer):
             'is_member', 'community_count',
             'meta_title', 'meta_description',
         ]
+        extra_kwargs = {'slug': {'required': False}}
+
+    def get_vendor_username(self, obj):
+        if hasattr(obj, 'vendor') and obj.vendor and obj.vendor.user:
+            return obj.vendor.user.username
+        return None
+
+    def get_vendor_id(self, obj):
+        if hasattr(obj, 'vendor') and obj.vendor:
+            return obj.vendor.id
+        return None
 
     def get_featured_products(self, obj):
         # Even here, we can optimize if we've prefetched featured_products_all
