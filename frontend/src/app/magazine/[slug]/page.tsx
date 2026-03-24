@@ -129,7 +129,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                     </p>
                 )}
 
-                <div className="flex items-center justify-center gap-8 border-t border-b border-border/50 py-6">
+                <div className="flex items-center justify-center gap-4 md:gap-8 border-t border-b border-border/50 py-6">
                     <div className="flex flex-col gap-1">
                         <span className="text-[8px] uppercase tracking-widest text-secondary/50">Published</span>
                         <span className="text-[10px] uppercase font-bold tracking-widest">
