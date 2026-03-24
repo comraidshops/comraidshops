@@ -41,6 +41,7 @@ interface EditorialBase {
     website?: string;
     magazine?: number;
     article?: { content: string };
+    items?: { id: number; label: string; product: { id: number; name: string } }[];
     
     // Exhibition nested fields
     products?: { id: number; name: string }[];
