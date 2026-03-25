@@ -196,7 +196,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                             <div className="h-[1px] w-8 bg-primary"></div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
-                            {magazine.article.products.map((product) => (
+                            {magazine.article.products.map((product: Product) => (
                                 <Link key={product.id} href={`/products/${product.slug}`} className="group block">
                                     <div className="aspect-[3/4] bg-secondary/5 relative mb-6 overflow-hidden">
                                         {product.image ? (
@@ -232,7 +232,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-                            {magazine.linked_articles.slice(0, 3).map((related) => (
+                            {magazine.linked_articles.slice(0, 3).map((related: any) => (
                                 <Link key={related.id} href={`/magazine/${related.slug}`} className="group block">
                                     <div className="relative aspect-[3/4] overflow-hidden bg-secondary/5 mb-8 rounded-sm ring-1 ring-border/5 group-hover:ring-primary/20 transition-all duration-700">
                                         {related.cover ? (
