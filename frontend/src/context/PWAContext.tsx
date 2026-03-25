@@ -38,14 +38,22 @@ export const PWAProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                        (window.navigator as any).standalone === true;
     setIsStandalone(standalone);
 
-    // Check iOS
-    const platform = window.navigator?.platform || '';
-    const ios = /iPad|iPhone|iPod/.test(platform) ||
-                (window.navigator?.userAgent?.includes("Mac") && "ontouchend" in document);
-    setIsIOS(!!ios);
+    // Check iOS / iPadOS robustly
+    const checkIsIOS = () => {
+      const ua = window.navigator.userAgent;
+      const platform = window.navigator.platform;
+      const ios = /iPad|iPhone|iPod/.test(ua) || 
+                  (platform === 'MacIntel' && window.navigator.maxTouchPoints > 1) ||
+                  (/iPad|iPhone|iPod/.test(platform));
+      return !!ios;
+    };
+    
+    const ios = checkIsIOS();
+    setIsIOS(ios);
+    console.log('[PWA] Device Detection:', { ios, standalone });
 
     const handleBeforeInstallPrompt = (e: Event) => {
-      console.log('beforeinstallprompt fired');
+      console.log('[PWA] beforeinstallprompt event captured');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
