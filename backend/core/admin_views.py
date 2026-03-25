@@ -313,6 +313,23 @@ class AdminArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all().order_by('-created_at')
     serializer_class = ArticleSerializer
     permission_classes = [permissions.IsAdminUser]
+    lookup_field = 'id'
+
+    def create(self, request, *args, **kwargs):
+        # If an article exists for this magazine, update it instead of creating
+        magazine_id = request.data.get('magazine')
+        if magazine_id:
+            try:
+                article = Article.objects.get(magazine_id=magazine_id)
+                serializer = self.get_serializer(article, data=request.data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                self.perform_update(serializer)
+                from rest_framework import status
+                from rest_framework.response import Response
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Article.DoesNotExist:
+                pass
+        return super().create(request, *args, **kwargs)
 
 class AdminExhibitionViewSet(viewsets.ModelViewSet):
     queryset = Exhibition.objects.all().order_by('-created_at')

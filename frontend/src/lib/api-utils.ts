@@ -77,6 +77,10 @@ export async function safeFetch(url: string, options: RequestInit = {}, retries 
             throw new Error(`Request failed with status ${res.status}: ${errorDetail}`);
         }
 
+        if (res.status === 204) {
+            return null;
+        }
+
         return await res.json();
     } catch (_err) {
         const error = _err as Error;

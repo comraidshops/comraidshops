@@ -83,6 +83,7 @@ class ProductLiteSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'price', 'image', 'slug', 'brand_name', 'category_name', 'stock', 'status', 'is_featured']
 
 class ArticleSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='magazine.title', read_only=True)
     products = ProductCardSerializer(many=True, read_only=True)
     product_ids = serializers.PrimaryKeyRelatedField(
         many=True, write_only=True, required=False, source='products', queryset=Product.objects.all()
@@ -90,7 +91,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Article
-        fields = ['id', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at']
 
 class MagazineSerializer(serializers.ModelSerializer):
     article = ArticleSerializer(read_only=True)
