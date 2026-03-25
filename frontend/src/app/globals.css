@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  /* SatisfyRunning Inspired Palette */
-  --background: #f4f4f4;
-  --foreground: #1a1a1a;
-  --accent: #d9d9d9;
-  --primary: #000000;
-  --secondary: #666666;
-  --border: #e5e5e5;
+  /* Forced Dark Mode Palette */
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --accent: #262626;
+  --primary: #ffffff;
+  --secondary: #a3a3a3;
+  --border: #333333;
 }
 
 @theme inline {
@@ -27,17 +27,6 @@
   @keyframes shimmer {
     from { transform: translateX(-100%); }
     to { transform: translateX(100%); }
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --accent: #262626;
-    --primary: #ffffff;
-    --secondary: #a3a3a3;
-    --border: #333333;
   }
 }
 
