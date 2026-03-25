@@ -1,29 +1,6 @@
 import { fetchMagazine, API_BASE_URL, MEDIA_BASE } from '@/lib/api';
-import { Product } from '@/lib/types';
+import { Product, Magazine } from '@/lib/types';
 
-interface Magazine {
-    id: number;
-    title: string;
-    slug: string;
-    description?: string;
-    excerpt?: string;
-    thumbnail?: string | null;
-    created_at?: string;
-    meta_title?: string | null;
-    meta_description?: string | null;
-    article?: {
-        title: string;
-        slug: string;
-        content: string;
-        products: Product[];
-    };
-    linked_articles?: {
-        id: number;
-        title: string;
-        slug: string;
-        cover?: string;
-    }[];
-}
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -42,7 +19,7 @@ function calculateReadingTime(content: string): number {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     try {
         const resolvedParams = await params;
-        const magazine = await fetchMagazine(resolvedParams.slug);
+        const magazine: any = await fetchMagazine(resolvedParams.slug);
         const title = magazine.meta_title || `${magazine.title} | Comraid Magazine`;
         const description = magazine.meta_description || magazine.excerpt || `Read ${magazine.title} on Comraid Magazine`;
         const canonicalUrl = `${SITE_URL}/magazine/${magazine.slug}`;
@@ -77,7 +54,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
     const resolvedParams = await params;
     const { slug } = resolvedParams;
     
-    let magazine: Magazine | null = null;
+    let magazine: any = null;
     try {
         magazine = await fetchMagazine(slug);
     } catch (error) {
