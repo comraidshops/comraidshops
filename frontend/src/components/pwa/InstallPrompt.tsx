@@ -22,7 +22,7 @@ export default function InstallPrompt() {
         return () => clearTimeout(timer);
       }
     }
-  }, [isInstallable, isStandalone, isIOS]);
+  }, [isInstallable, isStandalone, isIOS, manualShowPrompt]);
 
   const handleInstallClick = async () => {
     await installApp();

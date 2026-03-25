@@ -7,6 +7,7 @@ import { ShoppingBag, Search, Menu, X, User, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { usePWA } from '@/context/PWAContext';
+import { useNotification } from '@/context/NotificationContext';
 import Image from 'next/image';
 
 export default function Header() {
@@ -19,6 +20,7 @@ export default function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [mounted, setMounted] = useState(false);
     const { isInstallable, installApp, isIOS, isStandalone, setManualShowPrompt } = usePWA();
+    const { notify } = useNotification();
 
     useEffect(() => {
         const timer = setTimeout(() => setMounted(true), 0);
@@ -97,7 +99,7 @@ export default function Header() {
                                 } else if (isIOS) {
                                     setManualShowPrompt(true);
                                 } else {
-                                    alert("Installation is currently being prepared by your browser. Please browse a few more pages or refresh to enable the 'Install App' option.");
+                                    notify('info', 'PWA Sync in Progress', "Your browser is preparing the installation environment. Please navigate around for a few seconds or refresh to enable the 'Install' option.");
                                 }
                             }}
                             className="hover:text-primary transition-colors flex items-center gap-2"
@@ -182,7 +184,7 @@ export default function Header() {
                                             setIsMenuOpen(false);
                                             setManualShowPrompt(true);
                                         } else {
-                                            alert("Installation is being prepared. Please navigate around or refresh.");
+                                            notify('info', 'PWA Sync', 'Installation is being prepared. Please navigate around or refresh.');
                                         }
                                     }}
                                     className="text-xs font-black uppercase tracking-[0.2em] text-primary border border-primary/20 px-8 py-3 w-full text-center"
