@@ -89,13 +89,15 @@ export default function Header() {
                         {isSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
                     </button>
 
-                    {((isInstallable || isIOS) && !isStandalone) && (
+                    {(!isStandalone) && (
                         <button 
                             onClick={() => {
                                 if (isInstallable && !isIOS) {
                                     installApp();
-                                } else {
+                                } else if (isIOS) {
                                     setManualShowPrompt(true);
+                                } else {
+                                    alert("Installation is currently being prepared by your browser. Please browse a few more pages or refresh to enable the 'Install App' option.");
                                 }
                             }}
                             className="hover:text-primary transition-colors flex items-center gap-2"
@@ -103,7 +105,7 @@ export default function Header() {
                         >
                             <Download className="w-5 h-5" />
                             <span className="hidden lg:block text-[10px] font-black uppercase tracking-widest text-primary animate-pulse">
-                                Install
+                                {isInstallable || isIOS ? 'Install' : 'App'}
                             </span>
                         </button>
                     )}
@@ -170,14 +172,17 @@ export default function Header() {
                         <div className="w-full max-w-[200px] h-px bg-border"></div>
 
                         <div className="flex flex-col items-center gap-4">
-                            {((isInstallable || isIOS) && !isStandalone) && (
+                            {!isStandalone && (
                                 <button 
                                     onClick={() => {
-                                        setIsMenuOpen(false);
                                         if (isInstallable && !isIOS) {
+                                            setIsMenuOpen(false);
                                             installApp();
-                                        } else {
+                                        } else if (isIOS) {
+                                            setIsMenuOpen(false);
                                             setManualShowPrompt(true);
+                                        } else {
+                                            alert("Installation is being prepared. Please navigate around or refresh.");
                                         }
                                     }}
                                     className="text-xs font-black uppercase tracking-[0.2em] text-primary border border-primary/20 px-8 py-3 w-full text-center"
