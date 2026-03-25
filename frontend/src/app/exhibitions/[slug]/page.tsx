@@ -1,17 +1,8 @@
 import { Metadata } from 'next';
 import { fetchExhibition, fetchExhibitions } from '@/lib/api';
 
-export async function generateStaticParams() {
-    try {
-        const exhibitions = await fetchExhibitions();
-        return exhibitions.map((exhibition: any) => ({
-            slug: exhibition.slug,
-        }));
-    } catch (error) {
-        console.error("Failed to generate static params for exhibitions:", error);
-        return [];
-    }
-}
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import ExhibitionClient from './ExhibitionClient';
 import Link from 'next/link';
 

@@ -1,17 +1,7 @@
 import { fetchBrand, fetchBrandProducts, fetchBrands, PaginatedResponse, Brand, Product } from "@/lib/api"
 
-export async function generateStaticParams() {
-    try {
-        const brandsData = await fetchBrands();
-        const brands = Array.isArray(brandsData) ? brandsData : [];
-        return brands.map((brand: Brand) => ({
-            slug: brand.slug,
-        }));
-    } catch (error) {
-        console.error("Failed to generate static params for brands:", error);
-        return [];
-    }
-}
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 
 import ProductCard from "@/components/shop/ProductCard"

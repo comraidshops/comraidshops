@@ -1,4 +1,7 @@
 import { fetchProduct, Product, ProductImage, ProductFeature, ProductSpecification } from "@/lib/api"
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import ProductCard from "@/components/shop/ProductCard"
 import Image from "next/image"
 import Link from "next/link"
