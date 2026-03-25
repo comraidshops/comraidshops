@@ -1,5 +1,29 @@
 import { fetchMagazine, API_BASE_URL, MEDIA_BASE } from '@/lib/api';
-import { Magazine } from '@/lib/types';
+import { Product } from '@/lib/types';
+
+interface Magazine {
+    id: number;
+    title: string;
+    slug: string;
+    description?: string;
+    excerpt?: string;
+    thumbnail?: string | null;
+    created_at?: string;
+    meta_title?: string | null;
+    meta_description?: string | null;
+    article?: {
+        title: string;
+        slug: string;
+        content: string;
+        products: Product[];
+    };
+    linked_articles?: {
+        id: number;
+        title: string;
+        slug: string;
+        cover?: string;
+    }[];
+}
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
