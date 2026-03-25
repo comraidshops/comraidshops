@@ -1,4 +1,5 @@
-import { fetchMagazine, API_BASE_URL, MEDIA_BASE, Magazine } from '@/lib/api';
+import { fetchMagazine, API_BASE_URL, MEDIA_BASE } from '@/lib/api';
+import { Magazine } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
