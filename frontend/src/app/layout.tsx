@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { CartProvider } from "@/context/CartContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { PWAProvider } from "@/context/PWAContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -104,15 +105,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${playfair.variable} antialiased min-h-screen flex flex-col`}
       >
         <NotificationProvider>
-          <CartProvider>
-            <Header />
-            <main className="flex-grow pt-16 pb-20 md:pb-0">
-              {children}
-            </main>
-            <Footer />
-            <MobileBottomNav />
-            <InstallPrompt />
-          </CartProvider>
+          <PWAProvider>
+            <CartProvider>
+              <Header />
+              <main className="flex-grow pt-16 pb-20 md:pb-0">
+                {children}
+              </main>
+              <Footer />
+              <MobileBottomNav />
+              <InstallPrompt />
+            </CartProvider>
+          </PWAProvider>
         </NotificationProvider>
       </body>
     </html>

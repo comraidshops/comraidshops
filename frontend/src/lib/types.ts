@@ -209,9 +209,15 @@ export interface Magazine {
     article?: {
         title: string;
         slug: string;
-        content?: string;
-        products?: Product[];
+        content: string;
+        products: Product[];
     };
+    linked_articles?: {
+        id: number;
+        title: string;
+        slug: string;
+        cover?: string;
+    }[];
 }
 
 export interface PaginatedResponse<T> {

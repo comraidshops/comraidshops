@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
+import { ShoppingBag, Search, Menu, X, User, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
+import { usePWA } from '@/context/PWAContext';
 import Image from 'next/image';
 
 export default function Header() {
@@ -17,6 +18,7 @@ export default function Header() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const { isInstallable, installApp, isIOS, isStandalone, setManualShowPrompt } = usePWA();
 
     useEffect(() => {
         const timer = setTimeout(() => setMounted(true), 0);
@@ -86,6 +88,25 @@ export default function Header() {
                     >
                         {isSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
                     </button>
+
+                    {((isInstallable || isIOS) && !isStandalone) && (
+                        <button 
+                            onClick={() => {
+                                if (isInstallable && !isIOS) {
+                                    installApp();
+                                } else {
+                                    setManualShowPrompt(true);
+                                }
+                            }}
+                            className="hover:text-primary transition-colors flex items-center gap-2"
+                            title="Install App"
+                        >
+                            <Download className="w-5 h-5" />
+                            <span className="hidden lg:block text-[10px] font-black uppercase tracking-widest text-primary animate-pulse">
+                                Install
+                            </span>
+                        </button>
+                    )}
                     <Link href={isLoggedIn ? "/dashboard/user" : "/auth/login"} className="hover:text-primary transition-colors flex items-center gap-2">
                         <User className="w-5 h-5" />
                         <span className="hidden lg:block text-[10px] font-black uppercase tracking-widest">
@@ -149,6 +170,21 @@ export default function Header() {
                         <div className="w-full max-w-[200px] h-px bg-border"></div>
 
                         <div className="flex flex-col items-center gap-4">
+                            {((isInstallable || isIOS) && !isStandalone) && (
+                                <button 
+                                    onClick={() => {
+                                        setIsMenuOpen(false);
+                                        if (isInstallable && !isIOS) {
+                                            installApp();
+                                        } else {
+                                            setManualShowPrompt(true);
+                                        }
+                                    }}
+                                    className="text-xs font-black uppercase tracking-[0.2em] text-primary border border-primary/20 px-8 py-3 w-full text-center"
+                                >
+                                    Install App
+                                </button>
+                            )}
                             {isLoggedIn ? (
                                 <Link href="/dashboard/user" onClick={() => setIsMenuOpen(false)} className="text-xs font-black uppercase tracking-[0.2em] bg-primary text-background px-8 py-3">Dashboard</Link>
                             ) : (
