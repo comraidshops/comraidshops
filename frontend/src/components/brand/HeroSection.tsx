@@ -30,8 +30,8 @@ export default function HeroSection({ name, description, heroImage, brandSlug, i
                         priority
                         sizes="100vw"
                     />
-                    {/* Subtle dark gradient overlay to improve text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-black/30 z-10" />
+                    {/* Strengthened dark overlay to improve text readability on bright images */}
+                    <div className="absolute inset-0 bg-black/20 bg-gradient-to-t from-background via-transparent to-black/40 z-10" />
                 </motion.div>
             ) : (
                 <div className="absolute inset-0 z-0 bg-secondary/5" />
@@ -39,13 +39,13 @@ export default function HeroSection({ name, description, heroImage, brandSlug, i
 
             <motion.div
                 style={{ opacity, y: useTransform(scrollY, [0, 400], [0, 80]) }}
-                className="relative z-10 max-w-7xl mx-auto px-6 text-center flex flex-col items-center mt-20"
+                className="relative z-20 max-w-7xl mx-auto px-6 text-center flex flex-col items-center mt-20"
             >
-                <h1 className="text-[clamp(3rem,8vw,8rem)] font-light uppercase tracking-widest mb-10 leading-none">
+                <h1 className="text-[clamp(3rem,8vw,8rem)] font-bold uppercase tracking-widest mb-10 leading-none drop-shadow-2xl">
                     {name}
                 </h1>
                 {description && (
-                    <p className="text-lg md:text-xl text-foreground/80 max-w-3xl leading-relaxed tracking-wide font-light">
+                    <p className="text-lg md:text-xl text-foreground max-w-3xl leading-relaxed tracking-wide font-medium drop-shadow-lg">
                         {description}
                     </p>
                 )}
