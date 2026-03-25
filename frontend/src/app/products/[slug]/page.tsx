@@ -6,7 +6,7 @@ import ProductActions from "@/components/shop/ProductActions"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     try {
         const resolvedParams = await params;
         if (!resolvedParams.slug || resolvedParams.slug === 'undefined') {
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
     const resolvedParams = await params;
     const slug = resolvedParams.slug;
 

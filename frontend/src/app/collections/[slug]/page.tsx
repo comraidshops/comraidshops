@@ -4,7 +4,7 @@ import ProductCard from "@/components/shop/ProductCard"
 import Image from "next/image"
 import Link from "next/link"
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     try {
         const resolvedParams = await params;
         const collection: Collection = await fetchCollection(resolvedParams.slug);
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-export default async function CollectionPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+export default async function CollectionPage({ params }: { params: Promise<{ slug: string }> }) {
     const resolvedParams = await params;
     const slug = resolvedParams.slug;
 

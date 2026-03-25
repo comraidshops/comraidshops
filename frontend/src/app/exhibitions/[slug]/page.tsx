@@ -17,7 +17,7 @@ import Link from 'next/link';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     try {
         const resolvedParams = await params;
         const exhibition = await fetchExhibition(resolvedParams.slug);
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-export default async function ExhibitionPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+export default async function ExhibitionPage({ params }: { params: Promise<{ slug: string }> }) {
     const resolvedParams = await params;
     const { slug } = resolvedParams;
 

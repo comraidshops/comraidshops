@@ -26,7 +26,7 @@ import SocialLinks from "@/components/brand/SocialLinks"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     try {
         const resolvedParams = await params;
         const brand: Brand = await fetchBrand(resolvedParams.slug);
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-export default async function BrandPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+export default async function BrandPage({ params }: { params: Promise<{ slug: string }> }) {
     const resolvedParams = await params;
     const slug = resolvedParams.slug;
 

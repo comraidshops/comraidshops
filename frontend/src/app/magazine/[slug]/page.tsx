@@ -1,4 +1,4 @@
-import { fetchMagazine, API_BASE_URL, MEDIA_BASE, Magazine, Product } from '@/lib/api';
+import { fetchMagazine, API_BASE_URL, MEDIA_BASE, Magazine } from '@/lib/api';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -14,7 +14,7 @@ function calculateReadingTime(content: string): number {
     return Math.ceil(wordCount / wordsPerMinute);
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     try {
         const resolvedParams = await params;
         const magazine = await fetchMagazine(resolvedParams.slug);
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-export default async function MagazineDetailPage({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
+export default async function MagazineDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const resolvedParams = await params;
     const { slug } = resolvedParams;
     
@@ -212,6 +212,52 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                                     <div className="flex flex-col gap-1">
                                         <h3 className="text-[10px] font-bold uppercase tracking-widest group-hover:opacity-70 transition-opacity">{product.name}</h3>
                                         <div className="text-[10px] text-secondary tracking-widest">₦{Number(product.price).toLocaleString()}</div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Related Articles Section */}
+                {magazine.linked_articles && magazine.linked_articles.length > 0 && (
+                    <div className="mt-32 pt-24 border-t border-border/20">
+                        <div className="flex flex-col items-center mb-16">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary mb-4">
+                                Editorial Context
+                            </h2>
+                            <div className="h-[1px] w-12 bg-primary/30"></div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+                            {magazine.linked_articles.slice(0, 3).map((related) => (
+                                <Link key={related.id} href={`/magazine/${related.slug}`} className="group block">
+                                    <div className="relative aspect-[3/4] overflow-hidden bg-secondary/5 mb-8 rounded-sm ring-1 ring-border/5 group-hover:ring-primary/20 transition-all duration-700">
+                                        {related.cover ? (
+                                            <Image
+                                                src={related.cover.startsWith('http') ? related.cover : `${API_BASE_URL}${related.cover}`}
+                                                alt={related.title}
+                                                fill
+                                                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 flex items-center justify-center text-[8px] uppercase tracking-widest text-secondary/40">
+                                                Archival
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-primary">Literature</span>
+                                            <div className="h-px w-4 bg-border/50"></div>
+                                        </div>
+                                        <h3 className="text-xl font-bold uppercase tracking-tight leading-[1.1] group-hover:text-primary transition-colors font-playfair italic">
+                                            {related.title}
+                                        </h3>
+                                        <p className="text-[10px] text-secondary/60 uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform duration-500">
+                                            Read Context <span className="text-primary">→</span>
+                                        </p>
                                     </div>
                                 </Link>
                             ))}
