@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
@@ -29,6 +29,10 @@ const playfair = Playfair_Display({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
 
+export const viewport: Viewport = {
+  themeColor: "#000000",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -41,6 +45,15 @@ export const metadata: Metadata = {
   authors: [{ name: 'ComraidShops', url: SITE_URL }],
   creator: 'ComraidShops',
   publisher: 'ComraidShops',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'ComraidShops',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   robots: {
     index: true,
     follow: true,
@@ -74,9 +87,11 @@ export const metadata: Metadata = {
   icons: {
     icon: '/logo-white.png',
     shortcut: '/logo-white.png',
-    apple: '/logo-white.png',
+    apple: '/icon-192x192.png',
   },
 };
+
+import InstallPrompt from "@/components/pwa/InstallPrompt";
 
 export default function RootLayout({
   children,
@@ -96,6 +111,7 @@ export default function RootLayout({
             </main>
             <Footer />
             <MobileBottomNav />
+            <InstallPrompt />
           </CartProvider>
         </NotificationProvider>
       </body>

@@ -1,4 +1,48 @@
 import type { NextConfig } from "next";
+import withPWAInit from "@ducanh2912/next-pwa";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  skipWaiting: true,
+  workboxOptions: {
+    runtimeCaching: [
+      {
+        // 1. Cache images (30 days)
+        urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/i,
+        handler: "CacheFirst",
+        options: {
+          cacheName: "images-cache",
+          expiration: {
+            maxEntries: 100,
+            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+          },
+        },
+      },
+      {
+        // 3. NEVER cache sensitive endpoints
+        urlPattern: /\/(?:auth|user|orders|cart|payments)\/?/i,
+        handler: "NetworkOnly",
+        options: {
+          cacheName: "sensitive-endpoints",
+        },
+      },
+      {
+        // 2. Cache public API (5 minutes)
+        urlPattern: /\/(?:products|categories|collections)\/?/i,
+        handler: "StaleWhileRevalidate",
+        options: {
+          cacheName: "public-api-cache",
+          expiration: {
+            maxEntries: 100,
+            maxAgeSeconds: 5 * 60, // 5 minutes
+          },
+        },
+      },
+    ],
+  },
+});
 
 const nextConfig: NextConfig = {
   images: {
@@ -32,4 +76,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
