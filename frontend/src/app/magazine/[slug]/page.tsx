@@ -10,7 +10,7 @@ import { Metadata } from 'next';
 import ReadingProgressBar from '@/components/ui/ReadingProgressBar';
 import SocialShare from '@/components/ui/SocialShare';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
 function calculateReadingTime(content: string): number {
     const wordsPerMinute = 200;
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         const title = magazine.meta_title || `${magazine.title} | Comraid Magazine`;
         const description = magazine.meta_description || magazine.excerpt || `Read ${magazine.title} on Comraid Magazine`;
         const canonicalUrl = `${SITE_URL}/magazine/${magazine.slug}`;
-        const ogImage = magazine.thumbnail ? (magazine.thumbnail.startsWith('http') ? magazine.thumbnail : `${API_BASE_URL}${magazine.thumbnail}`) : `${SITE_URL}/og-magazine.jpg`;
+        const ogImage = magazine.thumbnail ? (magazine.thumbnail.startsWith('http') ? magazine.thumbnail : `${MEDIA_BASE}${magazine.thumbnail}`) : `${SITE_URL}/og-magazine.jpg`;
 
         return {
             title,

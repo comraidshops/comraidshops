@@ -12,19 +12,19 @@
     {% for item in items %}
     <tr>
         <td style="padding: 8px 0; border-bottom: 1px solid #333;">{{ item.quantity }}x {{ item.product.name }}</td>
-        <td style="padding: 8px 0; border-bottom: 1px solid #333; text-align: right;">${{ item.price }}</td>
+        <td style="padding: 8px 0; border-bottom: 1px solid #333; text-align: right;">₦{{ item.price }}</td>
     </tr>
-    {% endblock %}
+    {% endfor %}
     <tr>
         <td style="padding: 8px 0; font-weight: bold; color: #ffffff;">Total Amount</td>
-        <td style="padding: 8px 0; font-weight: bold; color: #ffffff; text-align: right;">${{ order.total_amount }}</td>
+        <td style="padding: 8px 0; font-weight: bold; color: #ffffff; text-align: right;">₦{{ order.total_amount }}</td>
     </tr>
 </table>
 
 <p>You will receive another notification once your order has been shipped.</p>
 
 <div class="btn-container">
-    <a href="{{ order_url|default:'https://comraidshops.com/user/orders' }}" class="btn">View Order Details</a>
+    <a href="{{ order_url|default:'https://comraidshops.art/user/orders' }}" class="btn">View Order Details</a>
 </div>
 
 <p>Best regards,<br>The ComraidShops Team</p>

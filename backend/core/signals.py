@@ -57,7 +57,7 @@ def handle_order_status_change(sender, instance, created, **kwargs):
     from django.conf import settings
     from django.db import transaction
 
-    frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.com')
+    frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
 
     prev_payment = getattr(instance, '_prev_payment_status', None)
     prev_order = getattr(instance, '_prev_order_status', None)

@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { fetchBrands, fetchShopProducts, fetchMagazines } from '@/lib/server-api';
 import { Brand, Product, Magazine } from '@/lib/types';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Static Routes

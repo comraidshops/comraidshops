@@ -1,4 +1,4 @@
-import { fetchBrand, fetchBrandProducts, fetchBrands, PaginatedResponse, Brand, Product } from "@/lib/api"
+import { fetchBrand, fetchBrandProducts, fetchBrands, PaginatedResponse, Brand, Product, MEDIA_BASE } from "@/lib/api"
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -14,7 +14,7 @@ import EditorialSection from "@/components/brand/EditorialSection"
 import MediaGallery from "@/components/brand/MediaGallery"
 import SocialLinks from "@/components/brand/SocialLinks"
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     try {
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         const title = brand.meta_title || `${brand.name} | ComraidShops`;
         const description = brand.meta_description || brand.tagline || brand.description?.slice(0, 160) || `Explore ${brand.name} at ComraidShops`;
         const canonicalUrl = `${SITE_URL}/brands/${brand.slug}`;
-        const ogImage = brand.hero_image || brand.logo || `${SITE_URL}/og-default.jpg`;
+        const ogImage = brand.hero_image ? (brand.hero_image.startsWith('http') ? brand.hero_image : `${MEDIA_BASE}${brand.hero_image}`) : (brand.logo ? (brand.logo.startsWith('http') ? brand.logo : `${MEDIA_BASE}${brand.logo}`) : `${SITE_URL}/og-default.jpg`);
 
         return {
             title,

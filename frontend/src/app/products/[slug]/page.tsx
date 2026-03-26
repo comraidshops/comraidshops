@@ -1,4 +1,4 @@
-import { fetchProduct, Product, ProductImage, ProductFeature, ProductSpecification } from "@/lib/api"
+import { fetchProduct, Product, ProductImage, ProductFeature, ProductSpecification, MEDIA_BASE } from "@/lib/api"
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -7,7 +7,7 @@ import Image from "next/image"
 import Link from "next/link"
 import ProductActions from "@/components/shop/ProductActions"
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     try {
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         const title = product.meta_title || `${product.name} by ${brandName} | ComraidShops`;
         const description = product.meta_description || product.short_description || product.description?.slice(0, 160) || `Buy ${product.name} on ComraidShops`;
         const canonicalUrl = `${SITE_URL}/products/${product.slug}`;
-        const ogImage = product.image || `${SITE_URL}/og-default.jpg`;
+        const ogImage = product.image ? (product.image.startsWith('http') ? product.image : `${MEDIA_BASE}${product.image}`) : `${SITE_URL}/og-default.jpg`;
 
         return {
             title,

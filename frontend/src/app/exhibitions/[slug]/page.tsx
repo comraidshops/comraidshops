@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
-import { fetchExhibition, fetchExhibitions } from '@/lib/api';
+import { fetchExhibition, fetchExhibitions, MEDIA_BASE } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 import ExhibitionClient from './ExhibitionClient';
 import Link from 'next/link';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     try {
@@ -16,7 +16,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         const title = exhibition.meta_title || `${exhibition.title} | ComraidShops Exhibition`;
         const description = exhibition.meta_description || exhibition.description?.slice(0, 160) || `Explore the ${exhibition.title} exhibition on ComraidShops.`;
         const canonicalUrl = `${SITE_URL}/exhibitions/${exhibition.slug}`;
-        const ogImage = exhibition.cover_image || exhibition.thumbnail || `${SITE_URL}/og-exhibition.jpg`;
+        const ogImage = exhibition.cover_image 
+            ? (exhibition.cover_image.startsWith('http') ? exhibition.cover_image : `${MEDIA_BASE}${exhibition.cover_image}`) 
+            : (exhibition.thumbnail ? (exhibition.thumbnail.startsWith('http') ? exhibition.thumbnail : `${MEDIA_BASE}${exhibition.thumbnail}`) : `${SITE_URL}/og-exhibition.jpg`);
 
         return {
             title,

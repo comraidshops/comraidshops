@@ -876,7 +876,7 @@ class RegisterView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = serializer.save()
         if user.email:
-            frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.com')
+            frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
             send_platform_email(
                 subject="Welcome to ComraidShops",
                 template_name="auth/welcome.html",
@@ -1016,7 +1016,7 @@ class PasswordResetRequestView(APIView):
             user = users.first()
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.com')
+            frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
             reset_url = f"{frontend_url}/reset-password?uid={uid}&token={token}"
             
             send_platform_email(
@@ -1064,7 +1064,7 @@ class VerifyEmailRequestView(APIView):
             
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.com')
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
         verify_url = f"{frontend_url}/verify-email?uid={uid}&token={token}"
         
         send_platform_email(

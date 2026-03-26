@@ -28,7 +28,7 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
 export const viewport: Viewport = {
   themeColor: "#000000",
