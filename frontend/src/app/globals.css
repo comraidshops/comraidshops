@@ -46,6 +46,13 @@ body {
   .editorial-content {
     color: var(--foreground) !important;
     font-family: var(--font-inter), sans-serif;
+    padding: 0 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .editorial-content {
+      padding: 0;
+    }
   }
   
   .editorial-content p,

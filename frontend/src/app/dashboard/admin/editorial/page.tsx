@@ -352,7 +352,7 @@ export default function AdminEditorial() {
                                                         }
                                                         editItem.linked_article_ids = item.linked_articles?.map((a: any) => a.id) || [];
                                                     }
-                                                    if (activeTab === 'exhibitions' || activeTab === 'fitframes') {
+                                                    if (activeTab === 'exhibitions' || activeTab === 'fitframes' || activeTab === 'articles') {
                                                         editItem.product_ids = item.items?.map((i: any) => i.product.id) || item.products?.map((p: any) => p.id) || [];
                                                         if (activeTab === 'exhibitions') {
                                                             editItem.collection_ids = item.collections?.map((c: any) => c.id) || [];
@@ -458,11 +458,19 @@ export default function AdminEditorial() {
                     )}
 
                     {activeTab === 'articles' && (
-                        <AdminRichText 
-                            label="Article Content"
-                            value={currentItem?.content || ''}
-                            onChange={(content: string) => setCurrentItem({ ...currentItem, content: content })}
-                        />
+                        <>
+                            <AdminRichText 
+                                label="Article Content"
+                                value={currentItem?.content || ''}
+                                onChange={(content: string) => setCurrentItem({ ...currentItem, content: content })}
+                            />
+                            <AdminMultiSelect 
+                                label="Linked Products"
+                                options={products.map(p => ({ value: p.id, label: p.name }))}
+                                value={currentItem?.product_ids || []}
+                                onChange={(vals) => setCurrentItem({ ...currentItem, product_ids: vals as number[] })}
+                            />
+                        </>
                     )}
 
                     {activeTab === 'brands' && (

@@ -114,14 +114,25 @@ class MagazineSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         article_content = validated_data.pop('article_content', None)
+        linked_articles = validated_data.pop('linked_articles', None)
         magazine = Magazine.objects.create(**validated_data)
+        
+        if linked_articles is not None:
+            magazine.linked_articles.set(linked_articles)
+            
         if article_content:
             Article.objects.create(magazine=magazine, content=article_content)
         return magazine
 
     def update(self, instance, validated_data):
         article_content = validated_data.pop('article_content', None)
+        linked_articles = validated_data.pop('linked_articles', None)
+        
         instance = super().update(instance, validated_data)
+        
+        if linked_articles is not None:
+            instance.linked_articles.set(linked_articles)
+            
         if article_content:
             article, created = Article.objects.get_or_create(magazine=instance)
             article.content = article_content

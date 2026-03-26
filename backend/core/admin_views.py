@@ -323,11 +323,9 @@ class AdminArticleViewSet(viewsets.ModelViewSet):
                 article = Article.objects.get(magazine_id=magazine_id)
                 serializer = self.get_serializer(article, data=request.data, partial=True)
                 serializer.is_valid(raise_exception=True)
-                self.perform_update(serializer)
-                from rest_framework import status
-                from rest_framework.response import Response
+                serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            except Article.DoesNotExist:
+            except (Article.DoesNotExist, ValueError, TypeError):
                 pass
         return super().create(request, *args, **kwargs)
 
