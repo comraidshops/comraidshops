@@ -94,7 +94,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
     };
 
     return (
-        <div className="min-h-screen bg-background pt-24 md:pt-32 pb-24 px-6 md:px-12 overflow-x-hidden">
+        <div className="min-h-screen bg-background pt-24 md:pt-32 pb-24 px-0 md:px-12 overflow-x-hidden">
             <ReadingProgressBar />
             <SocialShare title={magazine.title} />
             
@@ -124,7 +124,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                     </div>
                 </div>
                 
-                <h1 className="text-4xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.95] md:leading-[0.9] mb-8 md:mb-12 text-balance font-playfair break-words px-6 md:px-0">
+                <h1 className="text-4xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.95] md:leading-[0.9] mb-8 md:mb-12 text-balance font-playfair break-words px-8 md:px-0">
                     {magazine.title}.
                 </h1>
 
@@ -161,7 +161,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 </div>
 
-                <div className="max-w-none mb-32 px-6 md:px-0">
+                <div className="max-w-full mb-32 px-8 md:px-0">
                     {hasContent ? (
                         <div
                             className="editorial-content"

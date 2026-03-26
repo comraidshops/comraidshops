@@ -46,7 +46,15 @@ body {
   .editorial-content {
     color: var(--foreground) !important;
     font-family: var(--font-inter), sans-serif;
-    padding: 0 1.5rem;
+    padding: 0 2rem;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .editorial-content * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   @media (min-width: 768px) {
