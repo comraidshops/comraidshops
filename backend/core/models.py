@@ -37,6 +37,9 @@ class Magazine(models.Model):
     # SEO Fields
     meta_title = models.CharField(max_length=255, blank=True, null=True, help_text="SEO override title")
     meta_description = models.TextField(blank=True, null=True, help_text="SEO override description")
+    
+    # Linked Articles for "Editorial Context"
+    linked_articles = models.ManyToManyField('Article', related_name='linked_in_magazines', blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:

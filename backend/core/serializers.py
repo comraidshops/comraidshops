@@ -97,9 +97,19 @@ class MagazineSerializer(serializers.ModelSerializer):
     article = ArticleSerializer(read_only=True)
     article_content = serializers.CharField(write_only=True, required=False)
     
+    # New: Multi-article linking
+    linked_articles = ExhibitionArticleSerializer(many=True, read_only=True)
+    linked_article_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, required=False, source='linked_articles', queryset=Article.objects.all()
+    )
+    
     class Meta:
         model = Magazine
-        fields = ['id', 'title', 'slug', 'excerpt', 'thumbnail', 'is_featured', 'article', 'article_content', 'created_at', 'meta_title', 'meta_description']
+        fields = [
+            'id', 'title', 'slug', 'excerpt', 'thumbnail', 'is_featured', 
+            'article', 'article_content', 'linked_articles', 'linked_article_ids',
+            'created_at', 'meta_title', 'meta_description'
+        ]
         extra_kwargs = {'slug': {'required': False}}
 
     def create(self, validated_data):

@@ -48,10 +48,12 @@ interface EditorialBase {
     collections?: { id: number; name: string }[];
     magazines?: { id: number; title: string }[];
     articles?: { id: number; title: string }[];
+    linked_articles?: { id: number; title: string }[];
     product_ids?: number[];
     collection_ids?: number[];
     magazine_ids?: number[];
     article_ids?: number[];
+    linked_article_ids?: number[];
 }
 
 interface MagazineOption {
@@ -114,8 +116,8 @@ export default function AdminEditorial() {
         }
 
         fetchData();
-        if (activeTab === 'articles' || activeTab === 'exhibitions') fetchMagazines();
-        if (activeTab === 'exhibitions') fetchExhibitionDeps();
+        if (activeTab === 'articles' || activeTab === 'exhibitions' || activeTab === 'magazines') fetchMagazines();
+        if (activeTab === 'exhibitions' || activeTab === 'magazines') fetchExhibitionDeps();
     }, [activeTab]);
 
     async function handleCreate(e: React.FormEvent) {
@@ -344,8 +346,11 @@ export default function AdminEditorial() {
                                             <button 
                                                 onClick={() => {
                                                     const editItem = { ...item };
-                                                    if (activeTab === 'magazines' && item.article) {
-                                                        editItem.content = item.article.content;
+                                                    if (activeTab === 'magazines') {
+                                                        if (item.article) {
+                                                            editItem.content = item.article.content;
+                                                        }
+                                                        editItem.linked_article_ids = item.linked_articles?.map((a: any) => a.id) || [];
                                                     }
                                                     if (activeTab === 'exhibitions' || activeTab === 'fitframes') {
                                                         editItem.product_ids = item.items?.map((i: any) => i.product.id) || item.products?.map((p: any) => p.id) || [];
@@ -406,11 +411,19 @@ export default function AdminEditorial() {
                     />
                     
                     {activeTab === 'magazines' && (
-                        <AdminRichText 
-                            label="Magazine Article Content"
-                            value={currentItem?.content || ''}
-                            onChange={(content: string) => setCurrentItem({ ...currentItem, content: content })}
-                        />
+                        <>
+                            <AdminRichText 
+                                label="Magazine Article Content"
+                                value={currentItem?.content || ''}
+                                onChange={(content: string) => setCurrentItem({ ...currentItem, content: content })}
+                            />
+                            <AdminMultiSelect 
+                                label="Linked Articles (Editorial Context)"
+                                options={articles.map(a => ({ value: a.id, label: a.title }))}
+                                value={currentItem?.linked_article_ids || []}
+                                onChange={(vals) => setCurrentItem({ ...currentItem, linked_article_ids: vals as number[] })}
+                            />
+                        </>
                     )}
 
                     {activeTab !== 'brands' && (
