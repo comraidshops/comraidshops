@@ -119,7 +119,7 @@ export default function ManifestoFragment() {
                         
                         <p className="text-[13px] md:text-[15px] font-light uppercase tracking-[0.3em] text-secondary/60 leading-relaxed max-w-md">
                             ComraidShops exists for the <br />
-                            <span className="text-foreground font-medium mt-4 block tracking-[0.4em]">runners who create.</span>
+                            <span className="text-foreground font-medium mt-4 block tracking-[0.4em]">creators who create.</span>
                         </p>
                         
                         <div className="mt-16 flex items-center gap-4 text-[9px] uppercase tracking-[0.5em] text-secondary/40">
