@@ -35,10 +35,10 @@ export default function CurrentExhibition({ initialExhibition }: CurrentExhibiti
                         <span className="block text-xs font-bold uppercase tracking-[0.4em] text-primary">
                             Featured Exhibition
                         </span>
-                        <h2 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-4">
+                        <h2 className="font-bebas text-5xl md:text-8xl uppercase tracking-wide leading-[0.9] mb-4">
                             {exhibition.title}
                         </h2>
-                        <p className="text-lg md:text-xl text-secondary/80 max-w-xl leading-relaxed mb-8">
+                        <p className="font-source-serif text-lg md:text-xl text-secondary/80 max-w-xl leading-relaxed mb-8 italic">
                             {exhibition.description || "Experience the temporal intersection of architecture and human movement in our latest curated showcase."}
                         </p>
 

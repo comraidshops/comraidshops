@@ -22,7 +22,7 @@ export default function FeaturedLabels({ initialBrands }: FeaturedLabelsProps) {
         return (
             <section className="py-32 px-6 bg-secondary/5">
                 <div className="max-w-[1920px] mx-auto">
-                    <h2 className="text-2xl font-bold uppercase tracking-tight mb-16 border-b border-border pb-4">
+                    <h2 className="font-bebas text-3xl md:text-4xl uppercase tracking-wide mb-16 border-b border-border pb-4">
                         Featured Collaborators
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -65,7 +65,7 @@ export default function FeaturedLabels({ initialBrands }: FeaturedLabelsProps) {
                                     {brand.name}
                                 </h3>
                                 {brand.tagline && (
-                                    <p className="text-lg md:text-xl font-medium max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0 text-white drop-shadow-md">
+                                    <p className="font-source-serif text-lg md:text-xl italic max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0 text-white drop-shadow-md">
                                         &quot;{brand.tagline}&quot;
                                     </p>
                                 )}

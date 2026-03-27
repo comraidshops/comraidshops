@@ -41,7 +41,7 @@ export default function CurrentRotation({ initialProducts }: CurrentRotationProp
         <section className="py-32 px-6 bg-background">
             <div className="max-w-[1920px] mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-baseline mb-24 border-b border-border pb-4">
-                    <h2 className="text-2xl font-bold uppercase tracking-tight">Current Rotation</h2>
+                    <h2 className="font-bebas text-3xl md:text-4xl uppercase tracking-wide">Current Rotation</h2>
                     <span className="text-xs uppercase tracking-widest text-secondary hidden md:block">
                         Issue 01 • Fall/Winter 2026
                     </span>

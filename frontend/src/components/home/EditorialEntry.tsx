@@ -42,11 +42,11 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                             year: 'numeric'
                         }) : 'Recent Edition'}
                     </span>
-                    <h2 className="text-4xl md:text-5xl font-bold uppercase tracking-tighter mb-6 leading-none">
+                    <h2 className="font-bebas text-5xl md:text-6xl uppercase tracking-wide mb-6 leading-none">
                         {magazine.article?.title || magazine.title}
                     </h2>
                     <div 
-                        className="text-lg text-secondary mb-8 leading-relaxed max-w-md editorial-content-preview line-clamp-6"
+                        className="text-lg text-secondary mb-8 leading-relaxed max-w-md editorial-content-preview line-clamp-6 font-source-serif"
                         dangerouslySetInnerHTML={{ 
                             __html: magazine.article?.content || magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial." 
                         }}

@@ -182,7 +182,7 @@ export default function FitsAndFrames({ initialFits }: FitsAndFramesProps) {
         <section className="bg-black text-white py-32 px-4 md:px-8 relative overflow-hidden">
             {/* Header */}
             <div className="max-w-[1920px] mx-auto mb-16 flex flex-col md:flex-row items-baseline justify-between border-b border-white/20 pb-6">
-                <h2 className="text-4xl md:text-5xl font-bold uppercase tracking-tighter">
+                <h2 className="font-bebas text-5xl md:text-6xl uppercase tracking-wide">
                     Fits <span className="text-white/40">&</span> Frames
                 </h2>
                 <div className="mt-4 md:mt-0 flex gap-8 text-sm font-bold uppercase tracking-widest text-white/60">

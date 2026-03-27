@@ -5,7 +5,7 @@ export default function Footer() {
         <footer className="bg-background border-t border-border py-12 text-xs uppercase tracking-wide">
             <div className="max-w-[1920px] mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div>
-                    <h3 className="font-bold mb-4 uppercase">Explore</h3>
+                    <h3 className="font-baskerville font-bold mb-4 uppercase">Explore</h3>
                     <div className="flex flex-col gap-2">
                         <Link href="/about" className="text-secondary hover:text-primary transition-colors">About</Link>
                         <Link href="/magazine" className="text-secondary hover:text-primary transition-colors">Magazine</Link>
@@ -15,7 +15,7 @@ export default function Footer() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <h3 className="font-bold mb-2">Support</h3>
+                    <h3 className="font-baskerville font-bold mb-2">Support</h3>
                     <Link href="/contact" className="text-secondary hover:text-primary transition-colors">Contact</Link>
                     <Link href="/faq" className="text-secondary hover:text-primary transition-colors">FAQ</Link>
                     <Link href="/shipping" className="text-secondary hover:text-primary transition-colors">Shipping</Link>
@@ -23,13 +23,13 @@ export default function Footer() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <h3 className="font-bold mb-2">Legal</h3>
+                    <h3 className="font-baskerville font-bold mb-2">Legal</h3>
                     <Link href="/terms" className="text-secondary hover:text-primary transition-colors">Terms of Service</Link>
                     <Link href="/privacy" className="text-secondary hover:text-primary transition-colors">Privacy Policy</Link>
                 </div>
 
                 <div>
-                    <h3 className="font-bold mb-4">Newsletter</h3>
+                    <h3 className="font-baskerville font-bold mb-4">Newsletter</h3>
                     <form className="flex gap-2">
                         <input
                             type="email"

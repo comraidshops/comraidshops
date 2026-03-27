@@ -81,7 +81,7 @@ export default function HeroStatement({ initialSlides, initialUser }: HeroStatem
                     initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="font-playfair text-5xl md:text-7xl font-medium tracking-tight mb-12 drop-shadow-xl"
+                    className="font-cormorant text-5xl md:text-7xl font-bold italic tracking-tight mb-12 drop-shadow-xl"
                 >
                     Selected, <span className="italic opacity-80">Not Stocked.</span>
                 </motion.h1>

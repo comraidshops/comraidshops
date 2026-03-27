@@ -18,9 +18,11 @@
   --color-secondary: var(--secondary);
   --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
   --font-inter: var(--font-inter);
-  --font-playfair: var(--font-playfair);
+  --font-cormorant: var(--font-cormorant);
+  --font-bebas: var(--font-bebas);
+  --font-baskerville: var(--font-baskerville);
+  --font-source-serif: var(--font-source-serif);
   
   --animate-shimmer: shimmer 3s infinite;
 
@@ -45,7 +47,7 @@ body {
   
   .editorial-content {
     color: var(--foreground) !important;
-    font-family: var(--font-inter), sans-serif;
+    font-family: var(--font-source-serif), Georgia, serif;
     max-width: 100%;
     overflow-wrap: break-word;
     word-break: break-word;
@@ -70,7 +72,7 @@ body {
   .editorial-content u,
   .editorial-content b {
     margin-bottom: 1.25rem;
-    line-height: 1.625;
+    line-height: 1.75;
     color: rgba(255, 255, 255, 0.7) !important;
     font-size: 1rem;
   }
@@ -84,7 +86,7 @@ body {
     .editorial-content u,
     .editorial-content b {
       margin-bottom: 1.5rem;
-      line-height: 1.625;
+      line-height: 1.8;
       font-size: 1.125rem;
     }
   }
@@ -97,6 +99,7 @@ body {
     line-height: 1.6 !important;
     font-size: 1rem !important;
     color: var(--secondary) !important;
+    font-family: var(--font-source-serif), Georgia, serif;
   }
 
   .editorial-content-preview p:first-of-type::first-letter {
@@ -113,13 +116,13 @@ body {
   /* First paragraph drop cap */
   .editorial-content p:first-of-type::first-letter {
     float: left;
-    font-family: var(--font-sans), sans-serif;
-    font-size: 3.75rem;
+    font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+    font-size: 4rem;
     line-height: 1;
     padding-top: 0.1em;
     padding-right: 1rem;
     padding-left: 0;
-    font-weight: 900;
+    font-weight: 700;
     color: var(--primary);
   }
 
@@ -127,9 +130,10 @@ body {
   .editorial-content h2, 
   .editorial-content h3, 
   .editorial-content h4 {
-    font-family: var(--font-playfair), serif;
+    font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
     color: var(--foreground) !important;
     font-weight: 700;
+    font-style: italic;
     line-height: 1.2;
     margin-top: 3rem;
     margin-bottom: 1.5rem;
@@ -137,11 +141,11 @@ body {
   }
 
   .editorial-content h2 {
-    font-size: 2rem;
+    font-size: 2.25rem;
   }
 
   .editorial-content h3 {
-    font-size: 1.5rem;
+    font-size: 1.625rem;
   }
 
   /* Pull Quote Styles */
@@ -162,8 +166,8 @@ body {
   }
 
   .editorial-content blockquote p {
-    font-family: var(--font-playfair), serif;
-    font-size: 1.5rem !important;
+    font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+    font-size: 1.625rem !important;
     font-style: italic;
     line-height: 1.625 !important;
     margin-bottom: 0 !important;
@@ -172,7 +176,7 @@ body {
 
   @media (min-width: 768px) {
     .editorial-content blockquote p {
-      font-size: 1.875rem !important;
+      font-size: 2rem !important;
     }
   }
 
@@ -184,7 +188,7 @@ body {
     transform: translateX(-50%);
     font-size: 4rem;
     opacity: 0.1;
-    font-family: serif;
+    font-family: var(--font-cormorant), serif;
   }
 
   /* Emphasized Text */

@@ -77,7 +77,7 @@ export default function ManifestoFragment() {
                         Manifesto No. 01 / Perception
                     </motion.div>
                     
-                    <h2 className="text-4xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight leading-[0.85] flex flex-wrap justify-center gap-x-6 md:gap-x-10 mb-20 px-4">
+                    <h2 className="font-baskerville text-4xl md:text-7xl lg:text-8xl italic uppercase tracking-tight leading-[0.85] flex flex-wrap justify-center gap-x-6 md:gap-x-10 mb-20 px-4">
                         {sentence1.split(" ").map((word, i) => (
                             <motion.span
                                 key={i}
@@ -117,7 +117,7 @@ export default function ManifestoFragment() {
                     >
                         <div className="h-px w-24 bg-foreground/10 mb-16" />
                         
-                        <p className="text-[13px] md:text-[15px] font-light uppercase tracking-[0.3em] text-secondary/60 leading-relaxed max-w-md">
+                        <p className="font-baskerville text-[13px] md:text-[15px] uppercase tracking-[0.3em] text-secondary/60 leading-relaxed max-w-md">
                             ComraidShops exists for the <br />
                             <span className="text-foreground font-medium mt-4 block tracking-[0.4em]">creators by curators.</span>
                         </p>
