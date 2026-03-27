@@ -30,6 +30,33 @@ export async function refreshToken() {
     return data.access;
 }
 
+function formatErrorMessage(status: number, detail: string): string {
+    try {
+        const parsed = JSON.parse(detail);
+        // Handle DRF style errors: { "detail": "..." } or { "email": ["..."] }
+        if (parsed.detail) {
+            if (status === 401 && parsed.detail.includes("No active account found")) {
+                return "Invalid email or password. Please check your credentials.";
+            }
+            return parsed.detail;
+        }
+        
+        // Handle field-specific errors: { "field": ["message"] }
+        const firstField = Object.keys(parsed)[0];
+        if (firstField && Array.isArray(parsed[firstField])) {
+            return `${firstField}: ${parsed[firstField][0]}`;
+        }
+    } catch {
+        // Not JSON, return truncated original or generic message
+    }
+
+    if (status === 401) return "Session expired or unauthorized access.";
+    if (status === 403) return "You do not have permission to perform this action.";
+    if (status >= 500) return "A server error occurred. Please try again later.";
+    
+    return detail.length > 100 ? `Request failed with status ${status}` : detail || `Request failed (${status})`;
+}
+
 export async function safeFetch(url: string, options: RequestInit = {}, retries = 1, isRetryAfterRefresh = false) {
     const finalUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : url;
     
@@ -74,7 +101,8 @@ export async function safeFetch(url: string, options: RequestInit = {}, retries 
 
         if (!res.ok) {
             const errorDetail = await res.text();
-            throw new Error(`Request failed with status ${res.status}: ${errorDetail}`);
+            const formattedMessage = formatErrorMessage(res.status, errorDetail);
+            throw new Error(formattedMessage);
         }
 
         if (res.status === 204) {
