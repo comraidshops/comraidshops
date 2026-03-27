@@ -1,40 +1,34 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { fetchMagazines } from '@/lib/api';
+import { fetchMagazines } from '@/lib/server-api';
 import { Magazine } from '@/lib/types';
+import { Metadata } from 'next';
 
-export default function MagazineIndex() {
-    const [magazines, setMagazines] = useState<Magazine[]>([]);
-    const [loading, setLoading] = useState(true);
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
-    useEffect(() => {
-        async function loadMagazines() {
-            try {
-                const data = await fetchMagazines();
-                setMagazines(data);
-            } catch (error) {
-                console.error("Failed to fetch magazines:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadMagazines();
-    }, []);
+export const metadata: Metadata = {
+    title: 'Comraid Magazine | Culture, Philosophy & Process',
+    description: 'Beyond commerce, we explore the intersection of craft, discipline, and the architectural evolution of the human form. Comraid Magazine documents the defining movements of our era.',
+    alternates: { canonical: `${SITE_URL}/magazine` },
+    openGraph: {
+        title: 'Comraid Magazine | Culture, Philosophy & Process',
+        description: 'Deep dives into craft, discipline, and the architectural evolution of the human form.',
+        url: `${SITE_URL}/magazine`,
+        images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630, alt: 'Comraid Magazine' }],
+    },
+};
+
+export default async function MagazineIndex() {
+    let magazines: Magazine[] = [];
+    try {
+        const data: any = await fetchMagazines();
+        magazines = Array.isArray(data) ? data : (data?.results || []);
+    } catch (error) {
+        console.error("Failed to fetch magazines:", error);
+    }
 
     const featuredMag = magazines.length > 0 ? magazines[0] : null;
     const remainingMags = magazines.slice(1);
-
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-background pt-32 px-6 animate-pulse">
-                <div className="h-24 bg-secondary/10 w-1/2 mb-12"></div>
-                <div className="aspect-video bg-secondary/10"></div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-background pt-32 pb-24 px-6 md:px-12">

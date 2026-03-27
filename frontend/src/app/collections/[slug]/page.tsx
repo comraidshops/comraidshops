@@ -1,5 +1,6 @@
 import { fetchCollection } from "@/lib/api"
 import { Collection, Product } from "@/lib/types"
+import { MEDIA_BASE } from "@/lib/constants"
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -7,13 +8,36 @@ import ProductCard from "@/components/shop/ProductCard"
 import Image from "next/image"
 import Link from "next/link"
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     try {
         const resolvedParams = await params;
         const collection: Collection = await fetchCollection(resolvedParams.slug);
+        
+        let ogImage = `${SITE_URL}/og-default.jpg`;
+        if (collection.hero_image) {
+            ogImage = collection.hero_image.startsWith('http') 
+                ? collection.hero_image 
+                : `${MEDIA_BASE}${collection.hero_image}`;
+        }
+
         return {
             title: `${collection.name} | ComraidShops`,
             description: collection.description || `Explore the ${collection.name} collection at ComraidShops`,
+            alternates: { canonical: `${SITE_URL}/collections/${resolvedParams.slug}` },
+            openGraph: {
+                title: `${collection.name} | ComraidShops`,
+                description: collection.description || `Explore the ${collection.name} curated collection.`,
+                url: `${SITE_URL}/collections/${resolvedParams.slug}`,
+                images: [{ url: ogImage, width: 1200, height: 630, alt: collection.name }],
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title: `${collection.name} | ComraidShops`,
+                description: collection.description || `Explore the ${collection.name} collection.`,
+                images: [ogImage],
+            }
         }
     } catch {
         return {

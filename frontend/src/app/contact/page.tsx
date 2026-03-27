@@ -1,6 +1,21 @@
 import React from 'react';
 import Link from 'next/link';
 import { Mail, MapPin } from 'lucide-react';
+import { Metadata } from 'next';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
+
+export const metadata: Metadata = {
+    title: 'Contact Us | ComraidShops curated assistance',
+    description: 'Have a question about an order, our brands, or just want to say hello? Our team is here to help and will get back to you as soon as possible.',
+    alternates: { canonical: `${SITE_URL}/contact` },
+    openGraph: {
+        title: 'Contact Us | ComraidShops',
+        description: 'Get in touch with the Comraid team.',
+        url: `${SITE_URL}/contact`,
+        images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630, alt: 'Contact Comraid' }],
+    },
+};
 
 export default function ContactPage() {
     return (

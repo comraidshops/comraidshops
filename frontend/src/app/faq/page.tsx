@@ -1,4 +1,19 @@
 import React from 'react';
+import { Metadata } from 'next';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
+
+export const metadata: Metadata = {
+    title: 'Frequently Asked Questions | ComraidShops Guide',
+    description: 'Everything you need to know about shopping, shipping, and architectural curation on ComraidShops.',
+    alternates: { canonical: `${SITE_URL}/faq` },
+    openGraph: {
+        title: 'Frequently Asked Questions | ComraidShops',
+        description: 'Your guide to the ComraidShops ecosystem.',
+        url: `${SITE_URL}/faq`,
+        images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630, alt: 'Comraid FAQ' }],
+    },
+};
 
 export default function FAQPage() {
     return (

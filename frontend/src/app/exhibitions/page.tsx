@@ -1,39 +1,30 @@
-
-'use client';
-
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { fetchExhibitions, Exhibition } from '@/lib/api';
+import { fetchExhibitions } from '@/lib/server-api';
+import { Exhibition } from '@/lib/types';
+import { Metadata } from 'next';
 
-export default function ExhibitionsIndex() {
-    const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
-    const [loading, setLoading] = useState(true);
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
-    useEffect(() => {
-        async function loadExhibitions() {
-            try {
-                const data = await fetchExhibitions();
-                setExhibitions(data);
-            } catch (error) {
-                console.error("Failed to fetch exhibitions:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadExhibitions();
-    }, []);
+export const metadata: Metadata = {
+    title: 'Archive Exhibitions | Curated Temporal Collections',
+    description: 'Explore the temporal intersection of architecture and human movement within the ComraidShops curated archive. Temporal exhibits redefined.',
+    alternates: { canonical: `${SITE_URL}/exhibitions` },
+    openGraph: {
+        title: 'Archive Exhibitions | Curated Temporal Collections',
+        description: 'Exploring the intersection of architecture and human movement.',
+        url: `${SITE_URL}/exhibitions`,
+        images: [{ url: `${SITE_URL}/og-default.jpg`, width: 1200, height: 630, alt: 'Comraid Exhibitions' }],
+    },
+};
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-background pt-36 px-6 animate-pulse">
-                <div className="h-24 bg-secondary/10 w-1/2 mb-12"></div>
-                <div className="space-y-12">
-                    <div className="h-64 bg-secondary/10 w-full"></div>
-                    <div className="h-64 bg-secondary/10 w-full"></div>
-                </div>
-            </div>
-        );
+export default async function ExhibitionsIndex() {
+    let exhibitions: Exhibition[] = [];
+    try {
+        const data: any = await fetchExhibitions();
+        exhibitions = Array.isArray(data) ? data : (data?.results || []);
+    } catch (error) {
+        console.error("Failed to fetch exhibitions:", error);
     }
 
     return (
