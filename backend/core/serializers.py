@@ -123,8 +123,12 @@ class ArticleSerializer(serializers.ModelSerializer):
                 
             except Exception as e:
                 raise serializers.ValidationError({"video_file": f"Failed to upload video to Cloudinary: {str(e)}"})
+            
+            # Remove from attrs so it's not saved to the Model's FileField (redundant now)
+            attrs.pop('video_file', None)
         
         elif video_url:
+
             provider = detect_video_provider(video_url)
             if not provider:
                 # If provider is not detected, we default to whatever it is (e.g. direct URL)

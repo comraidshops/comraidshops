@@ -136,12 +136,22 @@ export default function AdminEditorial() {
                     finalKey = 'article_content';
                 }
                 
+                // For articles, "name" entered by user is purely labels for this UI, 
+                // backend requires "magazine" and "content".
+                if (activeTab === 'articles' && key === 'name') return;
+
                 if (Array.isArray(val) && key.endsWith('_ids')) {
                     val.forEach(v => formData.append(finalKey, v.toString()));
                 } else if (val !== null && val !== undefined && !Array.isArray(val)) {
                     formData.append(finalKey, val as string | Blob);
                 }
             });
+
+            // Explicit validation for Articles: Magazine ID is REQUIRED
+            if (activeTab === 'articles' && !formData.has('magazine')) {
+                throw new Error("Please select a Magazine for this article.");
+            }
+
 
             const newItem = await safeFetch(`/admin-api/${activeTab}/`, {
                 method: 'POST',

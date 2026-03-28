@@ -112,10 +112,22 @@ export async function safeFetch(url: string, options: RequestInit = {}, retries 
         return await res.json();
     } catch (_err) {
         const error = _err as Error;
-        if (retries > 0 && (error.name === 'TypeError' || error.name === 'AbortError')) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return safeFetch(url, options, retries - 1, isRetryAfterRefresh);
+        
+        // Handle network-level errors (CORS, DNS, connection dropped)
+        // Safari often reports "Load failed", Chrome "Failed to fetch"
+        if (error.name === 'TypeError' || error.message.includes('Load failed') || error.message.includes('Failed to fetch')) {
+            console.error(`[API] Critical network error calling ${finalUrl}:`, error);
+            
+            if (retries > 0) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                return safeFetch(url, options, retries - 1, isRetryAfterRefresh);
+            }
+            
+            // Re-throw with more context
+            throw new Error(`Connection Error: ${error.message}. Please check your internet or server status.`);
         }
+        
         throw error;
     }
+
 }

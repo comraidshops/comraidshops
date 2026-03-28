@@ -317,17 +317,38 @@ class AdminArticleViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         # If an article exists for this magazine, update it instead of creating
+        # This prevents OneToOneField integrity errors and allows "upsert" behavior
         magazine_id = request.data.get('magazine')
+        
         if magazine_id:
             try:
-                article = Article.objects.get(magazine_id=magazine_id)
+                # Ensure it's a valid integer ID before querying
+                magazine_id_int = int(magazine_id)
+                article = Article.objects.get(magazine_id=magazine_id_int)
+                
+                # Update existing article
                 serializer = self.get_serializer(article, data=request.data, partial=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except (Article.DoesNotExist, ValueError, TypeError):
+                # If magazine doesn't exist or ID is invalid, or article doesn't exist, 
+                # proceed to standard creation which will handle validation errors.
                 pass
-        return super().create(request, *args, **kwargs)
+
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            # Catch unexpected database integrity errors (e.g. unique constraint)
+            # that might have slipped through serializer validation.
+            from django.db import IntegrityError
+            if isinstance(e, IntegrityError):
+                return Response(
+                    {"detail": "An article already exists for this magazine or another integrity constraint was violated."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            raise e
+
 
 class AdminExhibitionViewSet(viewsets.ModelViewSet):
     queryset = Exhibition.objects.all().order_by('-created_at')
