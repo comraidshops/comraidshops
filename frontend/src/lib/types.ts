@@ -206,11 +206,17 @@ export interface Magazine {
     created_at?: string;
     meta_title?: string | null;
     meta_description?: string | null;
+    video_url?: string;
+    video_provider?: "youtube" | "vimeo" | "cloudinary";
+    video_thumbnail?: string;
     article?: {
         title: string;
         slug: string;
         content: string;
         products: Product[];
+        video_url?: string;
+        video_provider?: "youtube" | "vimeo" | "cloudinary";
+        video_thumbnail?: string;
     };
     linked_articles?: {
         id: number;

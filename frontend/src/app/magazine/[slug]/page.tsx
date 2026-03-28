@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import ReadingProgressBar from '@/components/ui/ReadingProgressBar';
 import SocialShare from '@/components/ui/SocialShare';
+import VideoBlock from '@/components/editorial/VideoBlock';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
@@ -160,6 +161,14 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 </div>
+
+                {/* Cinematic Video Block */}
+                <VideoBlock 
+                    video_url={magazine.video_url || magazine.article?.video_url}
+                    video_provider={magazine.video_provider || magazine.article?.video_provider}
+                    video_thumbnail={magazine.video_thumbnail || magazine.article?.video_thumbnail}
+                    title={magazine.title}
+                />
 
                 <div className="max-w-full mb-32 px-6 md:px-0">
                     {hasContent ? (

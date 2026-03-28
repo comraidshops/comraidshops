@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import User, Vendor, Brand, Category, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, BrandImage, ProductFeature, ProductSpecification, Commission, GlobalCommission, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember
+import cloudinary.uploader
+from .utils import detect_video_provider
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -91,7 +93,72 @@ class ArticleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Article
-        fields = ['id', 'title', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at']
+        fields = [
+            'id', 'title', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at',
+            'video_url', 'video_file', 'video_provider', 'video_thumbnail'
+        ]
+        read_only_fields = ['video_provider', 'video_thumbnail']
+
+    def validate(self, attrs):
+        video_url = attrs.get('video_url')
+        video_file = attrs.get('video_file')
+
+        if video_file:
+            try:
+                # Upload to Cloudinary
+                upload_result = cloudinary.uploader.upload(
+                    video_file,
+                    resource_type='video',
+                    folder='articles/videos/'
+                )
+                
+                # Update attributes with Cloudinary response
+                attrs['video_url'] = upload_result.get('secure_url')
+                attrs['video_provider'] = 'cloudinary'
+                
+                # Generate thumbnail from video frame (capture at 0.1 second)
+                # Cloudinary can return a poster/thumbnail URL if we ask for it
+                capture_url = upload_result.get('secure_url').replace('/upload/', '/upload/so_0.1/').replace('.mp4', '.jpg')
+                attrs['video_thumbnail'] = capture_url
+                
+            except Exception as e:
+                raise serializers.ValidationError({"video_file": f"Failed to upload video to Cloudinary: {str(e)}"})
+        
+        elif video_url:
+            provider = detect_video_provider(video_url)
+            if not provider:
+                # If provider is not detected, we default to whatever it is (e.g. direct URL)
+                # but the request asks to detect YouTube, Vimeo, Cloudinary.
+                # If it's none of those, we might just call it 'cloudinary' or 'direct' if it's a direct mp4.
+                # Let's stick to the detection logic for now.
+                attrs['video_provider'] = 'cloudinary' # Assume direct URL is Cloudinary if not YT/Vimeo
+            else:
+                attrs['video_provider'] = provider
+
+            # Basic thumbnail logic for YT/Vimeo if needed, though usually handled by their players/iframes
+            if attrs['video_provider'] == 'youtube':
+                video_id = self.extract_youtube_id(video_url)
+                if video_id:
+                    attrs['video_thumbnail'] = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+            elif attrs['video_provider'] == 'vimeo':
+                # Vimeo thumbnails require API call, skipping for now, frontend can handle or use placeholder
+                pass
+
+        return attrs
+
+    def extract_youtube_id(self, url):
+        # Very simple extractor
+        import re
+        patterns = [
+            r'v=([^&]+)',
+            r'youtu\.be/([^?]+)',
+            r'embed/([^?]+)'
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, url)
+            if match:
+                return match.group(1)
+        return None
 
 class MagazineSerializer(serializers.ModelSerializer):
     article = ArticleSerializer(read_only=True)
@@ -108,9 +175,15 @@ class MagazineSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'slug', 'excerpt', 'thumbnail', 'is_featured', 
             'article', 'article_content', 'linked_articles', 'linked_article_ids',
-            'created_at', 'meta_title', 'meta_description'
+            'created_at', 'meta_title', 'meta_description',
+            # Include these from related article for convenience in GET
+            'video_url', 'video_provider', 'video_thumbnail'
         ]
         extra_kwargs = {'slug': {'required': False}}
+
+    video_url = serializers.CharField(source='article.video_url', read_only=True)
+    video_provider = serializers.CharField(source='article.video_provider', read_only=True)
+    video_thumbnail = serializers.CharField(source='article.video_thumbnail', read_only=True)
 
     def create(self, validated_data):
         article_content = validated_data.pop('article_content', None)

@@ -53,6 +53,22 @@ class Article(models.Model):
     magazine = models.OneToOneField(Magazine, on_delete=models.CASCADE, related_name='article')
     content = models.TextField(blank=True, help_text="Full HTML content of the article")
     image = models.ImageField(upload_to="articles/images/", null=True, blank=True)
+    
+    # Cinematic Video System
+    video_url = models.URLField(max_length=500, null=True, blank=True, help_text="YouTube, Vimeo, or Cloudinary URL")
+    video_file = models.FileField(upload_to="articles/videos/", null=True, blank=True, help_text="Direct video upload (will be moved to Cloudinary)")
+    video_provider = models.CharField(
+        max_length=20, 
+        choices=[
+            ('youtube', 'YouTube'),
+            ('vimeo', 'Vimeo'),
+            ('cloudinary', 'Cloudinary')
+        ],
+        null=True,
+        blank=True
+    )
+    video_thumbnail = models.URLField(max_length=500, null=True, blank=True)
+
     products = models.ManyToManyField('Product', related_name='featured_in_articles', blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
