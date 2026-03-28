@@ -143,9 +143,15 @@ export default function AdminEditorial() {
                 if (Array.isArray(val) && key.endsWith('_ids')) {
                     val.forEach(v => formData.append(finalKey, v.toString()));
                 } else if (val !== null && val !== undefined && !Array.isArray(val)) {
-                    formData.append(finalKey, val as string | Blob);
+                    // Check if it's a plain object (for JSONFields like social_links)
+                    if (typeof val === 'object' && !(val instanceof File) && !(val instanceof Blob)) {
+                        formData.append(finalKey, JSON.stringify(val));
+                    } else {
+                        formData.append(finalKey, val as string | Blob);
+                    }
                 }
             });
+
 
             // Explicit validation for Articles: Magazine ID is REQUIRED
             if (activeTab === 'articles' && !formData.has('magazine')) {
@@ -188,10 +194,16 @@ export default function AdminEditorial() {
                     // Only append if it's not a remote URL string (existing image),
                     // but ALWAYS append video_url as it's a text field, not just a file reference.
                     if (key === 'video_url' || typeof val !== 'string' || (!val.startsWith('http') && !val.startsWith('/media/'))) {
-                        formData.append(finalKey, val as string | Blob);
+                        // Check if it's a plain object (for JSONFields like social_links)
+                        if (typeof val === 'object' && !(val instanceof Blob)) {
+                            formData.append(finalKey, JSON.stringify(val));
+                        } else {
+                            formData.append(finalKey, val as string | Blob);
+                        }
                     }
                 }
             });
+
 
             const updated = await safeFetch(`/admin-api/${activeTab}/${currentItem.id}/`, {
                 method: 'PATCH',
