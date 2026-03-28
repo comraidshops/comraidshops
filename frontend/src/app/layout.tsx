@@ -119,13 +119,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${inter.variable} ${cormorant.variable} ${bebas.variable} ${baskerville.variable} ${sourceSerif.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${inter.variable} ${cormorant.variable} ${bebas.variable} ${baskerville.variable} ${sourceSerif.variable} antialiased min-h-screen flex flex-col overflow-x-hidden`}
       >
+
         <NotificationProvider>
           <PWAProvider>
             <CartProvider>
               <Header />
-              <main className="flex-grow pt-16 pb-20 md:pb-0">
+              <main className="flex-grow pt-16 pb-20 md:pb-0 w-full overflow-x-hidden">
                 {children}
               </main>
               <Footer />

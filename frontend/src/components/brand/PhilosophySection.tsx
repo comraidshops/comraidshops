@@ -12,8 +12,9 @@ export default function PhilosophySection({ philosophy, awards, manifesto, featu
     if (!philosophy && !awards && !manifesto && !featured_quote) return null;
 
     return (
-        <section className="py-16 md:py-24 px-6 md:px-10 lg:px-16">
-            <div className="max-w-4xl mx-auto">
+        <section className="py-16 md:py-24 px-6 md:px-10 lg:px-16 overflow-hidden">
+            <div className="max-w-4xl mx-auto overflow-hidden">
+
                 {featured_quote && (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -34,15 +35,16 @@ export default function PhilosophySection({ philosophy, awards, manifesto, featu
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 1, ease: "easeOut" }}
-                        className="mb-24 md:mb-32"
+                        className="mb-24 md:mb-32 overflow-hidden"
                     >
                         <h2 className="text-xs uppercase tracking-[0.3em] text-secondary mb-12 text-center md:text-left font-semibold">Philosophy</h2>
                         <div 
-                            className="space-y-8 text-[18px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90"
-                            dangerouslySetInnerHTML={{ __html: philosophy }}
+                            className="editorial-content space-y-8 text-[18px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90 [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
+                            dangerouslySetInnerHTML={{ __html: (philosophy || '').replace(/[\u00A0\u202F\u2007\u2008\u2009\u200A]/g, ' ').replace(/&nbsp;/g, ' ') }}
                         />
                     </motion.div>
                 )}
+
 
                 {manifesto && (
                     <motion.div
@@ -50,19 +52,21 @@ export default function PhilosophySection({ philosophy, awards, manifesto, featu
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 1, ease: "easeOut", delay: 0.1 }}
-                        className="mb-24 md:mb-32 p-10 md:p-16 border border-foreground/5 bg-foreground/[0.02] relative"
+                        className="mb-24 md:mb-32 p-10 md:p-16 border border-foreground/5 bg-foreground/[0.02] relative overflow-hidden"
                     >
                         <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-foreground/20" />
                         <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-foreground/20" />
 
                         <h2 className="text-xs uppercase tracking-[0.3em] text-secondary mb-12 text-center md:text-left font-semibold">The Manifesto</h2>
-                        <div className="space-y-8 text-[18px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90 italic">
-                            {manifesto.split('\n\n').map((paragraph, idx) => (
+                        <div className="space-y-8 text-[18px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90 italic break-words [overflow-wrap:anywhere] max-w-full overflow-hidden">
+                            {manifesto.replace(/[\u00A0\s]/g, ' ').replace(/&nbsp;/g, ' ').split('\n\n').map((paragraph, idx) => (
                                 <p key={idx}>{paragraph}</p>
                             ))}
                         </div>
                     </motion.div>
                 )}
+
+
 
                 {awards && (
                     <motion.div

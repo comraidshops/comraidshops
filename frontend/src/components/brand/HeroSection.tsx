@@ -41,14 +41,18 @@ export default function HeroSection({ name, description, heroImage, brandSlug, i
                 style={{ opacity, y: useTransform(scrollY, [0, 400], [0, 80]) }}
                 className="relative z-20 max-w-7xl mx-auto px-6 text-center flex flex-col items-center mt-20"
             >
-                <h1 className="text-[clamp(3rem,8vw,8rem)] font-bold uppercase tracking-widest mb-10 leading-none drop-shadow-2xl">
+                <h1 className="text-[clamp(2.5rem,10vw,8rem)] font-bold uppercase tracking-widest mb-10 leading-none drop-shadow-2xl break-words w-full max-w-full overflow-hidden">
                     {name}
                 </h1>
+
                 {description && (
-                    <p className="text-lg md:text-xl text-foreground max-w-3xl leading-relaxed tracking-wide font-medium drop-shadow-lg">
-                        {description}
+                    <p className="text-lg md:text-xl text-foreground max-w-3xl leading-relaxed tracking-wide font-medium drop-shadow-lg break-words [overflow-wrap:anywhere]">
+                        {description.replace(/[\u00A0]/g, ' ').replace(/&nbsp;/g, ' ')}
                     </p>
                 )}
+
+
+
 
                 <div className="mt-12">
                     <JoinCommunityButton 

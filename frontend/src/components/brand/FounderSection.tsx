@@ -44,7 +44,8 @@ export default function FounderSection({ name, bio, story, image, establishedYea
                     className={`w-full ${image ? 'md:w-1/2 md:pt-[5%]' : 'max-w-3xl mx-auto'} flex flex-col`}
                 >
                     <h2 className="text-xs uppercase tracking-[0.3em] text-secondary mb-8 font-semibold">The Architect</h2>
-                    {name && <h3 className="text-[clamp(2rem,4vw,3.5rem)] font-light tracking-wide mb-10 leading-tight">{name}</h3>}
+                    {name && <h3 className="text-[clamp(2rem,4vw,3.5rem)] font-light tracking-wide mb-10 leading-tight break-words max-w-full">{name}</h3>}
+
 
                     <div className="flex flex-wrap gap-x-12 gap-y-4 mb-12 text-[10px] uppercase tracking-[0.4em] text-secondary">
                         {establishedYear && <div>Legacy Est. {establishedYear}</div>}
@@ -53,23 +54,28 @@ export default function FounderSection({ name, bio, story, image, establishedYea
 
                     <div className="space-y-12">
                         {bio && (
-                            <div className="space-y-6 text-[18px] md:text-[20px] leading-relaxed text-foreground/80 font-light">
-                                {bio.split('\n\n').map((paragraph, idx) => (
+                            <div className="space-y-6 text-[18px] md:text-[20px] leading-relaxed text-foreground/80 font-light break-words [overflow-wrap:anywhere]">
+                                {bio.replace(/[\u00A0]/g, ' ').replace(/&nbsp;/g, ' ').split('\n\n').map((paragraph, idx) => (
                                     <p key={idx}>{paragraph}</p>
                                 ))}
                             </div>
                         )}
 
+
+
                         {story && (
                             <div className="pt-12 border-t border-foreground/5">
                                 <h4 className="text-[10px] uppercase tracking-[0.4em] text-secondary mb-8 font-semibold">The Brand Story</h4>
-                                <div className="space-y-6 text-[18px] md:text-[20px] leading-relaxed text-foreground/70 font-light italic">
-                                    {story.split('\n\n').map((paragraph, idx) => (
+                                <div className="space-y-6 text-[18px] md:text-[20px] leading-relaxed text-foreground/70 font-light italic break-words [overflow-wrap:anywhere]">
+                                    {story.replace(/[\u00A0]/g, ' ').replace(/&nbsp;/g, ' ').split('\n\n').map((paragraph, idx) => (
                                         <p key={idx}>{paragraph}</p>
                                     ))}
                                 </div>
+
+
                             </div>
                         )}
+
                     </div>
                 </motion.div>
             </div>
