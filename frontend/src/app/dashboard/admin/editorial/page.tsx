@@ -41,6 +41,10 @@ interface EditorialBase {
     website?: string;
     magazine?: number;
     article?: { content: string };
+    video_url?: string;
+    video_file?: string | File | null;
+    video_provider?: string;
+    video_thumbnail?: string;
     items?: { id: number; label: string; product: { id: number; name: string } }[];
     
     // Exhibition nested fields
@@ -171,8 +175,9 @@ export default function AdminEditorial() {
                 } else if (val && (val as any) instanceof File) {
                     formData.append(finalKey, val as any);
                 } else if (val !== null && val !== undefined && !Array.isArray(val)) {
-                    // Only append if it's not a remote URL string (existing image)
-                    if (typeof val !== 'string' || (!val.startsWith('http') && !val.startsWith('/media/'))) {
+                    // Only append if it's not a remote URL string (existing image),
+                    // but ALWAYS append video_url as it's a text field, not just a file reference.
+                    if (key === 'video_url' || typeof val !== 'string' || (!val.startsWith('http') && !val.startsWith('/media/'))) {
                         formData.append(finalKey, val as string | Blob);
                     }
                 }
@@ -464,6 +469,30 @@ export default function AdminEditorial() {
                                 value={currentItem?.content || ''}
                                 onChange={(content: string) => setCurrentItem({ ...currentItem, content: content })}
                             />
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <AdminInput 
+                                    label="Video URL (YouTube/Vimeo)"
+                                    placeholder="https://www.youtube.com/watch?v=..."
+                                    value={currentItem?.video_url || ''}
+                                    onChange={(e) => setCurrentItem({ ...currentItem, video_url: e.target.value })}
+                                />
+                                <div className="space-y-2 mb-6">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-white/20 block px-1">Direct Video Upload</label>
+                                    <input 
+                                        type="file" 
+                                        accept="video/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) setCurrentItem({ ...currentItem, video_file: file });
+                                        }}
+                                        className="w-full bg-white/[0.03] border border-white/5 rounded-2xl py-3 px-6 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-primary/50 transition-all text-white file:bg-primary file:text-black file:border-0 file:rounded-xl file:px-4 file:py-1 file:mr-4 file:text-[8px] file:font-black file:uppercase file:cursor-pointer"
+                                    />
+                                    {currentItem?.video_url && currentItem.video_url.includes('cloudinary') && (
+                                        <p className="text-[8px] font-bold uppercase tracking-widest text-primary/60 px-2 italic">Video is hosted on Cloudinary</p>
+                                    )}
+                                </div>
+                            </div>
                             <AdminMultiSelect 
                                 label="Linked Products"
                                 options={products.map(p => ({ value: p.id, label: p.name }))}

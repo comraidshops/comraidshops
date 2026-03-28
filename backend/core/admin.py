@@ -22,8 +22,18 @@ class MagazineAdmin(admin.ModelAdmin):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('magazine', 'created_at', 'updated_at')
+    list_display = ('magazine', 'video_provider', 'created_at', 'updated_at')
     filter_horizontal = ('products',)
+    fieldsets = (
+        (None, {
+            'fields': ('magazine', 'title', 'content', 'image', 'products')
+        }),
+        ('Cinematic Video', {
+            'fields': ('video_url', 'video_file', 'video_provider', 'video_thumbnail'),
+            'description': 'Enter a YouTube/Vimeo URL or upload a direct video file.'
+        }),
+    )
+    readonly_fields = ('video_provider', 'video_thumbnail')
 
 @admin.register(Exhibition)
 class ExhibitionAdmin(admin.ModelAdmin):
