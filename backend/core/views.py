@@ -46,9 +46,9 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
 class MagazineViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Magazine.objects.select_related('article').prefetch_related('linked_articles__magazine').all()
+    queryset = Magazine.objects.prefetch_related('articles__products', 'linked_articles__magazine').all()
     def get_queryset(self):
-        qs = Magazine.objects.select_related('article').prefetch_related('linked_articles__magazine').all()
+        qs = Magazine.objects.prefetch_related('articles__products', 'linked_articles__magazine').all()
         featured = self.request.query_params.get('featured', None)
         if featured == 'true':
             qs = qs.filter(is_featured=True)
@@ -73,7 +73,7 @@ class MagazineFeaturedView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        magazine = Magazine.objects.filter(is_featured=True).select_related('article').prefetch_related('linked_articles__magazine').order_by('-created_at').first()
+        magazine = Magazine.objects.filter(is_featured=True).prefetch_related('articles__products', 'linked_articles__magazine').order_by('-created_at').first()
         if not magazine:
             return Response(None)
         from .serializers import MagazineSerializer
