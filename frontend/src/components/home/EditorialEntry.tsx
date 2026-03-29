@@ -43,12 +43,12 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                         }) : 'Recent Edition'}
                     </span>
                     <h2 className="font-bebas text-5xl md:text-6xl uppercase tracking-wide mb-6 leading-none">
-                        {magazine.article?.title || magazine.title}
+                        {magazine.articles?.[0]?.title || magazine.linked_articles?.[0]?.title || magazine.title}
                     </h2>
                     <div 
                         className="text-lg text-secondary mb-8 leading-relaxed max-w-md editorial-content-preview line-clamp-6 font-source-serif"
                         dangerouslySetInnerHTML={{ 
-                            __html: magazine.article?.content || magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial." 
+                            __html: magazine.articles?.[0]?.content || magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial." 
                         }}
                     />
                     
@@ -59,9 +59,9 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                         >
                             Read Full Edition
                         </Link>
-                        {magazine.article?.slug && (
+                        {(magazine.articles?.[0]?.slug || magazine.linked_articles?.[0]?.slug) && (
                             <Link 
-                                href={`/articles/${magazine.article.slug}`}
+                                href={`/articles/${magazine.articles?.[0]?.slug || magazine.linked_articles?.[0]?.slug}`}
                                 className="text-sm font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors"
                             >
                                 View Article
