@@ -14,13 +14,28 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug']
 
 class ExhibitionArticleSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(source='magazine.title', read_only=True)
-    slug = serializers.CharField(source='magazine.slug', read_only=True)
+    title = serializers.SerializerMethodField()
+    slug = serializers.SerializerMethodField()
     cover = serializers.ImageField(source='image', read_only=True)
 
     class Meta:
         model = Article
         fields = ['id', 'title', 'slug', 'cover']
+
+    def get_title(self, obj):
+        if obj.title:
+            return obj.title
+        if obj.magazine:
+            return obj.magazine.title
+        return f"Article {obj.id}"
+
+    def get_slug(self, obj):
+        if obj.magazine:
+            return obj.magazine.slug
+        # If no magazine is direct, but it's linked to a magazine calling this serializer, 
+        # it might need that magazine's slug, but we don't have that context easily.
+        # For now, return a placeholder or its ID to avoid null.
+        return f"article-{obj.id}"
 
 class ExhibitionProductSerializer(serializers.ModelSerializer):
     class Meta:

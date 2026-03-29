@@ -43,7 +43,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                         }) : 'Recent Edition'}
                     </span>
                     <h2 className="font-bebas text-5xl md:text-6xl uppercase tracking-wide mb-6 leading-none">
-                        {magazine.articles?.[0]?.title || magazine.linked_articles?.[0]?.title || magazine.title}
+                        {magazine.articles?.[0]?.title?.trim() || magazine.linked_articles?.[0]?.title?.trim() || magazine.title}
                     </h2>
                     <div 
                         className="text-lg text-secondary mb-8 leading-relaxed max-w-md editorial-content-preview line-clamp-6 font-source-serif"
@@ -59,9 +59,10 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                         >
                             Read Full Edition
                         </Link>
-                        {(magazine.articles?.[0]?.slug || magazine.linked_articles?.[0]?.slug) && (
+                        {/* Always show View Article if we have at least one article, link to the magazine's slug as it's the article's detail container */}
+                        {((magazine.articles?.length || 0) > 0 || (magazine.linked_articles?.length || 0) > 0) && (
                             <Link 
-                                href={`/articles/${magazine.articles?.[0]?.slug || magazine.linked_articles?.[0]?.slug}`}
+                                href={`/magazine/${(magazine.articles?.[0] || magazine.linked_articles?.[0]).slug || magazine.slug}`}
                                 className="text-sm font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors"
                             >
                                 View Article

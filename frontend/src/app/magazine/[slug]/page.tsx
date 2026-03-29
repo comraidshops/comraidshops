@@ -274,7 +274,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                                             <div className="h-px w-4 bg-border/50"></div>
                                         </div>
                                         <h3 className="text-xl font-bold uppercase tracking-tight leading-[1.1] group-hover:text-primary transition-colors font-playfair italic">
-                                            {related.title}
+                                            {related.title?.trim() || magazine.title}
                                         </h3>
                                         <p className="text-[10px] text-secondary/60 uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform duration-500">
                                             Read Context <span className="text-primary">→</span>
