@@ -196,6 +196,19 @@ export interface Exhibition {
     magazines?: Magazine[];
 }
 
+export interface Article {
+    id: number;
+    title: string;
+    content: string;
+    image?: string | null;
+    products: Product[];
+    video_url?: string;
+    video_provider?: "youtube" | "vimeo" | "cloudinary";
+    video_thumbnail?: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Magazine {
     id: number;
     title: string;
@@ -209,22 +222,17 @@ export interface Magazine {
     video_url?: string;
     video_provider?: "youtube" | "vimeo" | "cloudinary";
     video_thumbnail?: string;
-    article?: {
-        title: string;
-        slug: string;
-        content: string;
-        products: Product[];
-        video_url?: string;
-        video_provider?: "youtube" | "vimeo" | "cloudinary";
-        video_thumbnail?: string;
-    };
+    articles: Article[];
     linked_articles?: {
         id: number;
         title: string;
         slug: string;
+        thumbnail?: string;
+        image?: string;
         cover?: string;
     }[];
 }
+
 
 export interface PaginatedResponse<T> {
     count: number;

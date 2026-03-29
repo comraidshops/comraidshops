@@ -74,9 +74,16 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
         );
     }
 
-    const hasContent = !!magazine.article?.content;
-    const readingTime = hasContent ? calculateReadingTime(magazine.article?.content || '') : 0;
+    const primaryArticle = magazine.articles?.[0] || null;
+    const hasContent = !!primaryArticle?.content;
+    const readingTime = hasContent ? calculateReadingTime(primaryArticle.content) : 0;
     
+    // Collect all unique related articles: secondary ones from this magazine + explicitly linked ones
+    const allRelatedArticles = [
+        ...(magazine.articles?.slice(1) || []),
+        ...(magazine.linked_articles || [])
+    ].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+
     const articleSchema = {
         '@context': 'https://schema.org',
         '@type': 'Article',
@@ -164,9 +171,9 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
 
                 {/* Cinematic Video Block */}
                 <VideoBlock 
-                    video_url={magazine.video_url || magazine.article?.video_url}
-                    video_provider={magazine.video_provider || magazine.article?.video_provider}
-                    video_thumbnail={magazine.video_thumbnail || magazine.article?.video_thumbnail}
+                    video_url={magazine.video_url || primaryArticle?.video_url}
+                    video_provider={magazine.video_provider || primaryArticle?.video_provider}
+                    video_thumbnail={magazine.video_thumbnail || primaryArticle?.video_thumbnail}
                     title={magazine.title}
                 />
 
@@ -174,7 +181,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                     {hasContent ? (
                         <div
                             className="editorial-content"
-                            dangerouslySetInnerHTML={{ __html: magazine.article?.content || '' }}
+                            dangerouslySetInnerHTML={{ __html: primaryArticle.content }}
                         />
                     ) : (
                         <div className="editorial-content">
@@ -199,7 +206,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                 </div>
 
                 {/* Display Linked Products if any */}
-                {magazine.article?.products && magazine.article.products.length > 0 && (
+                {primaryArticle?.products && primaryArticle.products.length > 0 && (
                     <div className="border-t border-border/20 pt-24">
                         <div className="flex flex-col items-center mb-16">
                             <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] text-secondary mb-4">
@@ -208,7 +215,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                             <div className="h-[1px] w-8 bg-primary"></div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
-                            {magazine.article.products.map((product: Product) => (
+                            {primaryArticle.products.map((product: Product) => (
                                 <Link key={product.id} href={`/products/${product.slug}`} className="group block">
                                     <div className="aspect-[3/4] bg-secondary/5 relative mb-6 overflow-hidden">
                                         {product.image ? (
@@ -234,7 +241,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                 )}
 
                 {/* Related Articles Section */}
-                {magazine.linked_articles && magazine.linked_articles.length > 0 && (
+                {allRelatedArticles.length > 0 && (
                     <div className="mt-32 pt-24 border-t border-border/20">
                         <div className="flex flex-col items-center mb-16">
                             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary mb-4">
@@ -244,12 +251,12 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-                            {magazine.linked_articles.slice(0, 3).map((related: any) => (
-                                <Link key={related.id} href={`/magazine/${related.slug}`} className="group block">
+                            {allRelatedArticles.slice(0, 9).map((related: any) => (
+                                <Link key={related.id} href={`/magazine/${related.slug || ''}`} className="group block">
                                     <div className="relative aspect-[3/4] overflow-hidden bg-secondary/5 mb-8 rounded-sm ring-1 ring-border/5 group-hover:ring-primary/20 transition-all duration-700">
-                                        {related.cover ? (
+                                        {(related.thumbnail || related.image || related.cover) ? (
                                             <Image
-                                                src={related.cover.startsWith('http') ? related.cover : `${API_BASE_URL}${related.cover}`}
+                                                src={(related.thumbnail || related.image || related.cover).startsWith('http') ? (related.thumbnail || related.image || related.cover) : `${API_BASE_URL}${related.thumbnail || related.image || related.cover}`}
                                                 alt={related.title}
                                                 fill
                                                 className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
@@ -278,6 +285,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                         </div>
                     </div>
                 )}
+
 
                 <div className="mt-32 pt-16 border-t border-border/20 flex flex-col items-center">
                     <Link href="/magazine" className="text-xs font-bold uppercase tracking-[0.3em] underline underline-offset-8 decoration-border hover:decoration-primary transition-all">

@@ -50,7 +50,7 @@ class Magazine(models.Model):
         return self.title
 
 class Article(models.Model):
-    magazine = models.OneToOneField(Magazine, on_delete=models.CASCADE, related_name='article')
+    magazine = models.ForeignKey(Magazine, on_delete=models.SET_NULL, related_name='articles', null=True, blank=True)
     content = models.TextField(blank=True, help_text="Full HTML content of the article")
     image = models.ImageField(upload_to="articles/images/", null=True, blank=True)
     

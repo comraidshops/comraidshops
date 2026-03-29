@@ -165,7 +165,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         return None
 
 class MagazineSerializer(serializers.ModelSerializer):
-    article = ArticleSerializer(read_only=True)
+    articles = ArticleSerializer(many=True, read_only=True)
     article_content = serializers.CharField(write_only=True, required=False)
     
     # New: Multi-article linking
@@ -178,16 +178,29 @@ class MagazineSerializer(serializers.ModelSerializer):
         model = Magazine
         fields = [
             'id', 'title', 'slug', 'excerpt', 'thumbnail', 'is_featured', 
-            'article', 'article_content', 'linked_articles', 'linked_article_ids',
+            'articles', 'article_content', 'linked_articles', 'linked_article_ids',
             'created_at', 'meta_title', 'meta_description',
-            # Include these from related article for convenience in GET
+            # Include these from the primary article for convenience in GET
             'video_url', 'video_provider', 'video_thumbnail'
         ]
         extra_kwargs = {'slug': {'required': False}}
 
-    video_url = serializers.CharField(source='article.video_url', read_only=True)
-    video_provider = serializers.CharField(source='article.video_provider', read_only=True)
-    video_thumbnail = serializers.CharField(source='article.video_thumbnail', read_only=True)
+    video_url = serializers.SerializerMethodField()
+    video_provider = serializers.SerializerMethodField()
+    video_thumbnail = serializers.SerializerMethodField()
+
+    def get_video_url(self, obj):
+        article = obj.articles.first()
+        return article.video_url if article else None
+
+    def get_video_provider(self, obj):
+        article = obj.articles.first()
+        return article.video_provider if article else None
+
+    def get_video_thumbnail(self, obj):
+        article = obj.articles.first()
+        return article.video_thumbnail if article else None
+
 
     def create(self, validated_data):
         article_content = validated_data.pop('article_content', None)
@@ -211,10 +224,14 @@ class MagazineSerializer(serializers.ModelSerializer):
             instance.linked_articles.set(linked_articles)
             
         if article_content:
-            article, created = Article.objects.get_or_create(magazine=instance)
-            article.content = article_content
-            article.save()
+            article = instance.articles.first()
+            if article:
+                article.content = article_content
+                article.save()
+            else:
+                Article.objects.create(magazine=instance, content=article_content)
         return instance
+
 
 class CollectionSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()

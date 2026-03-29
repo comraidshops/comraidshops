@@ -374,10 +374,11 @@ export default function AdminEditorial() {
                                                 onClick={() => {
                                                     const editItem = { ...item };
                                                     if (activeTab === 'magazines') {
-                                                        if (item.article) {
-                                                            editItem.content = item.article.content;
+                                                        const m = item as any;
+                                                        if (m.articles && m.articles.length > 0) {
+                                                            editItem.content = m.articles[0].content;
                                                         }
-                                                        editItem.linked_article_ids = item.linked_articles?.map((a: any) => a.id) || [];
+                                                        editItem.linked_article_ids = m.linked_articles?.map((a: any) => a.id) || [];
                                                     }
                                                     if (activeTab === 'exhibitions' || activeTab === 'fitframes' || activeTab === 'articles') {
                                                         editItem.product_ids = item.items?.map((i: any) => i.product.id) || item.products?.map((p: any) => p.id) || [];
