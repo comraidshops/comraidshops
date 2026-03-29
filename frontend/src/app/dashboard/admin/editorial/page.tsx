@@ -474,16 +474,25 @@ export default function AdminEditorial() {
                     )}
 
                     {activeTab === 'articles' && (
-                        <AdminSelect 
-                            label="Magazine"
-                            value={currentItem?.magazine || ''}
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCurrentItem({ ...currentItem, magazine: parseInt(e.target.value) })}
-                            options={[
-                                { value: '', label: 'Select Magazine' },
-                                ...magazines.map(m => ({ value: m.id, label: m.title }))
-                            ]}
-                        />
+                        <>
+                            <AdminInput 
+                                label="Article Title"
+                                placeholder="Enter article title (optional, will use magazine title if blank)"
+                                value={currentItem?.title || ''}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, title: e.target.value })}
+                            />
+                            <AdminSelect 
+                                label="Magazine"
+                                value={currentItem?.magazine || ''}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCurrentItem({ ...currentItem, magazine: parseInt(e.target.value) })}
+                                options={[
+                                    { value: '', label: 'Select Magazine' },
+                                    ...magazines.map(m => ({ value: m.id, label: m.title }))
+                                ]}
+                            />
+                        </>
                     )}
+
 
                     {activeTab === 'articles' && (
                         <>

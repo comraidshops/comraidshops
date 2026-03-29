@@ -85,7 +85,8 @@ class ProductLiteSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'price', 'image', 'slug', 'brand_name', 'category_name', 'stock', 'status', 'is_featured']
 
 class ArticleSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(source='magazine.title', read_only=True)
+    title = serializers.CharField(required=False, allow_blank=True)
+    display_title = serializers.SerializerMethodField()
     products = ProductCardSerializer(many=True, read_only=True)
     product_ids = serializers.PrimaryKeyRelatedField(
         many=True, write_only=True, required=False, source='products', queryset=Product.objects.all()
@@ -94,10 +95,18 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = [
-            'id', 'title', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at',
+            'id', 'title', 'display_title', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at',
             'video_url', 'video_file', 'video_provider', 'video_thumbnail'
         ]
         read_only_fields = ['video_provider', 'video_thumbnail']
+
+    def get_display_title(self, obj):
+        if obj.title:
+            return obj.title
+        if obj.magazine:
+            return obj.magazine.title
+        return f"Article {obj.id}"
+
 
     def validate(self, attrs):
         video_url = attrs.get('video_url')
