@@ -19,6 +19,7 @@ class MagazineAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'is_featured', 'created_at')
     list_filter = ('is_featured',)
     prepopulated_fields = {'slug': ('title',)}
+    filter_horizontal = ('linked_articles',)
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
