@@ -252,7 +252,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                                     <div className="relative aspect-[3/4] overflow-hidden bg-secondary/5 mb-8 rounded-sm ring-1 ring-border/5 group-hover:ring-primary/20 transition-all duration-700">
                                         {(related.thumbnail || related.image || related.cover) ? (
                                             <Image
-                                                src={(related.thumbnail || related.image || related.cover).startsWith('http') ? (related.thumbnail || related.image || related.cover) : `${API_BASE_URL}${related.thumbnail || related.image || related.cover}`}
+                                                src={(related.thumbnail || related.image || related.cover).startsWith('http') ? (related.thumbnail || related.image || related.cover) : `${MEDIA_BASE}${related.thumbnail || related.image || related.cover}`}
                                                 alt={related.title}
                                                 fill
                                                 className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"

@@ -19,6 +19,18 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
 
     if (!magazine) return null;
 
+    // Extract a substantial snippet (at least 150 words)
+    const getLongPreview = () => {
+        const primaryContent = magazine.articles?.[0]?.content || magazine.description || magazine.excerpt || "";
+        const stripped = primaryContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        const words = stripped.split(' ');
+
+        if (words.length <= 150) return stripped;
+        return words.slice(0, 160).join(' ') + '...';
+    };
+
+    const previewContent = getLongPreview();
+
     return (
         <section className="relative w-full py-24 md:py-44 overflow-hidden bg-background">
             {/* Grain Overlay */}
@@ -66,9 +78,11 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                                 </h2>
                             </div>
 
-                            <p className="max-w-md text-lg md:text-xl text-secondary leading-relaxed font-light italic opacity-80 border-l-2 border-primary/20 pl-6 py-2">
-                                {magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial exploring the intersection of discipline and craft."}
-                            </p>
+                            <div className="max-w-xl text-md md:text-lg text-secondary leading-relaxed font-light italic opacity-80 border-l-2 border-primary/20 pl-6 py-2">
+                                <p className="line-clamp-[12] md:line-clamp-none">
+                                    {previewContent}
+                                </p>
+                            </div>
 
                             <div className="flex flex-wrap items-center gap-10 pt-4">
                                 <Link
