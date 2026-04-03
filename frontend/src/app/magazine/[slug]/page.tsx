@@ -21,12 +21,24 @@ function calculateReadingTime(content: string): number {
     return Math.ceil(wordCount / wordsPerMinute);
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({ 
+    params, 
+    searchParams 
+}: { 
+    params: Promise<{ slug: string }>,
+    searchParams: Promise<{ article?: string }> 
+}): Promise<Metadata> {
     try {
-        const resolvedParams = await params;
+        const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
         const magazine: any = await fetchMagazine(resolvedParams.slug);
-        const title = magazine.meta_title || `${magazine.title} | Comraid Magazine`;
-        const description = magazine.meta_description || magazine.excerpt || `Read ${magazine.title} on Comraid Magazine`;
+        
+        const activeArticleSlug = resolvedSearchParams.article;
+        const article = activeArticleSlug 
+            ? magazine.articles?.find((a: any) => a.slug === activeArticleSlug)
+            : magazine.articles?.[0];
+
+        const title = article?.title || magazine.meta_title || `${magazine.title} | Comraid Magazine`;
+        const description = magazine.meta_description || article?.excerpt || magazine.excerpt || `Read ${title} on Comraid Magazine`;
         const canonicalUrl = `${SITE_URL}/magazine/${magazine.slug}`;
         const ogImage = magazine.thumbnail ? (magazine.thumbnail.startsWith('http') ? magazine.thumbnail : `${MEDIA_BASE}${magazine.thumbnail}`) : `${SITE_URL}/og-magazine.jpg`;
 
@@ -55,9 +67,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-export default async function MagazineDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-    const resolvedParams = await params;
+export default async function MagazineDetailPage({ 
+    params, 
+    searchParams 
+}: { 
+    params: Promise<{ slug: string }>,
+    searchParams: Promise<{ article?: string }>
+}) {
+    const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
     const { slug } = resolvedParams;
+    const activeArticleSlug = resolvedSearchParams.article;
 
     let magazine: any = null;
     try {
@@ -75,25 +94,37 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
         );
     }
 
-    const primaryArticle = magazine.articles?.[0] || null;
+    const primaryArticle = activeArticleSlug 
+        ? (magazine.articles?.find((a: any) => a.slug === activeArticleSlug) || magazine.articles?.[0])
+        : (magazine.articles?.[0] || null);
+    
     const hasContent = !!primaryArticle?.content;
     const readingTime = hasContent ? calculateReadingTime(primaryArticle.content) : 0;
 
-    // Collect all unique related articles: secondary ones from this magazine + explicitly linked ones
+    // Collect all unique related articles: other ones from this magazine + explicitly linked ones
+    const articlesFromSameVolume = (magazine.articles || []).filter((a: any) => a.id !== primaryArticle?.id);
+    
     const allRelatedArticles = [
-        ...(magazine.articles?.slice(1) || []),
+        ...articlesFromSameVolume,
         ...(magazine.linked_articles || [])
     ].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
-        .map(article => ({
-            ...article,
-            imageUrl: article.image || article.cover || article.thumbnail,
-            targetSlug: article.magazine_slug || article.slug || magazine.slug
-        }));
+        .map(article => {
+            const isSameMagazine = !article.magazine_slug || article.magazine_slug === magazine.slug;
+            const targetHref = isSameMagazine 
+                ? `/magazine/${magazine.slug}?article=${article.slug}`
+                : `/magazine/${article.magazine_slug || article.slug}`;
+            
+            return {
+                ...article,
+                imageUrl: article.image || article.cover || article.thumbnail,
+                targetHref
+            };
+        });
 
     const articleSchema = {
         '@context': 'https://schema.org',
         '@type': 'Article',
-        headline: magazine.title,
+        headline: primaryArticle?.title || magazine.title,
         description: magazine.excerpt || magazine.title,
         image: magazine.thumbnail ? (magazine.thumbnail.startsWith('http') ? magazine.thumbnail : `${API_BASE_URL}${magazine.thumbnail}`) : undefined,
         datePublished: magazine.created_at,
@@ -110,7 +141,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
     return (
         <div className="min-h-screen bg-background pt-24 md:pt-32 pb-24 px-0 md:px-12 overflow-x-hidden">
             <ReadingProgressBar />
-            <SocialShare title={magazine.title} />
+            <SocialShare title={primaryArticle?.title || magazine.title} />
 
             <script
                 type="application/ld+json"
@@ -139,7 +170,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                 </div>
 
                 <h1 className="text-4xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.95] md:leading-[0.9] mb-8 md:mb-12 text-balance font-playfair break-words px-4 md:px-0">
-                    {stripHtml(magazine.title)}.
+                    {stripHtml(primaryArticle?.title || magazine.title)}.
                 </h1>
 
                 {magazine.excerpt && (
@@ -254,7 +285,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
                             {allRelatedArticles.slice(0, 9).map((related: any) => (
-                                <Link key={related.id} href={`/magazine/${related.targetSlug}`} className="group block">
+                                <Link key={related.id} href={related.targetHref} className="group block">
                                     <div className="relative aspect-[3/4] overflow-hidden bg-secondary/5 mb-8 rounded-sm ring-1 ring-border/5 group-hover:ring-primary/20 transition-all duration-700">
                                         {related.imageUrl ? (
                                             <Image
