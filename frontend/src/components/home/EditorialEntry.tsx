@@ -49,7 +49,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                                 src={magazine.thumbnail || '/new_image/art_of_suffering.jpg'}
                                 alt={magazine.title}
                                 fill
-                                className="object-cover grayscale hover:grayscale-0 transition-all duration-[2000ms] ease-out group-hover:scale-110"
+                                className="object-contain grayscale hover:grayscale-0 transition-all duration-[2000ms] ease-out group-hover:scale-110"
                                 priority
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-60"></div>
