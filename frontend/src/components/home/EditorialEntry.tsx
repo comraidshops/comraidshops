@@ -45,24 +45,24 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                     <h2 className="font-bebas text-5xl md:text-6xl uppercase tracking-wide mb-6 leading-none">
                         {magazine.articles?.[0]?.title?.trim() || magazine.linked_articles?.[0]?.title?.trim() || magazine.title}
                     </h2>
-                    <div 
+                    <div
                         className="text-lg text-secondary mb-8 leading-relaxed max-w-md editorial-content-preview line-clamp-6 font-source-serif"
-                        dangerouslySetInnerHTML={{ 
-                            __html: magazine.articles?.[0]?.content || magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial." 
+                        dangerouslySetInnerHTML={{
+                            __html: magazine.articles?.[0]?.content || magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial."
                         }}
                     />
-                    
+
                     <div className="flex flex-wrap gap-4">
-                        <Link 
+                        <Link
                             href={`/magazine/${magazine.slug}`}
                             className="text-sm font-bold uppercase tracking-widest border-b-2 border-primary pb-1 hover:text-primary transition-colors"
                         >
                             Read Full Edition
                         </Link>
-                        {/* Always show View Article if we have at least one article, link to the magazine's slug as it's the article's detail container */}
+                        {/* Always show View Article if we have at least one article. Link to the magazine's slug since articles are viewed within the magazine container. */}
                         {((magazine.articles?.length || 0) > 0 || (magazine.linked_articles?.length || 0) > 0) && (
-                            <Link 
-                                href={`/magazine/${(magazine.articles?.[0] || magazine.linked_articles?.[0]).slug || magazine.slug}`}
+                            <Link
+                                href={`/magazine/${magazine.slug}`}
                                 className="text-sm font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors"
                             >
                                 View Article

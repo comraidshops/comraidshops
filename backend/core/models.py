@@ -29,6 +29,7 @@ class Category(models.Model):
 class Magazine(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True, help_text="Detailed content for the magazine page")
     excerpt = models.TextField(blank=True, help_text="Short description for the magazine index page")
     thumbnail = models.ImageField(upload_to="editorial/thumbnails/", null=True, blank=True)
     is_featured = models.BooleanField(default=False)
@@ -52,6 +53,7 @@ class Magazine(models.Model):
 class Article(models.Model):
     magazine = models.ForeignKey(Magazine, on_delete=models.SET_NULL, related_name='articles', null=True, blank=True)
     title = models.CharField(max_length=255, blank=True, help_text="Optional title for the article. If not provided, magazine title will be used.")
+    slug = models.SlugField(unique=True, blank=True)
     content = models.TextField(blank=True, help_text="Full HTML content of the article")
     image = models.ImageField(upload_to="articles/images/", null=True, blank=True)
     
@@ -73,6 +75,12 @@ class Article(models.Model):
     products = models.ManyToManyField('Product', related_name='featured_in_articles', blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            title_part = self.title or (self.magazine.title if self.magazine else f"article-{self.id}")
+            self.slug = slugify(title_part)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         if self.title:

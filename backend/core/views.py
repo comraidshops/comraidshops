@@ -74,6 +74,12 @@ class MagazineFeaturedView(APIView):
 
     def get(self, request):
         magazine = Magazine.objects.filter(is_featured=True).prefetch_related('articles__products', 'linked_articles__magazine').order_by('-created_at').first()
+        
+        # Fallback: If no magazine is marked as featured, return the single most recent magazine.
+        # This prevents the homepage section from disappearing when the admin hasn't set a featured flag.
+        if not magazine:
+            magazine = Magazine.objects.prefetch_related('articles__products', 'linked_articles__magazine').order_by('-created_at').first()
+
         if not magazine:
             return Response(None)
         from .serializers import MagazineSerializer

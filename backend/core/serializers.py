@@ -110,7 +110,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = [
-            'id', 'title', 'display_title', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at',
+            'id', 'title', 'display_title', 'slug', 'magazine', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at',
             'video_url', 'video_file', 'video_provider', 'video_thumbnail'
         ]
         read_only_fields = ['video_provider', 'video_thumbnail']
