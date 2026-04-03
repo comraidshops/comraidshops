@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Magazine } from '@/lib/types';
 import { useFeaturedMagazine } from '@/lib/hooks';
+import { stripHtml, cleanContent } from '@/lib/format';
 
 interface EditorialEntryProps {
     initialArticle?: Magazine;
@@ -22,7 +23,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
     // Extract a substantial snippet
     const getLongPreview = () => {
         const rawContent = (magazine.articles?.[0]?.content || magazine.description || magazine.excerpt || "").trim();
-        const stripped = rawContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        const stripped = stripHtml(rawContent);
 
         if (stripped === "") return "Editorial content coming soon...";
 
@@ -76,7 +77,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                                 </div>
 
                                 <h2 className="text-6xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tighter leading-[0.85] text-balance font-cormorant italic transition-all duration-700">
-                                    {magazine.articles?.[0]?.title?.trim() || magazine.linked_articles?.[0]?.title?.trim() || magazine.title}.
+                                    {cleanContent(magazine.articles?.[0]?.title || magazine.linked_articles?.[0]?.title || magazine.title || "")}.
                                 </h2>
                             </div>
 

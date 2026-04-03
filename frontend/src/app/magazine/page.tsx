@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { fetchMagazines } from '@/lib/server-api';
 import { Magazine } from '@/lib/types';
 import { Metadata } from 'next';
+import { stripHtml } from '@/lib/format';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
@@ -65,10 +66,10 @@ export default async function MagazineIndex() {
                                 Featured
                             </span>
                             <h2 className="text-4xl md:text-5xl font-bold uppercase tracking-tight leading-none">
-                                {featuredMag.title}.
+                                {stripHtml(featuredMag.title)}.
                             </h2>
                             <p className="text-lg text-secondary leading-relaxed">
-                                {featuredMag.excerpt}
+                                {stripHtml(featuredMag.excerpt || "")}
                             </p>
                             <Link
                                 href={`/magazine/${featuredMag.slug}`}
@@ -99,10 +100,10 @@ export default async function MagazineIndex() {
                                         Philosophy
                                     </span>
                                     <h3 className="text-2xl font-bold uppercase tracking-tight group-hover:text-primary transition-colors">
-                                        {mag.title}.
+                                        {stripHtml(mag.title)}.
                                     </h3>
                                     <p className="text-sm text-secondary/80 mt-2 leading-relaxed">
-                                        {mag.excerpt}
+                                        {stripHtml(mag.excerpt || "")}
                                     </p>
                                 </div>
                             </article>

@@ -10,6 +10,7 @@ import { Metadata } from 'next';
 import ReadingProgressBar from '@/components/ui/ReadingProgressBar';
 import SocialShare from '@/components/ui/SocialShare';
 import VideoBlock from '@/components/editorial/VideoBlock';
+import { stripHtml, cleanContent } from '@/lib/format';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
 
@@ -138,12 +139,12 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                 </div>
 
                 <h1 className="text-4xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.95] md:leading-[0.9] mb-8 md:mb-12 text-balance font-playfair break-words px-4 md:px-0">
-                    {magazine.title}.
+                    {stripHtml(magazine.title)}.
                 </h1>
 
                 {magazine.excerpt && (
                     <p className="max-w-2xl mx-auto text-lg md:text-xl text-secondary font-light leading-relaxed mb-12 italic">
-                        "{magazine.excerpt}"
+                        "{stripHtml(magazine.excerpt)}"
                     </p>
                 )}
 
@@ -186,14 +187,14 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                     {hasContent ? (
                         <div
                             className="editorial-content"
-                            dangerouslySetInnerHTML={{ __html: primaryArticle.content }}
+                            dangerouslySetInnerHTML={{ __html: cleanContent(primaryArticle.content) }}
                         />
                     ) : (
                         <div
                             className="editorial-content"
                             dangerouslySetInnerHTML={{
-                                __html: magazine.description || magazine.excerpt || `
-                                <p>The depth of editorial content for ${magazine.title} is currently being curated. 
+                                __html: cleanContent(magazine.description || magazine.excerpt || `
+                                <p>The depth of editorial content for ${stripHtml(magazine.title)} is currently being curated. 
                                 Our magazine focuses on the intersection of craft, discipline, and the architectural 
                                 evolution of the human form.</p>
                                 <p>In every volume, we explore how discipline creates the conditions for expression, 
@@ -201,7 +202,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                                 <blockquote>
                                     <p>The architecture of intent is built in the details.</p>
                                 </blockquote>
-                            ` }}
+                            `) }}
                         />
                     )}
                 </div>
@@ -275,7 +276,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                                             <div className="h-px w-4 bg-border/50"></div>
                                         </div>
                                         <h3 className="text-xl font-bold uppercase tracking-tight leading-[1.1] group-hover:text-primary transition-colors font-playfair italic">
-                                            {related.title?.trim() || magazine.title}
+                                            {stripHtml(related.title || magazine.title)}
                                         </h3>
                                         <p className="text-[10px] text-secondary/60 uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-2 transition-transform duration-500">
                                             Read Context <span className="text-primary">→</span>

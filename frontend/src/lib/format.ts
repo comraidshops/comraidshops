@@ -13,3 +13,25 @@ export function formatCurrency(amount: number | string | undefined | null): stri
         maximumFractionDigits: 2,
     }).format(numericAmount).replace('NGN', '₦').trim();
 }
+
+/**
+ * Strips HTML tags and replaces &nbsp; with spaces
+ */
+export function stripHtml(html: string): string {
+    if (!html) return '';
+    return html
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+/**
+ * Replaces &nbsp; with regular spaces in HTML content
+ */
+export function cleanContent(html: string): string {
+    if (!html) return '';
+    return html
+        .replace(/&nbsp;/g, ' ')
+        .trim();
+}
