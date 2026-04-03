@@ -44,7 +44,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
 
                     {/* Left Side: Cinematic Cover Image */}
                     <div className="lg:col-span-7 relative group">
-                        <div className="relative aspect-[3/4] md:aspect-[16/10] overflow-hidden rounded-sm ring-1 ring-white/5">
+                        <div className="relative aspect-[3/4] md:aspect-[3/4] overflow-hidden rounded-sm ring-1 ring-white/5">
                             <Image
                                 src={magazine.thumbnail || '/new_image/art_of_suffering.jpg'}
                                 alt={magazine.title}
