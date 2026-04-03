@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function MagazineDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const resolvedParams = await params;
     const { slug } = resolvedParams;
-    
+
     let magazine: any = null;
     try {
         magazine = await fetchMagazine(slug);
@@ -77,7 +77,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
     const primaryArticle = magazine.articles?.[0] || null;
     const hasContent = !!primaryArticle?.content;
     const readingTime = hasContent ? calculateReadingTime(primaryArticle.content) : 0;
-    
+
     // Collect all unique related articles: secondary ones from this magazine + explicitly linked ones
     const allRelatedArticles = [
         ...(magazine.articles?.slice(1) || []),
@@ -105,20 +105,20 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
         <div className="min-h-screen bg-background pt-24 md:pt-32 pb-24 px-0 md:px-12 overflow-x-hidden">
             <ReadingProgressBar />
             <SocialShare title={magazine.title} />
-            
+
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
             />
-            
+
             <header className="max-w-4xl mx-auto mb-16 md:mb-20 text-center">
                 <div className="flex flex-col items-center gap-6 mb-8 md:mb-12">
                     <Link href="/magazine" className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] md:tracking-[0.4em] text-secondary hover:text-foreground transition-all">
                         <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Magazine
                     </Link>
-                    
+
                     <div className="h-[1px] w-8 md:w-12 bg-border/50"></div>
-                    
+
                     <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.1em] md:tracking-[0.3em] text-secondary/60">
                         <span>Volume 01</span>
                         <span className="w-1 h-1 rounded-full bg-border"></span>
@@ -131,7 +131,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                         )}
                     </div>
                 </div>
-                
+
                 <h1 className="text-4xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.95] md:leading-[0.9] mb-8 md:mb-12 text-balance font-playfair break-words px-4 md:px-0">
                     {magazine.title}.
                 </h1>
@@ -170,7 +170,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                 </div>
 
                 {/* Cinematic Video Block */}
-                <VideoBlock 
+                <VideoBlock
                     video_url={magazine.video_url || primaryArticle?.video_url}
                     video_provider={magazine.video_provider || primaryArticle?.video_provider}
                     video_thumbnail={magazine.video_thumbnail || primaryArticle?.video_thumbnail}
@@ -184,24 +184,20 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                             dangerouslySetInnerHTML={{ __html: primaryArticle.content }}
                         />
                     ) : (
-                        <div className="editorial-content">
-                            <p>
-                                The depth of editorial content for {magazine.title} is currently being curated. 
+                        <div
+                            className="editorial-content"
+                            dangerouslySetInnerHTML={{
+                                __html: magazine.description || magazine.excerpt || `
+                                <p>The depth of editorial content for ${magazine.title} is currently being curated. 
                                 Our magazine focuses on the intersection of craft, discipline, and the architectural 
-                                evolution of the human form.
-                            </p>
-                            <p>
-                                In every volume, we explore how discipline creates the conditions for expression, 
-                                and how meaningful resistance refines the intent of the creator.
-                            </p>
-                            <blockquote>
-                                <p>The architecture of intent is built in the details.</p>
-                            </blockquote>
-                            <p>
-                                Stay tuned as we finalize this feature. Comraid Magazine remains dedicated to 
-                                documenting the vanguard of creative discipline.
-                            </p>
-                        </div>
+                                evolution of the human form.</p>
+                                <p>In every volume, we explore how discipline creates the conditions for expression, 
+                                and how meaningful resistance refines the intent of the creator.</p>
+                                <blockquote>
+                                    <p>The architecture of intent is built in the details.</p>
+                                </blockquote>
+                            ` }}
+                        />
                     )}
                 </div>
 
@@ -219,11 +215,11 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                                 <Link key={product.id} href={`/products/${product.slug}`} className="group block">
                                     <div className="aspect-[3/4] bg-secondary/5 relative mb-6 overflow-hidden">
                                         {product.image ? (
-                                            <Image 
-                                                src={product.image.startsWith('http') ? product.image : `${API_BASE_URL}${product.image}`} 
-                                                alt={product.name} 
-                                                fill 
-                                                className="object-cover transition-transform duration-1000 group-hover:scale-110" 
+                                            <Image
+                                                src={product.image.startsWith('http') ? product.image : `${API_BASE_URL}${product.image}`}
+                                                alt={product.name}
+                                                fill
+                                                className="object-cover transition-transform duration-1000 group-hover:scale-110"
                                             />
                                         ) : (
                                             <div className="absolute inset-0 flex items-center justify-center text-[10px] text-secondary uppercase tracking-widest">No Image</div>
@@ -249,10 +245,10 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                             </h2>
                             <div className="h-[1px] w-12 bg-primary/30"></div>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
                             {allRelatedArticles.slice(0, 9).map((related: any) => (
-                                <Link key={related.id} href={`/magazine/${related.slug || ''}`} className="group block">
+                                <Link key={related.id} href={`/magazine/${related.magazine_slug || related.slug || magazine.slug}`} className="group block">
                                     <div className="relative aspect-[3/4] overflow-hidden bg-secondary/5 mb-8 rounded-sm ring-1 ring-border/5 group-hover:ring-primary/20 transition-all duration-700">
                                         {(related.thumbnail || related.image || related.cover) ? (
                                             <Image

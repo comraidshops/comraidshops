@@ -20,56 +20,80 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
     if (!magazine) return null;
 
     return (
-        <section className="py-24 px-6 bg-background overflow-hidden">
-            <div className="max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-12 items-center gap-12">
-                {/* Visual - Left */}
-                <div className="md:col-span-7 relative aspect-[4/5] bg-secondary/5 overflow-hidden group">
-                    <Image
-                        src={magazine.thumbnail || '/images/placeholder.jpg'}
-                        alt={magazine.title}
-                        fill
-                        className="object-cover object-top transition-transform duration-1000 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/[0.03] group-hover:bg-transparent transition-colors duration-500"></div>
-                </div>
+        <section className="relative w-full py-24 md:py-44 overflow-hidden bg-background">
+            {/* Grain Overlay */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay z-50 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
-                {/* Content - Offset */}
-                <div className="md:col-span-5 md:-ml-12 z-10 bg-background p-8 md:p-12 relative border-l border-border/50">
-                    <span className="block text-xs font-bold uppercase tracking-widest text-secondary mb-4">
-                        {magazine.created_at ? new Date(magazine.created_at).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric'
-                        }) : 'Recent Edition'}
-                    </span>
-                    <h2 className="font-bebas text-5xl md:text-6xl uppercase tracking-wide mb-6 leading-none">
-                        {magazine.articles?.[0]?.title?.trim() || magazine.linked_articles?.[0]?.title?.trim() || magazine.title}
-                    </h2>
-                    <div
-                        className="text-lg text-secondary mb-8 leading-relaxed max-w-md editorial-content-preview line-clamp-6 font-source-serif"
-                        dangerouslySetInnerHTML={{
-                            __html: magazine.articles?.[0]?.content || magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial."
-                        }}
-                    />
+            <div className="max-w-[1920px] mx-auto px-6 md:px-20">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-center">
 
-                    <div className="flex flex-wrap gap-4">
-                        <Link
-                            href={`/magazine/${magazine.slug}`}
-                            className="text-sm font-bold uppercase tracking-widest border-b-2 border-primary pb-1 hover:text-primary transition-colors"
-                        >
-                            Read Full Edition
-                        </Link>
-                        {/* Always show View Article if we have at least one article. Link to the magazine's slug since articles are viewed within the magazine container. */}
-                        {((magazine.articles?.length || 0) > 0 || (magazine.linked_articles?.length || 0) > 0) && (
-                            <Link
-                                href={`/magazine/${magazine.slug}`}
-                                className="text-sm font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors"
-                            >
-                                View Article
-                            </Link>
-                        )}
+                    {/* Left Side: Cinematic Cover Image */}
+                    <div className="lg:col-span-7 relative group">
+                        <div className="relative aspect-[3/4] md:aspect-[16/10] overflow-hidden rounded-sm ring-1 ring-white/5">
+                            <Image
+                                src={magazine.thumbnail || '/new_image/art_of_suffering.jpg'}
+                                alt={magazine.title}
+                                fill
+                                className="object-cover grayscale hover:grayscale-0 transition-all duration-[2000ms] ease-out group-hover:scale-110"
+                                priority
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-60"></div>
+                        </div>
+
+                        {/* Floating Publication Info */}
+                        <div className="absolute -bottom-6 -left-6 md:-left-12 bg-background p-6 md:p-8 ring-1 ring-border shadow-2xl z-20 hidden md:block transition-transform duration-700 group-hover:-translate-y-2">
+                            <div className="flex flex-col gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Volume 01</span>
+                                <div className="h-px w-10 bg-primary/20"></div>
+                                <span className="text-[10px] uppercase tracking-[0.2em] text-secondary">Editorial Archive</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Side: Editorial Body */}
+                    <div className="lg:col-span-5 relative z-10 flex flex-col justify-center">
+                        <div className="space-y-12">
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-primary/60">
+                                        The Vanguard
+                                    </span>
+                                    <div className="h-px w-12 bg-primary/10"></div>
+                                </div>
+
+                                <h2 className="text-6xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tighter leading-[0.85] text-balance font-cormorant italic transition-all duration-700">
+                                    {magazine.articles?.[0]?.title?.trim() || magazine.linked_articles?.[0]?.title?.trim() || magazine.title}.
+                                </h2>
+                            </div>
+
+                            <p className="max-w-md text-lg md:text-xl text-secondary leading-relaxed font-light italic opacity-80 border-l-2 border-primary/20 pl-6 py-2">
+                                {magazine.excerpt || magazine.description || "Discover the latest perspective in our featured editorial exploring the intersection of discipline and craft."}
+                            </p>
+
+                            <div className="flex flex-wrap items-center gap-10 pt-4">
+                                <Link
+                                    href={`/magazine/${magazine.slug}`}
+                                    className="group/btn relative flex items-center gap-4 text-xs font-black uppercase tracking-[0.3em] text-white hover:text-primary transition-all pb-2"
+                                >
+                                    <span className="relative z-10">Read the Story</span>
+                                    <span className="text-xl group-hover/btn:translate-x-2 transition-transform duration-500">→</span>
+                                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover/btn:w-full transition-all duration-700"></div>
+                                </Link>
+
+                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/40">
+                                    {magazine.created_at ? new Date(magazine.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Est. 2024'}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Background Narrative Decoration */}
+            <div className="absolute top-1/2 -right-20 transform -translate-y-1/2 rotate-90 pointer-events-none hidden xl:block">
+                <span className="text-[12rem] font-black uppercase tracking-tighter text-white/[0.02] whitespace-nowrap">
+                    ARCHIVAL CURATION
+                </span>
             </div>
         </section>
     );
