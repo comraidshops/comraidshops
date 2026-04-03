@@ -82,7 +82,12 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
     const allRelatedArticles = [
         ...(magazine.articles?.slice(1) || []),
         ...(magazine.linked_articles || [])
-    ].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+    ].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+        .map(article => ({
+            ...article,
+            imageUrl: article.image || article.cover || article.thumbnail,
+            targetSlug: article.magazine_slug || article.slug || magazine.slug
+        }));
 
     const articleSchema = {
         '@context': 'https://schema.org',
@@ -248,11 +253,11 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
                             {allRelatedArticles.slice(0, 9).map((related: any) => (
-                                <Link key={related.id} href={`/magazine/${related.magazine_slug || related.slug || magazine.slug}`} className="group block">
+                                <Link key={related.id} href={`/magazine/${related.targetSlug}`} className="group block">
                                     <div className="relative aspect-[3/4] overflow-hidden bg-secondary/5 mb-8 rounded-sm ring-1 ring-border/5 group-hover:ring-primary/20 transition-all duration-700">
-                                        {(related.thumbnail || related.image || related.cover) ? (
+                                        {related.imageUrl ? (
                                             <Image
-                                                src={(related.thumbnail || related.image || related.cover).startsWith('http') ? (related.thumbnail || related.image || related.cover) : `${MEDIA_BASE}${related.thumbnail || related.image || related.cover}`}
+                                                src={related.imageUrl.startsWith('http') ? related.imageUrl : `${MEDIA_BASE}${related.imageUrl}`}
                                                 alt={related.title}
                                                 fill
                                                 className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
@@ -288,7 +293,7 @@ export default async function MagazineDetailPage({ params }: { params: Promise<{
                         Discover More Stories
                     </Link>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }
