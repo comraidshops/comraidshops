@@ -76,7 +76,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                                     <div className="h-px w-12 bg-primary/10"></div>
                                 </div>
 
-                                <h2 className="text-6xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tighter leading-[0.85] text-balance font-cormorant italic transition-all duration-700">
+                                <h2 className="text-6xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tighter leading-[0.85] text-balance font-cormorant italic transition-all duration-700 lg:pr-32">
                                     {cleanContent(magazine.articles?.[0]?.title || magazine.linked_articles?.[0]?.title || magazine.title || "")}.
                                 </h2>
                             </div>
