@@ -20,26 +20,34 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
     const [mounted, setMounted] = useState(false);
     
     useEffect(() => {
+        const fetchUnreadCount = async () => {
+            try {
+                const token = localStorage.getItem('access_token');
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/notifications/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const unread = data.filter((n: Notification) => !n.read).length;
+                    setUnreadCount(unread);
+                }
+            } catch (error) {
+                console.error("Failed to fetch notifications", error);
+            }
+        };
+
         const timer = setTimeout(() => {
             setMounted(true);
-            const fetchUnreadCount = async () => {
-                try {
-                    const token = localStorage.getItem('access_token');
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/notifications/`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        const unread = data.filter((n: Notification) => !n.read).length;
-                        setUnreadCount(unread);
-                    }
-                } catch (error) {
-                    console.error("Failed to fetch notifications", error);
-                }
-            };
             fetchUnreadCount();
         }, 0);
-        return () => clearTimeout(timer);
+
+        // Add custom event listener
+        window.addEventListener('notifications_updated', fetchUnreadCount);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('notifications_updated', fetchUnreadCount);
+        };
     }, []);
 
     const pageName = (pathname || '').split('/').pop() || 'Dashboard';

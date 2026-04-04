@@ -57,7 +57,7 @@ export default function EarningsPage() {
                 />
                 <StatCard 
                     title="Net Earnings" 
-                    value={`₦${((metrics?.total_revenue || 0) - (metrics?.total_commission || 0)).toLocaleString()}`} 
+                    value={`₦${(Number(metrics?.total_revenue || 0) - Number(metrics?.total_commission || 0)).toLocaleString()}`} 
                     icon={<TrendingUp className="w-4 h-4" />} 
                 />
                 <StatCard 

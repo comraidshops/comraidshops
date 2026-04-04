@@ -152,7 +152,7 @@ export default function CreateProductPage() {
       <form onSubmit={handleSubmit} className="space-y-16">
         
         {/* SECTION: Identity */}
-        <section className="space-y-8 bg-white border border-border p-8">
+        <section className="space-y-8 bg-background border border-border p-8">
           <div className="flex items-center gap-3 border-b border-border pb-4">
             <Tag className="w-4 h-4 text-primary" />
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Identity & Classification</h3>
@@ -204,7 +204,7 @@ export default function CreateProductPage() {
         </section>
 
         {/* SECTION: Narrative */}
-        <section className="space-y-8 bg-white border border-border p-8">
+        <section className="space-y-8 bg-background border border-border p-8">
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <Layers className="w-4 h-4 text-primary" />
               <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Narrative & Editorial</h3>
@@ -232,7 +232,7 @@ export default function CreateProductPage() {
         </section>
 
         {/* SECTION: Multimedia */}
-        <section className="space-y-8 bg-white border border-border p-8">
+        <section className="space-y-8 bg-background border border-border p-8">
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <ImageIcon className="w-4 h-4 text-primary" />
               <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Cinematic Assets</h3>
@@ -256,7 +256,7 @@ export default function CreateProductPage() {
                         {additionalImages.map((file, idx) => (
                             <div key={idx} className="relative aspect-square bg-secondary/10 border border-border">
                                 <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="Preview" />
-                                <button type="button" onClick={() => removeAdditionalImage(idx)} className="absolute top-2 right-2 p-1 bg-white border border-border text-red-500 hover:bg-red-50">
+                                <button type="button" onClick={() => removeAdditionalImage(idx)} className="absolute top-2 right-2 p-1 bg-background border border-border text-red-500 hover:bg-red-500/10">
                                     <Trash2 className="w-3 h-3" />
                                 </button>
                             </div>
@@ -278,7 +278,7 @@ export default function CreateProductPage() {
         </section>
 
         {/* SECTION: Details & Specs */}
-        <section className="space-y-8 bg-white border border-border p-8">
+        <section className="space-y-8 bg-background border border-border p-8">
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <Settings className="w-4 h-4 text-primary" />
               <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Technical Specs & Variants</h3>

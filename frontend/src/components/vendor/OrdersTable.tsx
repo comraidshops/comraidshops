@@ -9,7 +9,7 @@ export interface Order {
     total: number;
     commission: number;
     earnings: number;
-    payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+    payment_status: 'pending' | 'paid' | 'failed' | 'refunded' | 'confirmed';
     order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
     date: string;
     // Shipping Details
@@ -36,6 +36,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
     const ALLOWED_STATUSES: Order['order_status'][] = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
     const PAYMENT_STATUS_COLORS = {
         paid: 'text-green-700 bg-green-50 border-green-100',
+        confirmed: 'text-green-700 bg-green-50 border-green-100',
         pending: 'text-amber-700 bg-amber-50 border-amber-100',
         failed: 'text-red-700 bg-red-50 border-red-100',
         refunded: 'text-gray-700 bg-gray-50 border-gray-100',
@@ -107,7 +108,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                                     ) : (
                                         <div className="flex items-center gap-4">
                                             {/* Quick Actions */}
-                                            {order.order_status === 'pending' && order.payment_status === 'paid' && (
+                                            {order.order_status === 'pending' && (order.payment_status === 'paid' || order.payment_status === 'confirmed') && (
                                                 <button 
                                                     onClick={() => onStatusChange?.(order.id, 'processing')}
                                                     className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-amber-600 text-white hover:bg-amber-700 transition-colors"

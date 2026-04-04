@@ -56,6 +56,7 @@ export default function NotificationsPage() {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            window.dispatchEvent(new Event('notifications_updated'));
         } catch (error) {
             console.error("Failed to mark read", error);
         }
@@ -69,6 +70,7 @@ export default function NotificationsPage() {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            window.dispatchEvent(new Event('notifications_updated'));
         } catch (error) {
             console.error("Failed to mark all read", error);
         }

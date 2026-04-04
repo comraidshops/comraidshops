@@ -57,6 +57,18 @@ export default function WithdrawalsPage() {
         setLoading(true);
         setStatus({ type: '', message: '' });
 
+        const withdrawalAmount = parseFloat(formData.amount);
+        if (withdrawalAmount <= 0) {
+            setStatus({ type: 'error', message: 'Withdrawal amount must be greater than zero.' });
+            setLoading(false);
+            return;
+        }
+        if (metrics && withdrawalAmount > metrics.vendor_balance) {
+            setStatus({ type: 'error', message: 'Insufficient cleared balance for this withdrawal amount.' });
+            setLoading(false);
+            return;
+        }
+
         try {
             const token = localStorage.getItem('access_token');
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/withdrawals/`, {

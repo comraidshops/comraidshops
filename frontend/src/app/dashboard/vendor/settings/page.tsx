@@ -60,7 +60,8 @@ export default function BrandSettingsPage() {
             Object.entries(formData).forEach(([key, value]) => {
                 if (value !== null && value !== undefined) {
                     if (key === 'social_links') {
-                        data.append(key, JSON.stringify(value));
+                        // Skip social_links as there are no UI fields yet, preventing accidental wipe
+                        return;
                     } else if (value instanceof File) {
                         data.append(key, value);
                     } else {
