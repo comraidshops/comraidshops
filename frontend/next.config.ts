@@ -45,9 +45,6 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  experimental: {
-    turbopack: {},
-  },
   images: {
     remotePatterns: [
       // Production backend (Cloudinary serves media, but keep API domain for any direct images)
