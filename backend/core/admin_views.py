@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status, generics
+from rest_framework import viewsets, permissions, status, generics, serializers
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -99,15 +99,28 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             )
 
         # Handle Brand Assignment if 'vendor_brand_id' is passed in the request
-        brand_id = self.request.data.get('vendor_brand_id')
-        if user.is_vendor and brand_id:
-            try:
-                brand = Brand.objects.get(id=brand_id)
-                user.vendor_profile.brand = brand
-                user.vendor_profile.brand_name = brand.name
-                user.vendor_profile.save()
-            except Brand.DoesNotExist:
-                pass
+        # We use the raw request data to handle explicit null (None) for un-assignment
+        if 'vendor_brand_id' in self.request.data:
+            brand_id = self.request.data.get('vendor_brand_id')
+            
+            # Ensure we have a fresh vendor profile if it was just created
+            from .models import Vendor as VendorModel
+            vendor, _ = VendorModel.objects.get_or_create(
+                user=user,
+                defaults={'brand_name': user.username, 'commission_rate': 0.10}
+            )
+
+            if brand_id in [None, "", "null", 0]:
+                vendor.brand = None
+                vendor.save()
+            else:
+                try:
+                    brand = Brand.objects.get(id=brand_id)
+                    vendor.brand = brand
+                    vendor.brand_name = brand.name
+                    vendor.save()
+                except Brand.DoesNotExist:
+                    pass
 
     @action(detail=True, methods=['post'])
     def approve_vendor(self, request, pk=None):
