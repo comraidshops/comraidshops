@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     description: 'Learn about Kenncofficial, the visionary founder of ComraidShops, and our mission to provide the architecture for independent luxury labels to thrive.',
     openGraph: {
         title: 'Kenncofficial | Founder of ComraidShops',
-        description: 'Discover the vision behind ComraidShops—a meticulously engineered environment for independent talent.',
+        description: 'Discover the vision behind ComraidShops. A meticulously engineered environment for independent talent.',
         images: ['/founder.png'],
         type: 'website',
     },
@@ -85,27 +85,27 @@ export default function AboutPage() {
                                 </div>
                                 
                                 <div className="space-y-8 max-w-xl">
-                                    <blockquote className="text-2xl md:text-3xl font-playfair italic leading-relaxed text-white/90">
+                                    <blockquote className="text-2xl md:text-4xl font-playfair italic leading-snug text-white/90">
                                         "Vision without execution is hallucination."
                                     </blockquote>
-                                    <div className="space-y-12 text-white/60 text-lg leading-relaxed">
+                                    <div className="space-y-12 text-white/60 text-[17px] leading-[1.8]">
                                         <div className="space-y-6">
-                                            <p className="text-white font-medium">Kenncofficial is not interested in things that exist without meaning.</p>
-                                            <div className="space-y-2 border-l border-primary/30 pl-6 italic">
+                                            <p className="text-white text-xl font-medium leading-relaxed">Kenncofficial is not interested in things that exist without meaning.</p>
+                                            <div className="space-y-3 border-l border-primary/30 pl-6 italic text-white/50">
                                                 <p>If it cannot tell a story, it is useless.</p>
                                                 <p>If it cannot hold depth, it is empty.</p>
-                                                <p>If it cannot explain a feeling—then it does not deserve to exist.</p>
+                                                <p>If it cannot explain a feeling, then it does not deserve to exist.</p>
                                             </div>
                                         </div>
 
                                         <div className="space-y-4">
                                             <p>He does not create for aesthetics. He creates because there are things he feels that refuse to stay unexpressed.</p>
-                                            <p>And the world, as it is, does a poor job of holding that kind of expression.</p>
+                                            <p className="text-white/40">And the world, as it is, does a poor job of holding that kind of expression.</p>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <p>In a society where talent is everywhere—but understanding is rare—where people create, but are never truly seen, where vision is often killed before it even takes form—</p>
-                                            <p className="text-white font-medium">He chose not to just create. He chose to build something that protects creation itself.</p>
+                                            <p>In a society where talent is everywhere but understanding is rare. Where people create, but are never truly seen. Where vision is often killed before it even takes form.</p>
+                                            <p className="text-white text-xl font-medium">He chose not to just create. He chose to build something that protects creation itself.</p>
                                         </div>
 
                                         <div className="space-y-2">
@@ -118,21 +118,30 @@ export default function AboutPage() {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <p>He understands the weight of having something real to say—and having no structure around you that knows what to do with it.</p>
+                                            <p>He understands the weight of having something real to say, and having no structure around you that knows what to do with it.</p>
                                             <p>He understands what it means to create in an environment that celebrates noise but ignores meaning.</p>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <p>So he builds differently. Not to remove the struggle—because struggle refines the artist. But to give that struggle direction. To give it visibility. To give it language.</p>
+                                            <p>So he builds differently. Not to remove the struggle, because struggle refines the artist. But to give that struggle direction. To give it visibility. To give it language.</p>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <div className="grid grid-cols-1 gap-2 border-y border-white/5 py-6">
-                                                <p className="text-white">As an artist, he <span className="italic">feels</span>.</p>
-                                                <p className="text-white">As a writer, he <span className="italic">translates</span>.</p>
-                                                <p className="text-white">As an engineer, he <span className="italic">structures</span>.</p>
+                                            <div className="grid grid-cols-3 gap-4 border-y border-white/5 py-8 text-center">
+                                                <div>
+                                                    <p className="text-white text-sm uppercase tracking-widest">Artist</p>
+                                                    <p className="text-white/40 italic text-xs mt-1">he feels</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-white text-sm uppercase tracking-widest">Writer</p>
+                                                    <p className="text-white/40 italic text-xs mt-1">he translates</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-white text-sm uppercase tracking-widest">Engineer</p>
+                                                    <p className="text-white/40 italic text-xs mt-1">he structures</p>
+                                                </div>
                                             </div>
-                                            <p>But none of these exist separately. They are all part of the same instinct: <span className="text-white font-medium">to take what is invisible—and make it undeniable.</span></p>
+                                            <p>But none of these exist separately. They are all part of the same instinct: <span className="text-white font-medium">to take what is invisible and make it undeniable.</span></p>
                                         </div>
 
                                         <div className="space-y-4">
@@ -140,7 +149,7 @@ export default function AboutPage() {
                                             <ul className="space-y-1 plain-list">
                                                 <li>To a culture that consumes without understanding.</li>
                                                 <li>To an industry that rewards imitation over identity.</li>
-                                                <li>To a system that sees creators—but does not value them.</li>
+                                                <li>To a system that sees creators but does not value them.</li>
                                             </ul>
                                         </div>
 
@@ -154,11 +163,11 @@ export default function AboutPage() {
 
                                         <div className="space-y-4">
                                             <p>Kenncofficial is not building for hype. He is building for people who feel too much to wear things that mean nothing.</p>
-                                            <p>For creators who refuse to dilute their voice just to be accepted. For individuals who want to wear context, not just clothing.</p>
+                                            <p className="text-white/40">For creators who refuse to dilute their voice just to be accepted. For individuals who want to wear context, not just clothing.</p>
                                         </div>
 
                                         <div className="space-y-2 border-l-2 border-primary pl-6">
-                                            <p className="text-white/40 italic">This is not about making things easier.</p>
+                                            <p className="text-white/30 italic text-sm">This is not about making things easier.</p>
                                             <p className="text-2xl text-white font-bold uppercase tracking-tighter">It is about making things matter.</p>
                                         </div>
 
