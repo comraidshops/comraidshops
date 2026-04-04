@@ -21,10 +21,17 @@ interface User {
     is_superuser: boolean;
     is_staff: boolean;
     date_joined: string;
+    vendor_brand_id?: number | null;
+}
+
+interface Brand {
+    id: number;
+    name: string;
 }
 
 export default function AdminUsers() {
     const [users, setUsers] = useState<User[]>([]);
+    const [brands, setBrands] = useState<Brand[]>([]);
     const [actionLoading, setActionLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -39,7 +46,19 @@ export default function AdminUsers() {
 
     useEffect(() => {
         getUsers();
+        getBrands();
     }, []);
+
+    async function getBrands() {
+        try {
+            // Note: Since this is public data, /brands/ works, but if there's an admin-api we would use that.
+            // Adjust if needed, but assuming /brands/ returns all brands.
+            const data = await safeFetch('/brands/');
+            setBrands(data);
+        } catch (error) {
+            console.error("Failed to fetch brands:", error);
+        }
+    }
 
     async function getUsers() {
         try {
@@ -376,6 +395,17 @@ export default function AdminUsers() {
                                 { value: 'true', label: 'Vendor' }
                             ]}
                         />
+                        {currentUser?.is_vendor && (
+                            <AdminSelect 
+                                label="Assigned Brand"
+                                value={currentUser?.vendor_brand_id?.toString() || ''}
+                                onChange={(e) => setCurrentUser(currentUser ? { ...currentUser, vendor_brand_id: e.target.value ? parseInt(e.target.value) : null } : null)}
+                                options={[
+                                    { value: '', label: 'None' },
+                                    ...brands.map(b => ({ value: b.id.toString(), label: b.name }))
+                                ]}
+                            />
+                        )}
                         <AdminSelect 
                             label="Role"
                             value={currentUser?.is_superuser ? 'superuser' : (currentUser?.is_staff ? 'staff' : 'standard')}

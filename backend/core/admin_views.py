@@ -19,9 +19,16 @@ from .serializers import (
 # --- Administrative Serializers ---
 
 class AdminUserSerializer(UserSerializer):
+    vendor_brand_id = serializers.SerializerMethodField()
+
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ['is_superuser', 'is_staff', 'is_vendor_approved', 'date_joined', 'last_login']
+        fields = UserSerializer.Meta.fields + ['is_superuser', 'is_staff', 'is_vendor_approved', 'date_joined', 'last_login', 'vendor_brand_id']
         read_only_fields = ['date_joined', 'last_login']
+
+    def get_vendor_brand_id(self, obj):
+        if obj.is_vendor and hasattr(obj, 'vendor_profile') and obj.vendor_profile.brand:
+            return obj.vendor_profile.brand.id
+        return None
 
 class AdminVendorSerializer(VendorSerializer):
     user_details = AdminUserSerializer(source='user', read_only=True)
@@ -79,6 +86,28 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = AdminUserSerializer
     permission_classes = [permissions.IsAdminUser]
+
+    def perform_update(self, serializer):
+        user = serializer.save()
+        
+        # Auto-create Vendor profile if is_vendor is checked
+        if user.is_vendor and not hasattr(user, 'vendor_profile'):
+            Vendor.objects.create(
+                user=user, 
+                brand_name=user.username,
+                commission_rate=0.10
+            )
+
+        # Handle Brand Assignment if 'vendor_brand_id' is passed in the request
+        brand_id = self.request.data.get('vendor_brand_id')
+        if user.is_vendor and brand_id:
+            try:
+                brand = Brand.objects.get(id=brand_id)
+                user.vendor_profile.brand = brand
+                user.vendor_profile.brand_name = brand.name
+                user.vendor_profile.save()
+            except Brand.DoesNotExist:
+                pass
 
     @action(detail=True, methods=['post'])
     def approve_vendor(self, request, pk=None):
