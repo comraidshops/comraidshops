@@ -82,12 +82,13 @@ from .admin_views import (
     AdminEarningViewSet, AdminCommissionViewSet, AdminMagazineViewSet,
     AdminArticleViewSet, AdminExhibitionViewSet, AdminCollectionViewSet,
     AdminHomepageSlideViewSet, AdminFitFrameViewSet, AdminBrandViewSet,
-    AdminBroadcastView
+    AdminBroadcastView, AdminCategoryViewSet
 )
 
 admin_router = DefaultRouter()
 admin_router.register(r'users', AdminUserViewSet, basename='admin-user')
 admin_router.register(r'vendors', AdminVendorViewSet, basename='admin-vendor')
+admin_router.register(r'categories', AdminCategoryViewSet, basename='admin-category')
 admin_router.register(r'products', AdminProductViewSet, basename='admin-product')
 admin_router.register(r'orders', AdminOrderViewSet, basename='admin-order')
 admin_router.register(r'withdrawals', AdminWithdrawalViewSet, basename='admin-withdrawal')

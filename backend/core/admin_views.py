@@ -28,6 +28,10 @@ class AdminVendorSerializer(VendorSerializer):
     class Meta(VendorSerializer.Meta):
         fields = VendorSerializer.Meta.fields + ['user_details', 'payout_balance']
 
+class AdminCategorySerializer(CategorySerializer):
+    class Meta(CategorySerializer.Meta):
+        fields = CategorySerializer.Meta.fields
+
 class AdminProductSerializer(ProductSerializer):
     class Meta(ProductSerializer.Meta):
         fields = ProductSerializer.Meta.fields
@@ -109,6 +113,11 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 class AdminVendorViewSet(viewsets.ModelViewSet):
     queryset = Vendor.objects.all()
     serializer_class = AdminVendorSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+class AdminCategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all().order_by('name')
+    serializer_class = AdminCategorySerializer
     permission_classes = [permissions.IsAdminUser]
 
 class AdminProductViewSet(viewsets.ModelViewSet):
