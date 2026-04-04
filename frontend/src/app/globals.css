@@ -243,4 +243,24 @@ body {
     width: 0%;
     transition: width 0.1s ease-out;
   }
+
+  /* Route Change Progress Bar */
+  .route-progress-bar {
+    animation: route-progress 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes route-progress {
+    0% {
+      transform: translateX(-100%);
+      width: 100%;
+    }
+    50% {
+      transform: translateX(0%);
+      width: 100%;
+    }
+    100% {
+      transform: translateX(100%);
+      width: 100%;
+    }
+  }
 }

@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Geist, Inter, Cormorant_Garamond, Bebas_Neue, Libre_Baskerville, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import RouteChangeIndicator from "@/components/layout/RouteChangeIndicator";
 import { CartProvider } from "@/context/CartContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { PWAProvider } from "@/context/PWAContext";
@@ -125,6 +127,9 @@ export default function RootLayout({
         <NotificationProvider>
           <PWAProvider>
             <CartProvider>
+              <Suspense fallback={null}>
+                <RouteChangeIndicator />
+              </Suspense>
               <Header />
               <main className="flex-grow pt-16 pb-20 md:pb-0 w-full overflow-x-hidden">
                 {children}
