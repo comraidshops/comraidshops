@@ -451,6 +451,7 @@ class VendorProductViewSet(viewsets.ModelViewSet):
         self._handle_media(product)
 
     def _handle_media(self, product):
+        # Additional Images (Gallery)
         images = self.request.FILES.getlist('uploaded_images')
         if images:
             ProductImage.objects.filter(product=product).delete()
@@ -461,7 +462,13 @@ class VendorProductViewSet(viewsets.ModelViewSet):
                     is_primary=(idx == 0),
                     order=idx
                 )
-                
+
+        # 360 Video - Fix: Extract from request.FILES and handle outside 'if images'
+        video_360 = self.request.FILES.get('uploaded_video_360')
+        if video_360:
+            from .models import Product360Video
+            # Recreate to ensure only one exists (OneToOneField)
+            Product360Video.objects.filter(product=product).delete()
             Product360Video.objects.create(
                 product=product,
                 video=video_360
@@ -480,10 +487,20 @@ class VendorProductViewSet(viewsets.ModelViewSet):
             from .models import ProductVariant
             product.variants.all().delete()
             for var in variants_data:
+                # Fix: Handle empty stock string from frontend text input
+                stock_val = var.get('stock')
+                try:
+                    if stock_val == '' or stock_val is None:
+                        stock = 0
+                    else:
+                        stock = int(stock_val)
+                except (ValueError, TypeError):
+                    stock = 0
+
                 ProductVariant.objects.create(
                     product=product,
-                    name=var.get('name'),
-                    stock=var.get('stock', 0)
+                    name=var.get('name') or "Unnamed Variant",
+                    stock=stock
                 )
 
         # Handle Specifications
@@ -501,8 +518,8 @@ class VendorProductViewSet(viewsets.ModelViewSet):
             for spec in specs_data:
                 ProductSpecification.objects.create(
                     product=product,
-                    name=spec.get('name'),
-                    value=spec.get('value')
+                    name=spec.get('name') or "Unnamed Specification",
+                    value=spec.get('value') or "N/A"
                 )
 
 class VendorOrderViewSet(viewsets.ModelViewSet):
