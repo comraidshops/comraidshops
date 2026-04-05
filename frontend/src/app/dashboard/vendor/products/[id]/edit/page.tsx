@@ -2,10 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus, Trash2, Settings } from 'lucide-react';
 import Image from 'next/image';
 import { Product } from '@/types/brand';
 import { ImageCropperModal } from '@/components/ui/ImageCropperModal';
+
+interface Variant {
+  name: string;
+  stock: number;
+}
+
+interface Specification {
+  name: string;
+  value: string;
+}
 
 export default function EditProductPage() {
     const router = useRouter();
@@ -19,6 +29,25 @@ export default function EditProductPage() {
     const [commissionRate, setCommissionRate] = useState<number>(0);
     const [globalCommissionMode, setGlobalCommissionMode] = useState<'fixed' | 'percentage'>('percentage');
     const [globalCommissionValue, setGlobalCommissionValue] = useState<number>(0);
+
+    const [variants, setVariants] = useState<Variant[]>([]);
+    const [specifications, setSpecifications] = useState<Specification[]>([]);
+
+    const addVariant = () => setVariants([...variants, { name: '', stock: 0 }]);
+    const removeVariant = (index: number) => setVariants(variants.filter((_, i) => i !== index));
+    const updateVariant = (index: number, field: keyof Variant, value: string | number) => {
+        const next = [...variants];
+        next[index] = { ...next[index], [field]: value as never };
+        setVariants(next);
+    };
+
+    const addSpec = () => setSpecifications([...specifications, { name: '', value: '' }]);
+    const removeSpec = (index: number) => setSpecifications(specifications.filter((_, i) => i !== index));
+    const updateSpec = (index: number, field: keyof Specification, value: string) => {
+        const next = [...specifications];
+        next[index] = { ...next[index], [field]: value };
+        setSpecifications(next);
+    };
 
     // Image Cropper State
     const [isCroppingMain, setIsCroppingMain] = useState(false);
@@ -69,6 +98,13 @@ export default function EditProductPage() {
         if (res.ok) {
           const data = await res.json();
           setProduct(data);
+          
+          if (data.variants && Array.isArray(data.variants)) {
+            setVariants(data.variants.map((v: any) => ({ name: v.name, stock: v.stock })));
+          }
+          if (data.specifications && Array.isArray(data.specifications)) {
+            setSpecifications(data.specifications.map((s: any) => ({ name: s.name, value: s.value })));
+          }
         } else {
           setError("Failed to fetch product details.");
         }
@@ -112,6 +148,9 @@ export default function EditProductPage() {
     if (!video360File || video360File.size === 0) {
       formData.delete('uploaded_video_360');
     }
+
+    formData.append('variants', JSON.stringify(variants));
+    formData.append('specifications', JSON.stringify(specifications));
 
     try {
       const token = localStorage.getItem('access_token');
@@ -263,6 +302,66 @@ export default function EditProductPage() {
             <input type="text" id="editorial_quote" name="editorial_quote" defaultValue={product.editorial_quote || ''} className="w-full bg-secondary/5 border border-border p-3 focus:outline-none focus:border-primary transition-colors h-12" />
           </div>
         </div>
+
+        {/* Technical Specs & Variants */}
+        <section className="space-y-8 bg-background border border-border p-8 mt-8 mb-8">
+            <div className="flex items-center gap-3 border-b border-border pb-4">
+              <Settings className="w-4 h-4 text-primary" />
+              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Technical Specs & Variants</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Available Variants</label>
+                        <button type="button" onClick={addVariant} className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-1 hover:underline">
+                            <Plus className="w-3 h-3" /> Add Variant
+                        </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                        {variants.map((v, idx) => (
+                            <div key={idx} className="flex gap-4 items-end">
+                                <div className="flex-1 space-y-1">
+                                    <input type="text" placeholder="Name (e.g. Size M)" value={v.name} onChange={(e) => updateVariant(idx, 'name', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs focus:outline-none focus:border-primary" />
+                                </div>
+                                <div className="w-24 space-y-1">
+                                    <input type="number" placeholder="Stock" value={v.stock} onChange={(e) => updateVariant(idx, 'stock', Number(e.target.value))} className="w-full bg-secondary/5 border border-border p-2 text-xs focus:outline-none focus:border-primary" />
+                                </div>
+                                <button type="button" onClick={() => removeVariant(idx)} className="p-2 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Key Specifications</label>
+                        <button type="button" onClick={addSpec} className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-1 hover:underline">
+                            <Plus className="w-3 h-3" /> Add Spec
+                        </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                        {specifications.map((s, idx) => (
+                            <div key={idx} className="flex gap-4 items-end">
+                                <div className="flex-1">
+                                    <input type="text" placeholder="Attribute (e.g. Material)" value={s.name} onChange={(e) => updateSpec(idx, 'name', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs focus:outline-none focus:border-primary" />
+                                </div>
+                                <div className="flex-1">
+                                    <input type="text" placeholder="Value" value={s.value} onChange={(e) => updateSpec(idx, 'value', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs focus:outline-none focus:border-primary" />
+                                </div>
+                                <button type="button" onClick={() => removeSpec(idx)} className="p-2 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <div className="space-y-4">
           <label htmlFor="image" className="block text-xs font-bold uppercase tracking-widest text-secondary">Main Campaign Image</label>
