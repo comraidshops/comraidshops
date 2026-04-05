@@ -9,7 +9,7 @@ import { ImageCropperModal } from '@/components/ui/ImageCropperModal';
 
 interface Variant {
   name: string;
-  stock: number;
+  stock: string | number;
 }
 
 interface Specification {
@@ -33,7 +33,7 @@ export default function EditProductPage() {
     const [variants, setVariants] = useState<Variant[]>([]);
     const [specifications, setSpecifications] = useState<Specification[]>([]);
 
-    const addVariant = () => setVariants([...variants, { name: '', stock: 0 }]);
+    const addVariant = () => setVariants([...variants, { name: '', stock: '' }]);
     const removeVariant = (index: number) => setVariants(variants.filter((_, i) => i !== index));
     const updateVariant = (index: number, field: keyof Variant, value: string | number) => {
         const next = [...variants];
@@ -323,10 +323,10 @@ export default function EditProductPage() {
                         {variants.map((v, idx) => (
                             <div key={idx} className="flex gap-4 items-end">
                                 <div className="flex-1 space-y-1">
-                                    <input type="text" placeholder="Name (e.g. Size M)" value={v.name} onChange={(e) => updateVariant(idx, 'name', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs focus:outline-none focus:border-primary" />
+                                    <input type="text" placeholder="Name (e.g. Size M)" value={v.name} onChange={(e) => updateVariant(idx, 'name', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs text-primary focus:outline-none focus:border-primary" />
                                 </div>
                                 <div className="w-24 space-y-1">
-                                    <input type="number" placeholder="Stock" value={v.stock} onChange={(e) => updateVariant(idx, 'stock', Number(e.target.value))} className="w-full bg-secondary/5 border border-border p-2 text-xs focus:outline-none focus:border-primary" />
+                                    <input type="text" placeholder="Stock" value={v.stock} onChange={(e) => updateVariant(idx, 'stock', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs text-primary focus:outline-none focus:border-primary" />
                                 </div>
                                 <button type="button" onClick={() => removeVariant(idx)} className="p-2 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100">
                                     <Trash2 className="w-4 h-4" />
@@ -348,10 +348,10 @@ export default function EditProductPage() {
                         {specifications.map((s, idx) => (
                             <div key={idx} className="flex gap-4 items-end">
                                 <div className="flex-1">
-                                    <input type="text" placeholder="Attribute (e.g. Material)" value={s.name} onChange={(e) => updateSpec(idx, 'name', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs focus:outline-none focus:border-primary" />
+                                    <input type="text" placeholder="Attribute (e.g. Material)" value={s.name} onChange={(e) => updateSpec(idx, 'name', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs text-primary focus:outline-none focus:border-primary" />
                                 </div>
                                 <div className="flex-1">
-                                    <input type="text" placeholder="Value" value={s.value} onChange={(e) => updateSpec(idx, 'value', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs focus:outline-none focus:border-primary" />
+                                    <input type="text" placeholder="Value" value={s.value} onChange={(e) => updateSpec(idx, 'value', e.target.value)} className="w-full bg-secondary/5 border border-border p-2 text-xs text-primary focus:outline-none focus:border-primary" />
                                 </div>
                                 <button type="button" onClick={() => removeSpec(idx)} className="p-2 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100">
                                     <Trash2 className="w-4 h-4" />
