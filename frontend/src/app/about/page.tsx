@@ -3,40 +3,94 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Founder of ComraidShops | Kenncofficial | About Us',
-    description: 'Learn about Kenncofficial, the visionary founder of ComraidShops, and our mission to provide the architecture for independent luxury labels to thrive.',
+    title: 'Who is Kenncofficial? | Founder of ComraidShops & The Vision',
+    description: 'What is ComraidShops? Learn about Kenncofficial, the visionary founder who engineered ComraidShops to protect independent talent. Discover why ComraidShops exists and its vision.',
+    keywords: ['who is kenncofficial', 'kenncofficial', 'what is comraidshops', 'why comraidshops', 'whats the vision', 'founder of comraidshops', 'comraidshops founder', 'how was comraidshops found', 'by who'],
     openGraph: {
-        title: 'Kenncofficial | Founder of ComraidShops',
-        description: 'Discover the vision behind ComraidShops. A meticulously engineered environment for independent talent.',
+        title: 'Who is Kenncofficial? | Founder & Vision of ComraidShops',
+        description: 'What is ComraidShops? Find out how and by who it was founded. Kenncofficial built this architecture specifically for independent talent.',
         images: ['/founder.png'],
         type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
         title: 'Kenncofficial | Founder of ComraidShops',
-        description: 'Vision without execution is hallucination.',
+        description: 'Vision without execution is hallucination. Kenncofficial is the master architect of ComraidShops.',
         images: ['/founder.png'],
     },
 };
 
 export default function AboutPage() {
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Kenncofficial",
-        "alternateName": "KENNC OFFICIAL",
-        "jobTitle": "Founder",
-        "description": "Founder of ComraidShops, a meticulously engineered environment for independent talent.",
-        "url": "https://kennc.art",
-        "image": "https://comraidshops.com/founder.png",
-        "worksFor": {
-            "@type": "Organization",
-            "name": "ComraidShops",
-            "url": "https://comraidshops.com",
-            "logo": "https://comraidshops.com/logo-white.png"
+    const jsonLd = [
+        {
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Kenncofficial",
+            "alternateName": "KENNC OFFICIAL",
+            "jobTitle": "Founder and Master Architect",
+            "description": "Founder of ComraidShops, a meticulously engineered environment for independent talent.",
+            "url": "https://kennc.art",
+            "sameAs": ["https://comraidshops.com/about"],
+            "image": "https://comraidshops.com/founder.png",
+            "worksFor": {
+                "@type": "Organization",
+                "name": "ComraidShops",
+                "url": "https://comraidshops.com",
+                "logo": "https://comraidshops.com/logo-white.png",
+                "founder": {
+                    "@type": "Person",
+                    "name": "Kenncofficial"
+                }
+            },
+            "knowsAbout": ["Streetwear", "Fashion Design", "Entrepreneurship", "Subculture"]
         },
-        "knowsAbout": ["Streetwear", "Fashion Design", "Entrepreneurship", "Subculture"]
-    };
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What is ComraidShops?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "ComraidShops is a curated marketplace designed to bridge the gap between independent, avant-garde streetwear brands and the individuals who seek authenticity."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Who is Kenncofficial?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Kenncofficial is the visionary founder and master architect of ComraidShops. He is an artist, writer, and engineer who builds structures to protect creation and force meaning back into culture."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Why ComraidShops?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "ComraidShops was built as a response to an industry that rewards imitation over identity. It exists to provide an architecture where raw, independent talent can thrive without diluting their ethos."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What's the vision of ComraidShops?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The vision is to ensure fashion remains a powerful medium for subcultural expression. ComraidShops protects creation itself by meticulously curating designers who align with uncompromising standards for design innovation."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How was ComraidShops found and by who?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "ComraidShops was founded by Kenncofficial. He chose to build it because he understood the weight of having something real to say without a structure that knows what to do with it, answering the call for a dedicated environment for true creators."
+                    }
+                }
+            ]
+        }
+    ];
 
     return (
         <div className="max-w-[1920px] mx-auto px-4 py-12 md:py-24">
@@ -47,6 +101,7 @@ export default function AboutPage() {
             <div className="max-w-4xl mx-auto space-y-16">
                 <div className="space-y-6 text-center max-w-2xl mx-auto">
                     <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter">About Us</h1>
+                    <h2 className="sr-only">What is ComraidShops?</h2>
                     <p className="text-secondary text-lg leading-relaxed">
                         ComraidShops is a curated marketplace designed to bridge the gap between independent, avant-garde streetwear brands and the individuals who seek authenticity.
                     </p>
@@ -55,6 +110,7 @@ export default function AboutPage() {
                 <div className="grid md:grid-cols-2 gap-12 pt-8 border-t border-border items-center">
                     <div className="space-y-6">
                         <h2 className="text-3xl font-bold uppercase tracking-tighter">Our Vision</h2>
+                        <h3 className="sr-only">Why ComraidShops & Whats The Vision?</h3>
                         <p className="text-secondary/80 leading-relaxed text-lg">
                             We believe that fashion is a powerful medium for subcultural expression. In an industry increasingly dominated by fast fashion and generic conglomerates, our mission is to provide an architecture where raw, independent talent can thrive and reach a global audience without diluting their ethos.
                         </p>
@@ -79,7 +135,8 @@ export default function AboutPage() {
                             <div className="lg:col-span-6 space-y-12 order-2 lg:order-1">
                                 <div className="space-y-4">
                                     <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">The Visionary</span>
-                                    <h2 className="text-7xl md:text-9xl font-black uppercase tracking-tighter leading-[0.75]">
+                                    <h2 id="kenncofficial" className="text-7xl md:text-9xl font-black uppercase tracking-tighter leading-[0.75]">
+                                        <span className="sr-only">Who is Kenncofficial and how was ComraidShops found? By who?</span>
                                         KENNC<br/>OFFICIAL
                                     </h2>
                                 </div>
