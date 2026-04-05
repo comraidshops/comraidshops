@@ -51,13 +51,13 @@ export default function AnalyticsPage() {
     }));
 
     return (
-        <div className="space-y-8 pb-12">
-            <h2 className="text-2xl font-bold uppercase tracking-tighter">Analytics</h2>
+        <div className="space-y-5 md:space-y-8 pb-8 md:pb-12">
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter">Analytics</h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-background border border-border p-6">
-                    <h3 className="text-sm font-bold uppercase tracking-widest mb-8">Sales by Product</h3>
-                    <div className="h-[300px] w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
+                <div className="bg-background border border-border p-4 md:p-6">
+                    <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest mb-5 md:mb-8">Sales by Product</h3>
+                    <div className="h-[220px] md:h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={barData} layout="vertical">
                                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E5E7EB" />
@@ -67,22 +67,22 @@ export default function AnalyticsPage() {
                                     type="category" 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    width={120}
-                                    tick={{fontSize: 10, fill: '#6B7280'}}
+                                    width={80}
+                                    tick={{fontSize: 9, fill: '#6B7280'}}
                                 />
                                 <Tooltip 
                                     cursor={{fill: 'rgba(0,0,0,0.05)'}}
-                                    contentStyle={{ backgroundColor: '#FFF', border: '1px solid #E5E7EB', borderRadius: '0px' }}
+                                    contentStyle={{ backgroundColor: '#FFF', border: '1px solid #E5E7EB', borderRadius: '0px', fontSize: '12px' }}
                                 />
-                                <Bar dataKey="sales" fill="#000" barSize={20} />
+                                <Bar dataKey="sales" fill="#000" barSize={16} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="bg-background border border-border p-6">
-                    <h3 className="text-sm font-bold uppercase tracking-widest mb-8">Revenue by Product</h3>
-                    <div className="h-[300px] w-full">
+                <div className="bg-background border border-border p-4 md:p-6">
+                    <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest mb-5 md:mb-8">Revenue by Product</h3>
+                    <div className="h-[220px] md:h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={barData} layout="vertical">
                                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E5E7EB" />
@@ -92,15 +92,15 @@ export default function AnalyticsPage() {
                                     type="category" 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    width={120}
-                                    tick={{fontSize: 10, fill: '#6B7280'}}
+                                    width={80}
+                                    tick={{fontSize: 9, fill: '#6B7280'}}
                                 />
                                 <Tooltip 
                                     cursor={{fill: 'rgba(0,0,0,0.05)'}}
-                                    formatter={(value: any) => [`₦${Number(value).toLocaleString()}`, 'Revenue']}
-                                    contentStyle={{ backgroundColor: '#FFF', border: '1px solid #E5E7EB', borderRadius: '0px' }}
+                                    formatter={(value: unknown) => [`₦${Number(value).toLocaleString()}`, 'Revenue']}
+                                    contentStyle={{ backgroundColor: '#FFF', border: '1px solid #E5E7EB', borderRadius: '0px', fontSize: '12px' }}
                                 />
-                                <Bar dataKey="revenue" fill="#000" barSize={20} />
+                                <Bar dataKey="revenue" fill="#000" barSize={16} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

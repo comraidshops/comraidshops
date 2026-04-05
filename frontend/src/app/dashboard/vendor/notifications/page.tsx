@@ -77,12 +77,12 @@ export default function NotificationsPage() {
     };
 
     return (
-        <div className="space-y-8 max-w-4xl">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold uppercase tracking-tighter">Notifications</h2>
+        <div className="space-y-5 md:space-y-8 max-w-4xl">
+            <div className="flex justify-between items-center gap-4">
+                <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter">Notifications</h2>
                 <button 
                     onClick={handleMarkAllRead}
-                    className="text-[10px] font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors"
+                    className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors active:scale-95 whitespace-nowrap"
                 >
                     Mark all as read
                 </button>

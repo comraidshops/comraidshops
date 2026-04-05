@@ -40,7 +40,7 @@ export default function BrandSettingsPage() {
                     const data = await res.json();
                     setFormData({
                         ...data,
-                        hero_image: null, // Don't try to set file input from API
+                        hero_image: null,
                         logo: null
                     });
                 }
@@ -60,7 +60,6 @@ export default function BrandSettingsPage() {
             Object.entries(formData).forEach(([key, value]) => {
                 if (value !== null && value !== undefined) {
                     if (key === 'social_links') {
-                        // Skip social_links as there are no UI fields yet, preventing accidental wipe
                         return;
                     } else if (value instanceof File) {
                         data.append(key, value);
@@ -89,18 +88,18 @@ export default function BrandSettingsPage() {
     };
 
     return (
-        <div className="space-y-8 pb-12 max-w-4xl">
-            <h2 className="text-2xl font-bold uppercase tracking-tighter">Brand Settings</h2>
+        <div className="space-y-5 md:space-y-8 pb-8 md:pb-12 max-w-4xl">
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter">Brand Settings</h2>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-5 md:space-y-8">
                 {/* Visual Identity */}
-                <div className="bg-background border border-border p-8">
-                    <h3 className="text-sm font-bold uppercase tracking-widest mb-8">Visual Identity</h3>
+                <div className="bg-background border border-border p-5 md:p-8">
+                    <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest mb-5 md:mb-8">Visual Identity</h3>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-4">Brand Logo</label>
-                            <div className="relative w-32 h-32 bg-secondary/5 border border-dashed border-border flex items-center justify-center overflow-hidden">
+                            <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-3 md:mb-4">Brand Logo</label>
+                            <div className="relative w-24 h-24 md:w-32 md:h-32 bg-secondary/5 border border-dashed border-border flex items-center justify-center overflow-hidden">
                                 {formData.logo && typeof window !== 'undefined' ? (
                                     <Image 
                                         src={URL.createObjectURL(formData.logo as unknown as Blob)} 
@@ -109,7 +108,7 @@ export default function BrandSettingsPage() {
                                         className="object-contain" 
                                     />
                                 ) : (
-                                    <Camera className="w-6 h-6 text-secondary/30" />
+                                    <Camera className="w-5 h-5 md:w-6 md:h-6 text-secondary/30" />
                                 )}
                                 <input 
                                     type="file" 
@@ -121,8 +120,8 @@ export default function BrandSettingsPage() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-4">Cover Banner</label>
-                            <div className="relative h-32 bg-secondary/5 border border-dashed border-border flex items-center justify-center overflow-hidden">
+                            <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-3 md:mb-4">Cover Banner</label>
+                            <div className="relative h-24 md:h-32 bg-secondary/5 border border-dashed border-border flex items-center justify-center overflow-hidden">
                                 {formData.hero_image && typeof window !== 'undefined' ? (
                                     <Image 
                                         src={URL.createObjectURL(formData.hero_image as unknown as Blob)} 
@@ -131,7 +130,7 @@ export default function BrandSettingsPage() {
                                         className="object-cover" 
                                     />
                                 ) : (
-                                    <Camera className="w-6 h-6 text-secondary/30" />
+                                    <Camera className="w-5 h-5 md:w-6 md:h-6 text-secondary/30" />
                                 )}
                                 <input 
                                     type="file" 
@@ -145,68 +144,68 @@ export default function BrandSettingsPage() {
                 </div>
 
                 {/* Brand Info */}
-                <div className="bg-background border border-border p-8 space-y-6">
-                    <h3 className="text-sm font-bold uppercase tracking-widest mb-2">Brand Information</h3>
+                <div className="bg-background border border-border p-5 md:p-8 space-y-4 md:space-y-6">
+                    <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest mb-1 md:mb-2">Brand Information</h3>
                     
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Brand Name</label>
+                        <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">Brand Name</label>
                         <input 
                             type="text" 
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Tagline</label>
+                        <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">Tagline</label>
                         <input 
                             type="text" 
                             value={formData.tagline}
                             onChange={(e) => setFormData({...formData, tagline: e.target.value})}
-                            className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm"
                             placeholder="Elevating craft through design"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Description</label>
+                        <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">Description</label>
                         <textarea 
                             rows={4}
                             value={formData.description}
                             onChange={(e) => setFormData({...formData, description: e.target.value})}
-                            className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors resize-none"
+                            className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors resize-none text-sm"
                         />
                     </div>
                 </div>
 
                 {/* Editorial Sections */}
-                <div className="bg-background border border-border p-8 space-y-6">
-                    <h3 className="text-sm font-bold uppercase tracking-widest mb-2">Editorial content</h3>
+                <div className="bg-background border border-border p-5 md:p-8 space-y-4 md:space-y-6">
+                    <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest mb-1 md:mb-2">Editorial content</h3>
                     
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Our Philosophy</label>
+                        <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">Our Philosophy</label>
                         <textarea 
                             rows={4}
                             value={formData.philosophy}
                             onChange={(e) => setFormData({...formData, philosophy: e.target.value})}
-                            className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors resize-none"
+                            className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors resize-none text-sm"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Our Story</label>
+                        <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">Our Story</label>
                         <textarea 
                             rows={6}
                             value={formData.story}
                             onChange={(e) => setFormData({...formData, story: e.target.value})}
-                            className="w-full bg-secondary/5 border border-border px-4 py-3 focus:outline-none focus:border-primary transition-colors resize-none"
+                            className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors resize-none text-sm"
                         />
                     </div>
                 </div>
 
                 {status.message && (
-                    <div className={`p-4 text-xs font-bold uppercase tracking-widest ${status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                    <div className={`p-3 md:p-4 text-[10px] md:text-xs font-bold uppercase tracking-widest ${status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                         {status.message}
                     </div>
                 )}
@@ -214,7 +213,7 @@ export default function BrandSettingsPage() {
                 <button 
                     type="submit" 
                     disabled={loading}
-                    className="bg-primary text-background font-bold uppercase tracking-widest px-12 py-4 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                    className="bg-primary text-background font-bold uppercase tracking-widest px-8 md:px-12 py-3.5 md:py-4 text-[10px] md:text-xs hover:bg-primary/90 transition-colors disabled:opacity-50 w-full md:w-auto active:scale-[0.98]"
                 >
                     {loading ? 'Saving...' : 'Save Settings'}
                 </button>

@@ -77,11 +77,9 @@ export default function VendorDashboard() {
             setMetrics(data);
             setError(null);
             
-            // Notification toast logic
             if (data.recent_notifications && data.recent_notifications.length > 0) {
                 const highestId = Math.max(...data.recent_notifications.map((n: BackendNotification) => n.id));
                 if (isBackground && lastNotificationId.current > 0 && highestId > lastNotificationId.current) {
-                    // Find the new unseen notifications
                     const newAlerts = data.recent_notifications.filter((n: BackendNotification) => n.id > lastNotificationId.current && !n.read);
                     if (newAlerts.length > 0) {
                         notify('info', 'New Alert', `You have ${newAlerts.length} new notification${newAlerts.length > 1 ? 's' : ''}.`);
@@ -109,10 +107,9 @@ export default function VendorDashboard() {
 
     fetchMetrics(false);
 
-    // Polling every 15 seconds
     const intervalId = setInterval(() => {
         fetchMetrics(true);
-    }, 30000); // Increased to 30s to reduce load
+    }, 30000);
 
     return () => {
         isMounted = false;
@@ -149,14 +146,13 @@ export default function VendorDashboard() {
 
   if (error) {
     return (
-      <div className="p-8 bg-red-50 border border-red-200">
+      <div className="p-6 md:p-8 bg-red-50 border border-red-200">
         <p className="text-red-800 text-sm font-bold tracking-widest uppercase">Dashboard Error: {error}</p>
       </div>
     );
   }
 
 
-  // Map backend order structure to frontend table structure
   const formattedOrders: Order[] = (metrics?.recent_orders || []).map((o: BackendOrder) => ({
     id: o.id.toString(),
     product: o.items[0]?.product_name || 'Multiple items',
@@ -179,18 +175,18 @@ export default function VendorDashboard() {
   }));
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-5 md:space-y-8 pb-8 md:pb-12">
       <div className="flex justify-end">
         <Link 
           href="/dashboard/vendor/withdrawals" 
-          className="bg-primary text-background font-bold uppercase tracking-widest text-xs px-6 py-4 rounded-none hover:bg-primary/90 transition-colors shadow-sm w-full md:w-auto text-center"
+          className="bg-primary text-background font-bold uppercase tracking-widest text-[10px] md:text-xs px-5 md:px-6 py-3 md:py-4 rounded-none hover:bg-primary/90 transition-colors shadow-sm w-full md:w-auto text-center active:scale-[0.98]"
         >
           Request Withdrawal
         </Link>
       </div>
 
       {/* Top row: Core sales stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <StatCard 
           title="Total Revenue" 
           value={formatCurrency(metrics?.total_revenue)} 
@@ -218,7 +214,7 @@ export default function VendorDashboard() {
       </div>
 
       {/* Second row: Product stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
         <StatCard 
           title="Active Products" 
           value={metrics?.approved_products || 0} 
@@ -235,10 +231,10 @@ export default function VendorDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-8">
+        <div className="lg:col-span-2 space-y-4 md:space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold uppercase tracking-tighter">Recent Orders</h2>
+            <h2 className="text-lg md:text-xl font-bold uppercase tracking-tighter">Recent Orders</h2>
           </div>
           <OrdersTable orders={formattedOrders} />
         </div>

@@ -54,7 +54,6 @@ export default function VendorOrdersPage() {
     }, []);
 
     const handleStatusUpdate = async (orderId: string, newStatus: Order['order_status']) => {
-        // Only confirm for potentially destructive actions (cancelled)
         if (newStatus === 'cancelled' && !confirm(`Are you sure you want to cancel Order #${orderId}?`)) {
             return;
         }
@@ -86,9 +85,9 @@ export default function VendorOrdersPage() {
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-5 md:space-y-8">
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold uppercase tracking-tighter">Order Management</h2>
+                <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter">Order Management</h2>
             </div>
             
             {loading ? (

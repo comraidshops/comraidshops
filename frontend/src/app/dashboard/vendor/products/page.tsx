@@ -59,12 +59,12 @@ export default function VendorProductsPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold uppercase tracking-tighter">Product Management</h2>
+    <div className="space-y-5 md:space-y-8">
+      <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
+        <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter">Product Management</h2>
         <Link 
           href="/dashboard/vendor/products/create"
-          className="bg-primary text-background px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-colors flex items-center gap-2"
+          className="bg-primary text-background px-5 md:px-6 py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 w-full md:w-auto active:scale-[0.98]"
         >
           <Plus className="w-4 h-4" />
           Add Product
@@ -75,4 +75,3 @@ export default function VendorProductsPage() {
     </div>
   );
 }
-

@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Using a basic mock interface for now
 export interface Order {
     id: string;
     product: string;
@@ -12,7 +11,6 @@ export interface Order {
     payment_status: 'pending' | 'paid' | 'failed' | 'refunded' | 'confirmed';
     order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
     date: string;
-    // Shipping Details
     shipping_full_name?: string;
     shipping_phone_number?: string;
     shipping_address_line1?: string;
@@ -52,8 +50,164 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
         }
     };
 
-    return (
-        <div className="bg-background border border-border overflow-x-auto">
+    const renderQuickActions = (order: Order) => {
+        if (updatingId === order.id) {
+            return (
+                <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-secondary/40">Updating...</span>
+                </div>
+            );
+        }
+
+        return (
+            <div className="flex items-center gap-2 flex-wrap">
+                {order.order_status === 'pending' && (order.payment_status === 'paid' || order.payment_status === 'confirmed') && (
+                    <button 
+                        onClick={() => onStatusChange?.(order.id, 'processing')}
+                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-colors active:scale-95"
+                    >
+                        Process
+                    </button>
+                )}
+                {order.order_status === 'processing' && (
+                    <button 
+                        onClick={() => onStatusChange?.(order.id, 'shipped')}
+                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-primary text-background hover:bg-primary/90 transition-colors active:scale-95"
+                    >
+                        Ship
+                    </button>
+                )}
+                {order.order_status === 'shipped' && (
+                    <button 
+                        onClick={() => onStatusChange?.(order.id, 'delivered')}
+                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 transition-colors active:scale-95"
+                    >
+                        Deliver
+                    </button>
+                )}
+                <select 
+                    value={order.order_status}
+                    onChange={(e) => onStatusChange?.(order.id, e.target.value as Order['order_status'])}
+                    className="text-[10px] font-bold uppercase tracking-widest bg-secondary/5 border border-border px-2 py-1.5 focus:ring-0 cursor-pointer text-secondary/60 hover:text-primary transition-colors"
+                >
+                    <option value="" disabled>Change</option>
+                    {ALLOWED_STATUSES.map(s => (
+                        <option key={s} value={s} className="bg-background text-primary uppercase">
+                            {s}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        );
+    };
+
+    // ── MOBILE CARD VIEW ──
+    const MobileCardView = () => (
+        <div className="md:hidden space-y-3">
+            {orders.map((order) => (
+                <div key={order.id} className="bg-background border border-border overflow-hidden">
+                    {/* Card header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-secondary/5">
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-primary">#{order.id}</span>
+                            <span className="text-[10px] text-secondary">{order.date}</span>
+                        </div>
+                        <button 
+                            onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+                            className="text-secondary hover:text-primary transition-colors p-1"
+                        >
+                            {expandedOrder === order.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </button>
+                    </div>
+
+                    {/* Card body */}
+                    <div className="px-4 py-3 space-y-3">
+                        {/* Product & buyer */}
+                        <div>
+                            <p className="font-medium text-sm leading-snug">{order.product}</p>
+                            <p className="text-[11px] text-secondary mt-0.5">Buyer: {order.buyer}</p>
+                        </div>
+
+                        {/* Key metrics row */}
+                        <div className="grid grid-cols-3 gap-2">
+                            <div>
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-secondary/50">Total</p>
+                                <p className="text-sm font-bold">₦{order.total.toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-secondary/50">Earnings</p>
+                                <p className="text-sm font-bold text-green-600">₦{order.earnings.toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-secondary/50">Qty</p>
+                                <p className="text-sm font-bold">{order.quantity}</p>
+                            </div>
+                        </div>
+
+                        {/* Status badges */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${PAYMENT_STATUS_COLORS[order.payment_status] || 'border-border text-secondary'}`}>
+                                {order.payment_status}
+                            </span>
+                            <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${getStatusColor(order.order_status)}`}>
+                                {order.order_status === 'pending' ? 'Order Pending' : order.order_status}
+                            </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="pt-2 border-t border-border/50">
+                            {renderQuickActions(order)}
+                        </div>
+                    </div>
+
+                    {/* Expanded shipping details */}
+                    {expandedOrder === order.id && (
+                        <div className="px-4 py-4 bg-secondary/5 border-t border-border space-y-4 animate-in slide-in-from-top-2 duration-300">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">Shipping Details</h4>
+                            <div className="space-y-3">
+                                <div className="flex items-start gap-2.5">
+                                    <User className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <p className="text-[9px] font-bold uppercase tracking-widest text-secondary">Recipient</p>
+                                        <p className="text-sm font-bold mt-0.5">{order.shipping_full_name || order.buyer || 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-2.5">
+                                    <Phone className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <p className="text-[9px] font-bold uppercase tracking-widest text-secondary">Phone</p>
+                                        <p className="text-sm font-bold mt-0.5">{order.shipping_phone_number || 'Pending'}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-2.5">
+                                    <MapPin className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <p className="text-[9px] font-bold uppercase tracking-widest text-secondary">Address</p>
+                                        <div className="text-sm font-medium mt-0.5 leading-relaxed">
+                                            {order.shipping_address_line1 || 'N/A'}<br />
+                                            {order.shipping_address_line2 && <>{order.shipping_address_line2}<br /></>}
+                                            {order.shipping_city}, {order.shipping_state} {order.shipping_zip_code}<br />
+                                            {order.shipping_country}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ))}
+            {orders.length === 0 && (
+                <div className="bg-background border border-border px-6 py-12 text-center text-secondary text-sm">
+                    No orders found.
+                </div>
+            )}
+        </div>
+    );
+
+    // ── DESKTOP TABLE VIEW ──
+    const DesktopTableView = () => (
+        <div className="hidden md:block bg-background border border-border overflow-x-auto">
             <table className="w-full text-sm text-left">
                 <thead className="text-xs text-secondary uppercase tracking-widest border-b border-border bg-secondary/5">
                     <tr>
@@ -100,54 +254,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                                     </span>
                                 </td>
                                 <td className="px-6 py-4">
-                                    {updatingId === order.id ? (
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                                            <span className="text-[10px] uppercase font-bold tracking-widest text-secondary/40">Updating...</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-4">
-                                            {/* Quick Actions */}
-                                            {order.order_status === 'pending' && (order.payment_status === 'paid' || order.payment_status === 'confirmed') && (
-                                                <button 
-                                                    onClick={() => onStatusChange?.(order.id, 'processing')}
-                                                    className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-amber-600 text-white hover:bg-amber-700 transition-colors"
-                                                >
-                                                    Process
-                                                </button>
-                                            )}
-                                            {order.order_status === 'processing' && (
-                                                <button 
-                                                    onClick={() => onStatusChange?.(order.id, 'shipped')}
-                                                    className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-primary text-background hover:bg-primary/90 transition-colors"
-                                                >
-                                                    Ship
-                                                </button>
-                                            )}
-                                            {order.order_status === 'shipped' && (
-                                                <button 
-                                                    onClick={() => onStatusChange?.(order.id, 'delivered')}
-                                                    className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-green-600 text-white hover:bg-green-700 transition-colors"
-                                                >
-                                                    Deliver
-                                                </button>
-                                            )}
-    
-                                            {/* Full Status Selector */}
-                                            <select 
-                                                value={order.order_status}
-                                                onChange={(e) => onStatusChange?.(order.id, e.target.value as Order['order_status'])}
-                                                className="text-[10px] font-bold uppercase tracking-widest bg-transparent border-none focus:ring-0 cursor-pointer text-secondary/60 hover:text-primary transition-colors appearance-none"
-                                            >
-                                                <option value="" disabled>Change Status</option>
-                                                {ALLOWED_STATUSES.map(s => (
-                                                    <option key={s} value={s} className="bg-background text-primary uppercase">
-                                                        {s}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    )}
+                                    {renderQuickActions(order)}
                                 </td>
                                 <td className="px-6 py-4 text-secondary">{order.date}</td>
                             </tr>
@@ -198,7 +305,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                     ))}
                     {orders.length === 0 && (
                         <tr>
-                            <td colSpan={9} className="px-6 py-12 text-center text-secondary">
+                            <td colSpan={11} className="px-6 py-12 text-center text-secondary">
                                 No orders found.
                             </td>
                         </tr>
@@ -206,5 +313,12 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                 </tbody>
             </table>
         </div>
+    );
+
+    return (
+        <>
+            <MobileCardView />
+            <DesktopTableView />
+        </>
     );
 }

@@ -32,7 +32,6 @@ export default function EarningsPage() {
                 const token = localStorage.getItem('access_token');
                 const headers = { 'Authorization': `Bearer ${token}` };
                 
-                // Fetch metrics for the top cards
                 const metricsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/dashboard/`, { headers });
                 if (metricsRes.ok) setMetrics(await metricsRes.json());
 
@@ -46,10 +45,10 @@ export default function EarningsPage() {
     }, []);
 
     return (
-        <div className="space-y-8 pb-12">
-            <h2 className="text-2xl font-bold uppercase tracking-tighter">Earnings & Commissions</h2>
+        <div className="space-y-5 md:space-y-8 pb-8 md:pb-12">
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter">Earnings & Commissions</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
                 <StatCard 
                     title="Total Revenue" 
                     value={`₦${(metrics?.total_revenue || 0).toLocaleString()}`} 
@@ -69,7 +68,8 @@ export default function EarningsPage() {
 
             <RevenueChart />
 
-            <div className="bg-background border border-border">
+            {/* Transaction History — Desktop Table */}
+            <div className="hidden md:block bg-background border border-border">
                 <div className="px-6 py-4 border-b border-border">
                     <h3 className="text-sm font-bold uppercase tracking-widest">Transaction History</h3>
                 </div>
@@ -104,6 +104,41 @@ export default function EarningsPage() {
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            {/* Transaction History — Mobile Cards */}
+            <div className="md:hidden space-y-3">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest">Transaction History</h3>
+                {earnings.map((e) => (
+                    <div key={e.id} className="bg-background border border-border p-4 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-primary">#{e.order_id}</span>
+                            <span className="text-[10px] text-secondary">{new Date(e.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            <div>
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-secondary/50">Gross</p>
+                                <p className="text-sm font-bold">₦{parseFloat(e.gross_amount).toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-secondary/50">Fee</p>
+                                <p className="text-sm font-bold text-red-500">-₦{parseFloat(e.commission_amount).toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-secondary/50">Net</p>
+                                <p className="text-sm font-bold text-green-600">₦{parseFloat(e.net_amount).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div className="pt-1.5 border-t border-border/50">
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-secondary capitalize">{e.status}</span>
+                        </div>
+                    </div>
+                ))}
+                {earnings.length === 0 && (
+                    <div className="bg-background border border-border px-6 py-12 text-center text-secondary text-sm">
+                        No transaction history found.
+                    </div>
+                )}
             </div>
         </div>
     );

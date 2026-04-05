@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bell, LogOut } from 'lucide-react';
+import { Bell, LogOut, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import DashboardSidebar from '@/components/vendor/DashboardSidebar';
 import VendorMobileNav from '@/components/vendor/VendorMobileNav';
@@ -11,7 +11,6 @@ import VendorGuard from '@/components/auth/VendorGuard';
 interface Notification {
     id: number;
     read: boolean;
-    // add other fields if necessary
 }
 
 export default function VendorDashboardLayout({ children }: { children: React.ReactNode }) {
@@ -41,7 +40,6 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
             fetchUnreadCount();
         }, 0);
 
-        // Add custom event listener
         window.addEventListener('notifications_updated', fetchUnreadCount);
 
         return () => {
@@ -50,8 +48,24 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
         };
     }, []);
 
-    const pageName = (pathname || '').split('/').pop() || 'Dashboard';
+    const pathSegments = (pathname || '').split('/').filter(Boolean);
+    const pageName = pathSegments[pathSegments.length - 1] || 'Dashboard';
     const formattedPageName = pageName === 'vendor' ? 'Overview' : pageName.charAt(0).toUpperCase() + pageName.slice(1);
+
+    // Build breadcrumb trail
+    const breadcrumbs = pathSegments.slice(2).map((seg, i) => ({
+        label: seg === 'vendor' ? 'Dashboard' : seg.charAt(0).toUpperCase() + seg.slice(1),
+        href: '/' + pathSegments.slice(0, i + 3).join('/'),
+        isLast: i === pathSegments.length - 3
+    }));
+
+    // Time-based greeting
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good Morning';
+        if (hour < 17) return 'Good Afternoon';
+        return 'Good Evening';
+    };
 
     const handleLogout = () => {
         localStorage.clear();
@@ -64,34 +78,67 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
                 <DashboardSidebar />
 
                 <div className="flex-1 md:ml-64 flex flex-col min-h-screen overflow-x-hidden">
-                    <header className="h-16 bg-background border-b border-border flex items-center justify-between px-6 sticky top-0 z-10 w-full">
-                        <h1 className="font-bold uppercase tracking-tight text-sm md:text-base">
-                            {formattedPageName}
-                        </h1>
+                    {/* Top accent line */}
+                    <div className="h-[2px] bg-gradient-to-r from-primary via-primary/60 to-transparent w-full" />
 
-                        <div className="flex items-center gap-4">
-                            <button 
-                                onClick={handleLogout}
-                                className="md:hidden flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-red-500 mr-2"
-                            >
-                                <LogOut className="w-4 h-4" />
-                                Logout
-                            </button>
-                            <Link href="/dashboard/vendor/notifications" className="relative text-secondary hover:text-primary transition-colors block">
-                                <Bell className="w-5 h-5" />
-                                {mounted && unreadCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-[8px] text-background">
-                                        {unreadCount}
-                                    </span>
-                                )}
-                            </Link>
-                            <div className="h-8 w-8 bg-secondary/20 rounded-full flex items-center justify-center text-xs font-bold uppercase">
-                                VS
+                    <header className="bg-background border-b border-border sticky top-0 z-10 w-full">
+                        {/* Main header row */}
+                        <div className="h-14 md:h-16 flex items-center justify-between px-4 md:px-8">
+                            {/* Mobile: greeting + page name */}
+                            <div className="flex flex-col md:hidden">
+                                <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-secondary/50">
+                                    {getGreeting()}
+                                </span>
+                                <h1 className="font-bold uppercase tracking-tight text-sm leading-tight">
+                                    {formattedPageName}
+                                </h1>
+                            </div>
+
+                            {/* Desktop: breadcrumb */}
+                            <div className="hidden md:flex items-center gap-1.5">
+                                {breadcrumbs.map((crumb, i) => (
+                                    <div key={crumb.href} className="flex items-center gap-1.5">
+                                        {i > 0 && <ChevronRight className="w-3 h-3 text-secondary/30" />}
+                                        {crumb.isLast ? (
+                                            <span className="text-sm font-bold uppercase tracking-tight">
+                                                {crumb.label}
+                                            </span>
+                                        ) : (
+                                            <Link href={crumb.href} className="text-xs font-medium uppercase tracking-wider text-secondary hover:text-primary transition-colors">
+                                                {crumb.label}
+                                            </Link>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <button 
+                                    onClick={handleLogout}
+                                    className="md:hidden flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-red-500/80 active:scale-95 transition-transform"
+                                >
+                                    <LogOut className="w-3.5 h-3.5" />
+                                    Exit
+                                </button>
+
+                                <div className="w-px h-5 bg-border md:hidden" />
+
+                                <Link href="/dashboard/vendor/notifications" className="relative text-secondary hover:text-primary transition-colors block p-1.5 -m-1.5">
+                                    <Bell className="w-[18px] h-[18px] md:w-5 md:h-5" />
+                                    {mounted && unreadCount > 0 && (
+                                        <span className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[7px] font-bold text-background ring-2 ring-background">
+                                            {unreadCount}
+                                        </span>
+                                    )}
+                                </Link>
+                                <div className="h-7 w-7 md:h-8 md:w-8 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center text-[10px] md:text-xs font-bold uppercase text-primary">
+                                    VS
+                                </div>
                             </div>
                         </div>
                     </header>
 
-                    <main className="flex-1 p-6 pb-24 md:p-8 max-w-7xl mx-auto w-full">
+                    <main className="flex-1 px-4 py-5 pb-28 md:p-8 md:pb-8 max-w-7xl mx-auto w-full">
                         {children}
                     </main>
                 </div>
