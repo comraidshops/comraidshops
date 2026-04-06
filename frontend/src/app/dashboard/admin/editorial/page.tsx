@@ -141,7 +141,11 @@ export default function AdminEditorial() {
                 if (activeTab === 'articles' && key === 'name') return;
 
                 if (Array.isArray(val) && key.endsWith('_ids')) {
-                    val.forEach(v => formData.append(finalKey, v.toString()));
+                    if (val.length === 0) {
+                        formData.append(finalKey, '');
+                    } else {
+                        val.forEach(v => formData.append(finalKey, v.toString()));
+                    }
                 } else if (val !== null && val !== undefined && !Array.isArray(val)) {
                     // Check if it's a plain object (for JSONFields like social_links)
                     if (typeof val === 'object' && !(val instanceof File) && !(val instanceof Blob)) {
@@ -187,18 +191,24 @@ export default function AdminEditorial() {
                 }
 
                 if (Array.isArray(val) && key.endsWith('_ids')) {
-                    val.forEach(v => formData.append(finalKey, v.toString()));
+                    if (val.length === 0) {
+                        formData.append(finalKey, '');
+                    } else {
+                        val.forEach(v => formData.append(finalKey, v.toString()));
+                    }
                 } else if (val && (val as any) instanceof File) {
                     formData.append(finalKey, val as any);
-                } else if (val !== null && val !== undefined && !Array.isArray(val)) {
-                    // Only append if it's not a remote URL string (existing image),
-                    // but ALWAYS append video_url as it's a text field, not just a file reference.
-                    if (key === 'video_url' || typeof val !== 'string' || (!val.startsWith('http') && !val.startsWith('/media/'))) {
+                } else if (val !== undefined && !Array.isArray(val)) {
+                    // Always send article_content and video_url (if not articles tab)
+                    const isImageUrl = typeof val === 'string' && (val.startsWith('http') || val.startsWith('/media/'));
+                    const isSpecialField = finalKey === 'article_content' || finalKey === 'video_url';
+
+                    if (isSpecialField || (!isImageUrl && finalKey !== 'id')) {
                         // Check if it's a plain object (for JSONFields like social_links)
-                        if (typeof val === 'object' && !(val instanceof Blob)) {
+                        if (typeof val === 'object' && val !== null && !(val instanceof Blob)) {
                             formData.append(finalKey, JSON.stringify(val));
                         } else {
-                            formData.append(finalKey, val as string | Blob);
+                            formData.append(finalKey, val === null ? '' : (val as string | Blob));
                         }
                     }
                 }

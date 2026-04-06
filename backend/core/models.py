@@ -78,8 +78,20 @@ class Article(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            title_part = self.title or (self.magazine.title if self.magazine else f"article-{self.id}")
-            self.slug = slugify(title_part)
+            title_source = self.title or (self.magazine.title if self.magazine else "")
+            if not title_source:
+                import uuid
+                title_source = f"article-{uuid.uuid4().hex[:8]}"
+            
+            base_slug = slugify(title_source)
+            slug = base_slug
+            # Limit loop to prevent infinite hang if something is very wrong
+            counter = 1
+            while Article.objects.filter(slug=slug).exists() and counter < 100:
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+            
         super().save(*args, **kwargs)
 
     def __str__(self):

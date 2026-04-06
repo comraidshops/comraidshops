@@ -196,7 +196,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 class MagazineSerializer(serializers.ModelSerializer):
     articles = ArticleSerializer(many=True, read_only=True)
-    article_content = serializers.CharField(write_only=True, required=False)
+    article_content = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
     
     # New: Multi-article linking
     linked_articles = ExhibitionArticleSerializer(many=True, read_only=True)
@@ -219,6 +219,22 @@ class MagazineSerializer(serializers.ModelSerializer):
     video_provider = serializers.SerializerMethodField()
     video_thumbnail = serializers.SerializerMethodField()
 
+    def to_internal_value(self, data):
+        # Handle empty lists sent via FormData as [''] or ''
+        if hasattr(data, 'getlist'):
+            # It's a QueryDict (Multipart)
+            data = data.copy()
+            for field in ['linked_article_ids']:
+                if field in data and data.get(field) == '':
+                    data.setlist(field, [])
+        elif isinstance(data, dict):
+            # It's a plain dict (JSON or simulated)
+            data = data.copy()
+            for field in ['linked_article_ids']:
+                if field in data and data.get(field) == '':
+                    data[field] = []
+        return super().to_internal_value(data)
+
     def get_video_url(self, obj):
         article = obj.articles.first()
         return article.video_url if article else None
@@ -240,7 +256,7 @@ class MagazineSerializer(serializers.ModelSerializer):
         if linked_articles is not None:
             magazine.linked_articles.set(linked_articles)
             
-        if article_content:
+        if article_content is not None:
             Article.objects.create(magazine=magazine, content=article_content)
         return magazine
 
@@ -248,12 +264,18 @@ class MagazineSerializer(serializers.ModelSerializer):
         article_content = validated_data.pop('article_content', None)
         linked_articles = validated_data.pop('linked_articles', None)
         
+        # Check if linked_article_ids was present but empty in the request data
+        if linked_articles is None and hasattr(self, 'initial_data') and 'linked_article_ids' in self.initial_data:
+            # If it's in initial_data but not in validated_data and linked_articles is None, 
+            # it means it was sent as an empty list or empty value.
+            linked_articles = []
+
         instance = super().update(instance, validated_data)
         
         if linked_articles is not None:
             instance.linked_articles.set(linked_articles)
             
-        if article_content:
+        if article_content is not None:
             article = instance.articles.first()
             if article:
                 article.content = article_content
