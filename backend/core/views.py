@@ -1182,7 +1182,13 @@ class DetailedSocialLoginSerializer(SocialLoginSerializer):
             error_msg = str(e)
             if hasattr(e, 'response') and e.response is not None:
                 error_msg += f" | Google Response: {e.response.text}"
-            raise serializers.ValidationError(f'Google Token Exchange Error: {error_msg}')
+            
+            # CRITICAL DIAGNOSTIC: Show exactly what we are sending for comparison
+            # to the Google Cloud Console "Authorized redirect URIs"
+            raise serializers.ValidationError(
+                f"Google Token Exchange Error: {error_msg} | "
+                f"Backend used redirect_uri: '{callback_url}'"
+            )
 
         attrs['token'] = token
         return super().validate(attrs)
