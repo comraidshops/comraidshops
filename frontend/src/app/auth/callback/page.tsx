@@ -31,7 +31,16 @@ function CallbackHandler() {
                     body: JSON.stringify({ code })
                 });
 
-                const data = await res.json();
+                // Handle non-JSON responses (e.g. 500 HTML error pages)
+                const contentType = res.headers.get('content-type') || '';
+                let data;
+                if (contentType.includes('application/json')) {
+                    data = await res.json();
+                } else {
+                    const text = await res.text();
+                    console.error("Non-JSON response:", res.status, text);
+                    data = { error: `Server error (${res.status}). Please try again later.` };
+                }
 
                 if (res.ok) {
                     setStatus('Success! Archiving session...');

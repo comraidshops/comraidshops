@@ -1102,3 +1102,15 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = config("GOOGLE_OAUTH_CALLBACK_URL", default="http://localhost:3000/auth/callback")
     client_class = OAuth2Client
+
+    def post(self, request, *args, **kwargs):
+        import traceback
+        try:
+            return super().post(request, *args, **kwargs)
+        except Exception as e:
+            print(f"[GoogleLogin ERROR] {type(e).__name__}: {e}")
+            traceback.print_exc()
+            return Response(
+                {"error": f"Google authentication failed: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
