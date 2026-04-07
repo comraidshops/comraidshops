@@ -1152,8 +1152,18 @@ class DetailedSocialLoginSerializer(SocialLoginSerializer):
         # We use our patched client_class from the view (GoogleLogin)
         # and the custom callback_url from the view settings
         client_class = getattr(view, 'client_class', OAuth2Client)
-        callback_url = getattr(view, 'callback_url', adapter.get_callback_url(request, app))
+        # Allow frontend to pass callback_url, fallback to view, then adapter
+        callback_url = attrs.get('callback_url')
+        if not callback_url:
+            callback_url = getattr(view, 'callback_url', adapter.get_callback_url(request, app))
+        
         code = attrs.get('code')
+        
+        # DIAGNOSTIC LOGGING
+        print(f"[GOOGLE DEBUG] Using callback_url: '{callback_url}'")
+        print(f"[GOOGLE DEBUG] App Client ID: '{app.client_id}'")
+        print(f"[GOOGLE DEBUG] Request Origin: '{request.headers.get('Origin')}'")
+        print(f"[GOOGLE DEBUG] Request Host: '{request.get_host()}'")
 
         client = client_class(
             request, app.client_id, app.secret,

@@ -28,7 +28,10 @@ function CallbackHandler() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ code })
+                    body: JSON.stringify({ 
+                        code,
+                        callback_url: `${window.location.origin}/auth/callback`
+                    }),
                 });
 
                 // Handle non-JSON responses (e.g. 500 HTML error pages)
