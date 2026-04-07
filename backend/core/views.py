@@ -1106,13 +1106,12 @@ class GoogleLogin(SocialLoginView):
     def post(self, request, *args, **kwargs):
         import traceback
         try:
-            # Fix MultipleObjectsReturned: clean up duplicate SocialApp entries
+            # Fix MultipleObjectsReturned: settings.py defines Google credentials
+            # via SOCIALACCOUNT_PROVIDERS, which creates an in-memory SocialApp.
+            # If there are ALSO database SocialApp entries, allauth finds multiple.
+            # Delete ALL database entries so only the settings-based one is used.
             from allauth.socialaccount.models import SocialApp
-            google_apps = SocialApp.objects.filter(provider='google')
-            if google_apps.count() > 1:
-                # Keep the most recent one, delete the rest
-                keep = google_apps.order_by('-id').first()
-                google_apps.exclude(id=keep.id).delete()
+            SocialApp.objects.filter(provider='google').delete()
 
             return super().post(request, *args, **kwargs)
         except Exception as e:
