@@ -1150,9 +1150,20 @@ class GoogleLogin(SocialLoginView):
             return super().post(request, *args, **kwargs)
         except Exception as e:
             tb = traceback.format_exc()
-            error_detail = f"{type(e).__name__}: {e}" if str(e) else f"{type(e).__name__}: {repr(e.args) if e.args else 'no details'}"
+            
+            # Try to extract more detail if it's an OAuth2Error or similar
+            error_detail = f"{type(e).__name__}: {e}"
+            if hasattr(e, 'response') and e.response is not None:
+                try:
+                    error_detail += f" | Google Response: {e.response.text}"
+                except:
+                    pass
+            elif not str(e):
+                error_detail = f"{type(e).__name__}: {repr(e.args) if e.args else 'no details'}"
+                
             print(f"[GoogleLogin ERROR] {error_detail}")
             print(f"[GoogleLogin TRACEBACK] {tb}")
+            
             return Response(
                 {"error": f"Google authentication failed: {error_detail}", "traceback": tb},
                 status=status.HTTP_400_BAD_REQUEST
