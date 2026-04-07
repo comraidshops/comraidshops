@@ -1098,10 +1098,25 @@ class VerifyEmailRequestView(APIView):
             recipient_list=[user.email]
         )
         return Response({'message': 'Verification email sent.'})
-class CustomGoogleOAuth2Adapter(GoogleOAuth2Adapter):
-    # Fix incompatibility between dj-rest-auth and django-allauth
+
+from allauth.socialaccount.providers.google.provider import GoogleProvider
+
+class PatchedGoogleProvider(GoogleProvider):
     def get_scope(self, request=None):
-        return super().get_scope()
+        print(f"[PATCH] get_scope called with request={request}")
+        try:
+            return super().get_scope()
+        except TypeError as e:
+            print(f"[PATCH] TypeError in super().get_scope(): {e}")
+            raise
+
+class CustomGoogleOAuth2Adapter(GoogleOAuth2Adapter):
+    def get_provider(self):
+        print("[PATCH] CustomGoogleOAuth2Adapter.get_provider() called.")
+        provider = super().get_provider()
+        provider.__class__ = PatchedGoogleProvider
+        print(f"[PATCH] Provider class mutated to {provider.__class__}")
+        return provider
 
 class GoogleLogin(SocialLoginView):
     adapter_class = CustomGoogleOAuth2Adapter
