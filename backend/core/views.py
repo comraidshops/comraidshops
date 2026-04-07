@@ -1100,58 +1100,86 @@ class VerifyEmailRequestView(APIView):
         return Response({'message': 'Verification email sent.'})
 
 from allauth.socialaccount.providers.google.provider import GoogleProvider
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client, OAuth2Error
+from dj_rest_auth.registration.serializers import SocialLoginSerializer
+from rest_framework import serializers
 
 class PatchedGoogleProvider(GoogleProvider):
     def get_scope(self, request=None):
-        print(f"[PATCH] get_scope called with request={request}")
-        try:
-            return super().get_scope()
-        except TypeError as e:
-            print(f"[PATCH] TypeError in super().get_scope(): {e}")
-            raise
+        return super().get_scope()
 
 class CustomGoogleOAuth2Adapter(GoogleOAuth2Adapter):
     def get_provider(self):
-        print("[PATCH] CustomGoogleOAuth2Adapter.get_provider() called.")
         provider = super().get_provider()
         provider.__class__ = PatchedGoogleProvider
-        print(f"[PATCH] Provider class mutated to {provider.__class__}")
         return provider
-
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 class PatchedOAuth2Client(OAuth2Client):
     def __init__(self, *args, **kwargs):
-        # dj-rest-auth passes 7 positional arguments: 
-        # (request, client_id, secret, method, url, callback, scope)
-        # allauth 65+ OAuth2Client dropped the `scope` argument.
-        # This misaligned the arguments causing the previous errors.
-        # We absorb the 7th positional argument (`scope`) to realign them.
+        # Fix for allauth 65+ argument alignment
         args_list = list(args)
         if len(args_list) == 7:
             args_list.pop(6)
         super().__init__(*args_list, **kwargs)
 
+class DetailedSocialLoginSerializer(SocialLoginSerializer):
+    def validate(self, attrs):
+        view = self.context.get('view')
+        request = self._get_request()
+
+        if not view:
+            raise serializers.ValidationError('View is not in context')
+
+        adapter_class = getattr(view, 'adapter_class', None)
+        if not adapter_class:
+            raise serializers.ValidationError('Adapter class is not defined')
+
+        adapter = adapter_class(request)
+        app = adapter.get_app(request)
+        
+        # We use our patched client_class from the view
+        client_class = getattr(view, 'client_class', self.client_class)
+        callback_url = adapter.get_callback_url(request, app)
+        code = attrs.get('code')
+
+        client = client_class(
+            request, app.client_id, app.secret,
+            adapter.access_token_method,
+            adapter.access_token_url,
+            callback_url,
+            scope_delimiter=adapter.scope_delimiter,
+            headers=adapter.headers,
+            basic_auth=adapter.basic_auth,
+        )
+
+        try:
+            token = client.get_access_token(code)
+        except Exception as e:
+            # THIS REVEALS THE REAL ERROR
+            error_msg = str(e)
+            if hasattr(e, 'response') and e.response is not None:
+                error_msg += f" | Google Response: {e.response.text}"
+            raise serializers.ValidationError(f'Google Token Exchange Error: {error_msg}')
+
+        attrs['token'] = token
+        return super().validate(attrs)
+
 class GoogleLogin(SocialLoginView):
     adapter_class = CustomGoogleOAuth2Adapter
     callback_url = config("GOOGLE_OAUTH_CALLBACK_URL", default="http://localhost:3000/auth/callback")
     client_class = PatchedOAuth2Client
+    serializer_class = DetailedSocialLoginSerializer
 
     def post(self, request, *args, **kwargs):
         import traceback
         try:
-            # Fix MultipleObjectsReturned: settings.py defines Google credentials
-            # via SOCIALACCOUNT_PROVIDERS, which creates an in-memory SocialApp.
-            # If there are ALSO database SocialApp entries, allauth finds multiple.
-            # Delete ALL database entries so only the settings-based one is used.
+            # Fix MultipleObjectsReturned
             from allauth.socialaccount.models import SocialApp
             SocialApp.objects.filter(provider='google').delete()
 
             return super().post(request, *args, **kwargs)
         except Exception as e:
             tb = traceback.format_exc()
-            
-            # Try to extract more detail if it's an OAuth2Error or similar
             error_detail = f"{type(e).__name__}: {e}"
             if hasattr(e, 'response') and e.response is not None:
                 try:
@@ -1162,8 +1190,6 @@ class GoogleLogin(SocialLoginView):
                 error_detail = f"{type(e).__name__}: {repr(e.args) if e.args else 'no details'}"
                 
             print(f"[GoogleLogin ERROR] {error_detail}")
-            print(f"[GoogleLogin TRACEBACK] {tb}")
-            
             return Response(
                 {"error": f"Google authentication failed: {error_detail}", "traceback": tb},
                 status=status.HTTP_400_BAD_REQUEST
