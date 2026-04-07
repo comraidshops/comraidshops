@@ -1150,9 +1150,9 @@ class DetailedSocialLoginSerializer(SocialLoginSerializer):
                 )
         
         # We use our patched client_class from the view (GoogleLogin)
-        # or fall back to the standard OAuth2Client
+        # and the custom callback_url from the view settings
         client_class = getattr(view, 'client_class', OAuth2Client)
-        callback_url = adapter.get_callback_url(request, app)
+        callback_url = getattr(view, 'callback_url', adapter.get_callback_url(request, app))
         code = attrs.get('code')
 
         client = client_class(
