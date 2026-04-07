@@ -1135,7 +1135,13 @@ class DetailedSocialLoginSerializer(SocialLoginSerializer):
             raise serializers.ValidationError('Adapter class is not defined')
 
         adapter = adapter_class(request)
-        app = adapter.get_app(request)
+        provider = adapter.get_provider()
+        
+        from allauth.socialaccount.models import SocialApp
+        try:
+            app = SocialApp.objects.get_current(provider.id, request)
+        except SocialApp.DoesNotExist:
+            raise serializers.ValidationError(f"SocialApp for provider '{provider.id}' not found. Check SOCIALACCOUNT_PROVIDERS in settings.py")
         
         # We use our patched client_class from the view
         client_class = getattr(view, 'client_class', self.client_class)
