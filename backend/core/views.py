@@ -1118,10 +1118,22 @@ class CustomGoogleOAuth2Adapter(GoogleOAuth2Adapter):
         print(f"[PATCH] Provider class mutated to {provider.__class__}")
         return provider
 
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
+class PatchedOAuth2Client(OAuth2Client):
+    def __init__(self, *args, **kwargs):
+        # dj-rest-auth passes `request` as the first positional argument,
+        # but allauth 65+ OAuth2Client dropped it. This misaligns the arguments,
+        # causing "__init__() got multiple values for argument 'scope_delimiter'".
+        # We absorb the `request` argument if there are 7 positional arguments.
+        if len(args) == 7:
+            args = args[1:]
+        super().__init__(*args, **kwargs)
+
 class GoogleLogin(SocialLoginView):
     adapter_class = CustomGoogleOAuth2Adapter
     callback_url = config("GOOGLE_OAUTH_CALLBACK_URL", default="http://localhost:3000/auth/callback")
-    client_class = OAuth2Client
+    client_class = PatchedOAuth2Client
 
     def post(self, request, *args, **kwargs):
         import traceback
