@@ -1106,6 +1106,14 @@ class GoogleLogin(SocialLoginView):
     def post(self, request, *args, **kwargs):
         import traceback
         try:
+            # Fix MultipleObjectsReturned: clean up duplicate SocialApp entries
+            from allauth.socialaccount.models import SocialApp
+            google_apps = SocialApp.objects.filter(provider='google')
+            if google_apps.count() > 1:
+                # Keep the most recent one, delete the rest
+                keep = google_apps.order_by('-id').first()
+                google_apps.exclude(id=keep.id).delete()
+
             return super().post(request, *args, **kwargs)
         except Exception as e:
             tb = traceback.format_exc()
