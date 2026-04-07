@@ -11,6 +11,7 @@ import json
 import hashlib
 import hmac
 from django.conf import settings
+from decouple import config
 from .permissions import IsApprovedVendor, IsVendorUser
 from .models import User, Vendor, Brand, Category, Product, Order, OrderItem, Notification, ProductImage, Product360Video, Collection, Magazine, Exhibition, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember
 from .serializers import (
@@ -1099,5 +1100,5 @@ class VerifyEmailRequestView(APIView):
         return Response({'message': 'Verification email sent.'})
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = "http://localhost:3000/auth/callback"
+    callback_url = config("GOOGLE_OAUTH_CALLBACK_URL", default="http://localhost:3000/auth/callback")
     client_class = OAuth2Client
