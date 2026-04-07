@@ -1098,8 +1098,13 @@ class VerifyEmailRequestView(APIView):
             recipient_list=[user.email]
         )
         return Response({'message': 'Verification email sent.'})
+class CustomGoogleOAuth2Adapter(GoogleOAuth2Adapter):
+    # Fix incompatibility between dj-rest-auth and django-allauth
+    def get_scope(self, request=None):
+        return super().get_scope()
+
 class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
+    adapter_class = CustomGoogleOAuth2Adapter
     callback_url = config("GOOGLE_OAUTH_CALLBACK_URL", default="http://localhost:3000/auth/callback")
     client_class = OAuth2Client
 
