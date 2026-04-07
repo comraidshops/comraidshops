@@ -1138,10 +1138,16 @@ class DetailedSocialLoginSerializer(SocialLoginSerializer):
         provider = adapter.get_provider()
         
         from allauth.socialaccount.models import SocialApp
-        try:
-            app = SocialApp.objects.get_current(provider.id, request)
-        except SocialApp.DoesNotExist:
-            raise serializers.ValidationError(f"SocialApp for provider '{provider.id}' not found. Check SOCIALACCOUNT_PROVIDERS in settings.py")
+        # Resilient app retrieval for both allauth 64 and 65+
+        app = SocialApp.objects.filter(provider=provider.id).first()
+        if not app:
+            try:
+                app = provider.app
+            except Exception:
+                raise serializers.ValidationError(
+                    f"SocialApp for provider '{provider.id}' not found. "
+                    "Make sure it is defined in SOCIALACCOUNT_PROVIDERS in settings.py"
+                )
         
         # We use our patched client_class from the view
         client_class = getattr(view, 'client_class', self.client_class)
