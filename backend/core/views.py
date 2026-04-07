@@ -1149,8 +1149,9 @@ class DetailedSocialLoginSerializer(SocialLoginSerializer):
                     "Make sure it is defined in SOCIALACCOUNT_PROVIDERS in settings.py"
                 )
         
-        # We use our patched client_class from the view
-        client_class = getattr(view, 'client_class', self.client_class)
+        # We use our patched client_class from the view (GoogleLogin)
+        # or fall back to the standard OAuth2Client
+        client_class = getattr(view, 'client_class', OAuth2Client)
         callback_url = adapter.get_callback_url(request, app)
         code = attrs.get('code')
 
