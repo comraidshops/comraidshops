@@ -1122,13 +1122,15 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 class PatchedOAuth2Client(OAuth2Client):
     def __init__(self, *args, **kwargs):
-        # dj-rest-auth passes `request` as the first positional argument,
-        # but allauth 65+ OAuth2Client dropped it. This misaligns the arguments,
-        # causing "__init__() got multiple values for argument 'scope_delimiter'".
-        # We absorb the `request` argument if there are 7 positional arguments.
-        if len(args) == 7:
-            args = args[1:]
-        super().__init__(*args, **kwargs)
+        # dj-rest-auth passes 7 positional arguments: 
+        # (request, client_id, secret, method, url, callback, scope)
+        # allauth 65+ OAuth2Client dropped the `scope` argument.
+        # This misaligned the arguments causing the previous errors.
+        # We absorb the 7th positional argument (`scope`) to realign them.
+        args_list = list(args)
+        if len(args_list) == 7:
+            args_list.pop(6)
+        super().__init__(*args_list, **kwargs)
 
 class GoogleLogin(SocialLoginView):
     adapter_class = CustomGoogleOAuth2Adapter
