@@ -1123,6 +1123,9 @@ class PatchedOAuth2Client(OAuth2Client):
         super().__init__(*args_list, **kwargs)
 
 class DetailedSocialLoginSerializer(SocialLoginSerializer):
+    # Declare callback_url as an explicit field so DRF doesn't strip it
+    callback_url = serializers.CharField(required=False, allow_blank=True)
+
     def validate(self, attrs):
         view = self.context.get('view')
         request = self._get_request()
@@ -1155,7 +1158,12 @@ class DetailedSocialLoginSerializer(SocialLoginSerializer):
         # Allow frontend to pass callback_url, fallback to view, then adapter
         callback_url = attrs.get('callback_url')
         if not callback_url:
+            # Also try request.data directly as a secondary fallback
+            callback_url = request.data.get('callback_url')
+        if not callback_url:
             callback_url = getattr(view, 'callback_url', adapter.get_callback_url(request, app))
+        # Strip whitespace to avoid env-file trailing-space issues
+        callback_url = callback_url.strip() if callback_url else callback_url
         
         code = attrs.get('code')
         
@@ -1202,9 +1210,13 @@ class GoogleLogin(SocialLoginView):
     def post(self, request, *args, **kwargs):
         import traceback
         try:
-            # Fix MultipleObjectsReturned
+            # Deduplicate SocialApps - keep only one, don't delete all
             from allauth.socialaccount.models import SocialApp
-            SocialApp.objects.filter(provider='google').delete()
+            google_apps = SocialApp.objects.filter(provider='google')
+            if google_apps.count() > 1:
+                # Keep the first, delete the rest
+                keep = google_apps.first()
+                google_apps.exclude(pk=keep.pk).delete()
 
             return super().post(request, *args, **kwargs)
         except Exception as e:
