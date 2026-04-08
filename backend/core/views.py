@@ -1228,3 +1228,47 @@ class GoogleLogin(APIView):
             }
         })
 
+
+class DiagnosticEmailView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        email = request.GET.get('email', 'test@example.com')
+        api_key = getattr(settings, 'RESEND_API_KEY', '')
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', '')
+        
+        diagnostic = {
+            "ENV_api_key_starts_with": api_key[:10] if api_key else "EMPTY_OR_NONE",
+            "ENV_from_email": from_email,
+            "test_target": email
+        }
+
+        if not api_key:
+            diagnostic["error"] = "RESEND_API_KEY is empty in Django settings."
+            return Response(diagnostic)
+
+        url = "https://api.resend.com/emails"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "from": from_email,
+            "to": [email],
+            "subject": "Diagnostic Test",
+            "html": "<p>Test email</p>"
+        }
+        
+        try:
+            response = http_requests.post(url, headers=headers, json=payload, timeout=10)
+            diagnostic["resend_status"] = response.status_code
+            try:
+                diagnostic["resend_response"] = response.json()
+            except:
+                diagnostic["resend_response"] = response.text
+        except Exception as e:
+            diagnostic["resend_exception"] = str(e)
+
+        return Response(diagnostic)
+
+

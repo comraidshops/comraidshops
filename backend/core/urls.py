@@ -11,7 +11,7 @@ from .views import (
     RegisterView, ProfileView, AddressViewSet, SavedCardViewSet,
     UserNotificationViewSet, ChangePasswordView, HomepageSlideViewSet,
     PasswordResetRequestView, PasswordResetConfirmView, VerifyEmailRequestView,
-    GoogleLogin
+    GoogleLogin, DiagnosticEmailView
 )
 
 router = DefaultRouter()
@@ -62,11 +62,12 @@ urlpatterns = [
     path('vendor/notifications/<int:pk>/mark_read/', VendorNotificationViewSet.as_view({'post': 'mark_read'}), name='vendor-notifications-mark-read'),
     path('vendor/notifications/mark_all_read/', VendorNotificationViewSet.as_view({'post': 'mark_all_read'}), name='vendor-notifications-mark-all-read'),
     path('vendor/settings/', VendorSettingsView.as_view(), name='vendor-settings'),
-    path('vendor/community/', VendorCommunityView.as_view(), name='vendor-community'),
     path('vendor/analytics/', VendorAnalyticsAPIView.as_view(), name='vendor-analytics'),
+    path('auth/diagnostic/', DiagnosticEmailView.as_view(), name='diagnostic-email'),
     
     # --- Administrative Endpoints ---
     path('admin/stats/', include([
+
         path('', include([
             path('', include([
                 # Placeholder for complex nested paths if needed
