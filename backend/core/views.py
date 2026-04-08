@@ -1209,6 +1209,16 @@ class GoogleLogin(APIView):
             user.set_unusable_password()
             user.save()
 
+            # Send welcome email for Google registrations
+            from core.email_service import send_platform_email
+            frontend_url = config('FRONTEND_URL', default='https://comraidshops.art')
+            send_platform_email(
+                subject="Welcome to ComraidShops",
+                template_name="auth/welcome.html",
+                context={"user": user, "login_url": f"{frontend_url}/login"},
+                recipient_list=[user.email]
+            )
+
         # ── Step 4: Issue JWT tokens ─────────────────────────────────────────
         from rest_framework_simplejwt.tokens import RefreshToken
 
