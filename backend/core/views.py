@@ -26,9 +26,8 @@ from .serializers import (
 )
 from django.views.decorators.cache import cache_page
 from django.db.models import Prefetch
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
+
+
 
 class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Collection.objects.all()
@@ -1099,97 +1098,133 @@ class VerifyEmailRequestView(APIView):
         )
         return Response({'message': 'Verification email sent.'})
 
-from allauth.socialaccount.providers.google.provider import GoogleProvider
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client, OAuth2Error
-from dj_rest_auth.registration.serializers import SocialLoginSerializer
-from rest_framework import serializers
+import requests as http_requests
 
-class PatchedGoogleProvider(GoogleProvider):
-    def get_scope(self, request=None):
-        return super().get_scope()
+class GoogleLogin(APIView):
+    """
+    Self-contained Google OAuth2 login.
+    Exchanges an authorization code for Google tokens, fetches user info,
+    creates/finds the Django user, and returns JWT tokens.
+    
+    No dependency on dj-rest-auth or allauth social login machinery,
+    which avoids version incompatibility issues.
+    """
+    permission_classes = [permissions.AllowAny]
 
-class CustomGoogleOAuth2Adapter(GoogleOAuth2Adapter):
-    def get_provider(self):
-        provider = super().get_provider()
-        provider.__class__ = PatchedGoogleProvider
-        return provider
+    GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+    GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
 
-class PatchedOAuth2Client(OAuth2Client):
-    def __init__(self, *args, **kwargs):
-        # Fix for allauth 65+ argument alignment
-        args_list = list(args)
-        if len(args_list) == 7:
-            args_list.pop(6)
-        super().__init__(*args_list, **kwargs)
-
-class DetailedSocialLoginSerializer(SocialLoginSerializer):
-    # Declare callback_url as an explicit field so DRF doesn't strip it
-    callback_url = serializers.CharField(required=False, allow_blank=True)
-
-    def validate(self, attrs):
-        view = self.context.get('view')
-        request = self._get_request()
-
-        # Determine the correct callback_url from:
-        # 1. Frontend POST body (most reliable - uses window.location.origin)
-        # 2. View class attribute (from env var)
-        # 3. Adapter default
-        callback_url = attrs.pop('callback_url', None)
-        if not callback_url:
-            callback_url = request.data.get('callback_url')
-        if callback_url:
-            callback_url = callback_url.strip()
-            # Set it on the view so the PARENT serializer uses it for token exchange
-            view.callback_url = callback_url
-
-        print(f"[GOOGLE DEBUG] Final callback_url set on view: '{view.callback_url}'")
-        print(f"[GOOGLE DEBUG] Request Origin: '{request.headers.get('Origin')}'")
-
-        try:
-            return super().validate(attrs)
-        except Exception as e:
-            error_msg = str(e)
-            if hasattr(e, 'response') and e.response is not None:
-                try:
-                    error_msg += f" | Google Response: {e.response.text}"
-                except:
-                    pass
-            raise serializers.ValidationError(
-                f"Google Token Exchange Error: {error_msg} | "
-                f"Backend used redirect_uri: '{getattr(view, 'callback_url', 'unknown')}'"
-            )
-
-class GoogleLogin(SocialLoginView):
-    adapter_class = CustomGoogleOAuth2Adapter
-    callback_url = config("GOOGLE_OAUTH_CALLBACK_URL", default="http://localhost:3000/auth/callback")
-    client_class = PatchedOAuth2Client
-    serializer_class = DetailedSocialLoginSerializer
-
-    def post(self, request, *args, **kwargs):
-        import traceback
-        try:
-            # Deduplicate SocialApps - keep only one, don't delete all
-            from allauth.socialaccount.models import SocialApp
-            google_apps = SocialApp.objects.filter(provider='google')
-            if google_apps.count() > 1:
-                # Keep the first, delete the rest
-                keep = google_apps.first()
-                google_apps.exclude(pk=keep.pk).delete()
-
-            return super().post(request, *args, **kwargs)
-        except Exception as e:
-            tb = traceback.format_exc()
-            error_detail = f"{type(e).__name__}: {e}"
-            if hasattr(e, 'response') and e.response is not None:
-                try:
-                    error_detail += f" | Google Response: {e.response.text}"
-                except:
-                    pass
-            elif not str(e):
-                error_detail = f"{type(e).__name__}: {repr(e.args) if e.args else 'no details'}"
-                
-            print(f"[GoogleLogin ERROR] {error_detail}")
+    def post(self, request):
+        code = request.data.get('code')
+        if not code:
             return Response(
-                {"error": f"Google authentication failed: {error_detail}", "traceback": tb},
+                {"error": "Authorization code is required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        # Determine callback_url: prefer frontend-sent value, fallback to env
+        callback_url = request.data.get('callback_url', '').strip()
+        if not callback_url:
+            callback_url = config(
+                "GOOGLE_OAUTH_CALLBACK_URL",
+                default="http://localhost:3000/auth/callback"
+            ).strip()
+
+        client_id = config("GOOGLE_CLIENT_ID", default="")
+        client_secret = config("GOOGLE_CLIENT_SECRET", default="")
+
+        if not client_id or not client_secret:
+            return Response(
+                {"error": "Google OAuth is not configured on the server."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        # ── Step 1: Exchange authorization code for tokens ────────────────────
+        token_response = http_requests.post(self.GOOGLE_TOKEN_URL, data={
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": callback_url,
+            "grant_type": "authorization_code",
+        })
+
+        token_data = token_response.json()
+
+        if "error" in token_data:
+            print(f"[GoogleLogin ERROR] Token exchange failed: {token_data}")
+            print(f"[GoogleLogin DEBUG] Used redirect_uri: '{callback_url}'")
+            return Response(
+                {
+                    "error": f"Google token exchange failed: {token_data.get('error_description', token_data['error'])}",
+                    "detail": f"redirect_uri used: '{callback_url}'"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        access_token = token_data.get("access_token")
+
+        # ── Step 2: Fetch user info from Google ──────────────────────────────
+        userinfo_response = http_requests.get(
+            self.GOOGLE_USERINFO_URL,
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+        if userinfo_response.status_code != 200:
+            return Response(
+                {"error": "Failed to fetch user info from Google."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        userinfo = userinfo_response.json()
+        email = userinfo.get("email")
+        first_name = userinfo.get("given_name", "")
+        last_name = userinfo.get("family_name", "")
+        google_id = userinfo.get("id")
+
+        if not email:
+            return Response(
+                {"error": "Google account has no email address."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # ── Step 3: Create or get user ───────────────────────────────────────
+        try:
+            user = User.objects.get(email__iexact=email)
+        except User.DoesNotExist:
+            # Create a new user with a username derived from email
+            base_username = email.split("@")[0]
+            username = base_username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+            )
+            # Set unusable password since they're using Google auth
+            user.set_unusable_password()
+            user.save()
+
+        # ── Step 4: Issue JWT tokens ─────────────────────────────────────────
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "access_token": str(refresh.access_token),
+            "refresh_token": str(refresh),
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            }
+        })
+
