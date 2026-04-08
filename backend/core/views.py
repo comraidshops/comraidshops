@@ -1130,76 +1130,34 @@ class DetailedSocialLoginSerializer(SocialLoginSerializer):
         view = self.context.get('view')
         request = self._get_request()
 
-        if not view:
-            raise serializers.ValidationError('View is not in context')
-
-        adapter_class = getattr(view, 'adapter_class', None)
-        if not adapter_class:
-            raise serializers.ValidationError('Adapter class is not defined')
-
-        adapter = adapter_class(request)
-        provider = adapter.get_provider()
-        
-        from allauth.socialaccount.models import SocialApp
-        # Resilient app retrieval for both allauth 64 and 65+
-        app = SocialApp.objects.filter(provider=provider.id).first()
-        if not app:
-            try:
-                app = provider.app
-            except Exception:
-                raise serializers.ValidationError(
-                    f"SocialApp for provider '{provider.id}' not found. "
-                    "Make sure it is defined in SOCIALACCOUNT_PROVIDERS in settings.py"
-                )
-        
-        # We use our patched client_class from the view (GoogleLogin)
-        # and the custom callback_url from the view settings
-        client_class = getattr(view, 'client_class', OAuth2Client)
-        # Allow frontend to pass callback_url, fallback to view, then adapter
-        callback_url = attrs.get('callback_url')
+        # Determine the correct callback_url from:
+        # 1. Frontend POST body (most reliable - uses window.location.origin)
+        # 2. View class attribute (from env var)
+        # 3. Adapter default
+        callback_url = attrs.pop('callback_url', None)
         if not callback_url:
-            # Also try request.data directly as a secondary fallback
             callback_url = request.data.get('callback_url')
-        if not callback_url:
-            callback_url = getattr(view, 'callback_url', adapter.get_callback_url(request, app))
-        # Strip whitespace to avoid env-file trailing-space issues
-        callback_url = callback_url.strip() if callback_url else callback_url
-        
-        code = attrs.get('code')
-        
-        # DIAGNOSTIC LOGGING
-        print(f"[GOOGLE DEBUG] Using callback_url: '{callback_url}'")
-        print(f"[GOOGLE DEBUG] App Client ID: '{app.client_id}'")
-        print(f"[GOOGLE DEBUG] Request Origin: '{request.headers.get('Origin')}'")
-        print(f"[GOOGLE DEBUG] Request Host: '{request.get_host()}'")
+        if callback_url:
+            callback_url = callback_url.strip()
+            # Set it on the view so the PARENT serializer uses it for token exchange
+            view.callback_url = callback_url
 
-        client = client_class(
-            request, app.client_id, app.secret,
-            adapter.access_token_method,
-            adapter.access_token_url,
-            callback_url,
-            scope_delimiter=adapter.scope_delimiter,
-            headers=adapter.headers,
-            basic_auth=adapter.basic_auth,
-        )
+        print(f"[GOOGLE DEBUG] Final callback_url set on view: '{view.callback_url}'")
+        print(f"[GOOGLE DEBUG] Request Origin: '{request.headers.get('Origin')}'")
 
         try:
-            token = client.get_access_token(code)
+            return super().validate(attrs)
         except Exception as e:
-            # THIS REVEALS THE REAL ERROR
             error_msg = str(e)
             if hasattr(e, 'response') and e.response is not None:
-                error_msg += f" | Google Response: {e.response.text}"
-            
-            # CRITICAL DIAGNOSTIC: Show exactly what we are sending for comparison
-            # to the Google Cloud Console "Authorized redirect URIs"
+                try:
+                    error_msg += f" | Google Response: {e.response.text}"
+                except:
+                    pass
             raise serializers.ValidationError(
                 f"Google Token Exchange Error: {error_msg} | "
-                f"Backend used redirect_uri: '{callback_url}'"
+                f"Backend used redirect_uri: '{getattr(view, 'callback_url', 'unknown')}'"
             )
-
-        attrs['token'] = token
-        return super().validate(attrs)
 
 class GoogleLogin(SocialLoginView):
     adapter_class = CustomGoogleOAuth2Adapter
