@@ -281,6 +281,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='ComraidShops <noreply@comraidshops.art>')
 RESEND_API_KEY = config('RESEND_API_KEY', default='')
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000' if DEBUG else 'https://comraidshops.art')
 
 # Caching Configuration
 CACHES = {

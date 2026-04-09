@@ -860,8 +860,31 @@ class PaystackWebhookView(APIView):
             try:
                 order = Order.objects.get(id=order_id)
                 if order.payment_status == 'pending':
-                    order.payment_status = 'paid' # Note: signals.py handles confirmation logic based on payment_status='paid'
+                    order.payment_status = 'paid'
                     order.save()
+
+                    # ── Alert all superuser admins about the new payment ──────
+                    from .email_service import send_platform_email
+                    frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
+                    customer_display = (
+                        order.customer.email if order.customer else order.guest_email or 'Guest'
+                    )
+                    admin_emails = list(
+                        User.objects.filter(is_superuser=True)
+                        .exclude(email='')
+                        .values_list('email', flat=True)
+                    )
+                    for admin_email in admin_emails:
+                        send_platform_email(
+                            subject=f'Action Required: New Payment — Order #{order.id}',
+                            template_name='order/admin_payment_alert.html',
+                            context={
+                                'order': order,
+                                'customer_display': customer_display,
+                                'admin_orders_url': f'{frontend_url}/dashboard/superuser/orders',
+                            },
+                            recipient_list=[admin_email],
+                        )
             except Order.DoesNotExist:
                 pass
             

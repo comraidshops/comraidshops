@@ -64,6 +64,9 @@ def handle_order_status_change(sender, instance, created, **kwargs):
 
     # ─── 1. PAYMENT CONFIRMED TRANSITION ─────────────────────────────────────
     if instance.payment_status == 'confirmed' and prev_payment != 'confirmed':
+        import logging
+        logger = logging.getLogger(__name__)
+
         try:
             with transaction.atomic():
                 # ── Create Commission & VendorEarning per vendor ──────────────
@@ -122,66 +125,71 @@ def handle_order_status_change(sender, instance, created, **kwargs):
                 Order.objects.filter(pk=instance.pk).update(order_status='processing')
 
         except Exception as e:
-            import logging
-            logging.getLogger(__name__).error(
+            logger.error(
                 f"[signals] Error creating earnings for Order #{instance.pk}: {e}"
             )
             return
 
-        # ── Notify customer ───────────────────────────────────────────────────
-        if instance.customer:
-            Notification.objects.get_or_create(
-                user=instance.customer,
-                title=f'Payment Confirmed — Order #{instance.id}',
-                defaults={
-                    'body': (
-                        f'Great news! Your payment for Order #{instance.id} has been confirmed. '
-                        f'Total: ₦{instance.total_amount:,.2f}. Your vendors are preparing your items.'
-                    )
-                }
-            )
-
-        user_email = getattr(instance.customer, 'email', None) or instance.guest_email
-        if user_email:
-            send_platform_email(
-                subject=f'Payment Confirmed — Order #{instance.id}',
-                template_name='order/order_confirmation.html',
-                context={
-                    'user': instance.customer,
-                    'order': instance,
-                    'items': instance.items.all(),
-                    'order_url': f'{frontend_url}/dashboard/user/orders/{instance.id}',
-                },
-                recipient_list=[user_email],
-            )
-
-        # ── Notify each vendor ────────────────────────────────────────────────
-        vendor_items = {}
-        for item in instance.items.select_related('product__vendor').all():
-            vendor = item.product.vendor
-            vendor_items.setdefault(vendor, []).append(item)
-
-        for vendor, items in vendor_items.items():
-            VendorNotification.objects.create(
-                vendor=vendor,
-                message=(
-                    f'Payment confirmed for Order #{instance.id}. '
-                    f'Please begin processing. Items: {", ".join(i.product.name for i in items)}.'
-                ),
-                type='payment_confirmed',
-                read=False,
-            )
-            if vendor.user.email:
-                send_platform_email(
-                    subject=f'New Confirmed Order #{instance.id}',
-                    template_name='order/vendor_notification.html',
-                    context={
-                        'vendor': vendor,
-                        'order': instance,
-                        'vendor_items': items,
-                    },
-                    recipient_list=[vendor.user.email],
+        # ── Notifications & Emails (non-critical — must never crash) ──────
+        try:
+            # ── Notify customer ───────────────────────────────────────────
+            if instance.customer:
+                Notification.objects.get_or_create(
+                    user=instance.customer,
+                    title=f'Payment Confirmed — Order #{instance.id}',
+                    defaults={
+                        'body': (
+                            f'Great news! Your payment for Order #{instance.id} has been confirmed. '
+                            f'Total: ₦{instance.total_amount:,.2f}. Your vendors are preparing your items.'
+                        )
+                    }
                 )
+
+            user_email = getattr(instance.customer, 'email', None) or instance.guest_email
+            if user_email:
+                send_platform_email(
+                    subject=f'Payment Confirmed — Order #{instance.id}',
+                    template_name='order/order_confirmation.html',
+                    context={
+                        'user': instance.customer,
+                        'order': instance,
+                        'items': instance.items.all(),
+                        'order_url': f'{frontend_url}/dashboard/user/orders/{instance.id}',
+                    },
+                    recipient_list=[user_email],
+                )
+
+            # ── Notify each vendor ────────────────────────────────────────
+            vendor_items = {}
+            for item in instance.items.select_related('product__vendor').all():
+                vendor = item.product.vendor
+                vendor_items.setdefault(vendor, []).append(item)
+
+            for vendor, items in vendor_items.items():
+                VendorNotification.objects.create(
+                    vendor=vendor,
+                    message=(
+                        f'Payment confirmed for Order #{instance.id}. '
+                        f'Please begin processing. Items: {", ".join(i.product.name for i in items)}.'
+                    ),
+                    type='payment_confirmed',
+                    read=False,
+                )
+                if vendor.user.email:
+                    send_platform_email(
+                        subject=f'New Confirmed Order #{instance.id}',
+                        template_name='order/vendor_notification.html',
+                        context={
+                            'vendor': vendor,
+                            'order': instance,
+                            'vendor_items': items,
+                        },
+                        recipient_list=[vendor.user.email],
+                    )
+        except Exception as e:
+            logger.error(
+                f"[signals] Non-critical error sending notifications for Order #{instance.pk}: {e}"
+            )
 
     # ─── 2. ORDER STATUS CHANGE NOTIFICATIONS ────────────────────────────────
     if instance.order_status != prev_order:
