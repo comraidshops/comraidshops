@@ -13,7 +13,8 @@ from .serializers import (
     UserSerializer, VendorSerializer, ProductSerializer, OrderSerializer,
     CategorySerializer, BrandSerializer, MagazineSerializer, ExhibitionSerializer,
     CollectionSerializer, HomepageSlideSerializer, WithdrawalRequestSerializer,
-    VendorEarningSerializer, CommissionSerializer, ArticleSerializer, FitFrameSerializer
+    VendorEarningSerializer, CommissionSerializer, ArticleSerializer, FitFrameSerializer,
+    AdminOrderSerializer
 )
 
 # --- Administrative Serializers ---
@@ -238,7 +239,7 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by('-created_at').prefetch_related(
         'items__product__vendor', 'items__product__images'
     )
-    serializer_class = OrderSerializer
+    serializer_class = AdminOrderSerializer
     permission_classes = [permissions.IsAdminUser]
     http_method_names = ['get', 'head', 'options', 'post']  # No direct PUT/PATCH/DELETE
 

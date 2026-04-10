@@ -16,18 +16,26 @@ export default function VendorOrdersPage() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             if (res.ok) {
                 const data = await res.json();
-                const formatted: Order[] = data.map((o: { 
-                    id: number; 
-                    total_amount: string; 
-                    customer_name: string; 
-                    payment_status: Order['payment_status']; 
-                    order_status: Order['order_status']; 
+                const formatted: Order[] = data.map((o: {
+                    id: number;
+                    total_amount: string;
+                    customer_name: string;
+                    payment_status: Order['payment_status'];
+                    order_status: Order['order_status'];
                     created_at: string;
                     items: { product_name: string; quantity: number }[];
                     financials?: { commission: string; net_earning: string };
+                    shipping_full_name?: string;
+                    shipping_phone_number?: string;
+                    shipping_address_line1?: string;
+                    shipping_address_line2?: string;
+                    shipping_city?: string;
+                    shipping_state?: string;
+                    shipping_zip_code?: string;
+                    shipping_country?: string;
                 }) => ({
                     id: o.id.toString(),
                     product: o.items[0]?.product_name || 'Multiple items',
@@ -38,7 +46,15 @@ export default function VendorOrdersPage() {
                     earnings: parseFloat(o.financials?.net_earning || (parseFloat(o.total_amount) * 0.9).toString()),
                     payment_status: o.payment_status,
                     order_status: o.order_status,
-                    date: new Date(o.created_at).toLocaleDateString()
+                    date: new Date(o.created_at).toLocaleDateString(),
+                    shipping_full_name: o.shipping_full_name,
+                    shipping_phone_number: o.shipping_phone_number,
+                    shipping_address_line1: o.shipping_address_line1,
+                    shipping_address_line2: o.shipping_address_line2,
+                    shipping_city: o.shipping_city,
+                    shipping_state: o.shipping_state,
+                    shipping_zip_code: o.shipping_zip_code,
+                    shipping_country: o.shipping_country,
                 }));
                 setOrders(formatted);
             }
@@ -89,14 +105,14 @@ export default function VendorOrdersPage() {
             <div className="flex justify-between items-center">
                 <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter">Order Management</h2>
             </div>
-            
+
             {loading ? (
                 <div className="flex justify-center py-12">
                     <p className="text-secondary uppercase tracking-widest text-xs">Loading orders...</p>
                 </div>
             ) : (
-                <OrdersTable 
-                    orders={orders} 
+                <OrdersTable
+                    orders={orders}
                     onStatusChange={handleStatusUpdate}
                     updatingId={updatingId}
                 />

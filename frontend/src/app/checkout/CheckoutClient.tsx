@@ -53,7 +53,7 @@ export default function CheckoutClient() {
         } else {
             fetchAddresses();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const runDiagnostic = async () => {
@@ -71,7 +71,7 @@ export default function CheckoutClient() {
     const handleCreateOrder = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        
+
         try {
             const paymentData = await initializePayment({
                 items: items.map(i => ({ id: i.id, quantity: i.quantity })),
@@ -127,10 +127,10 @@ export default function CheckoutClient() {
     if (items.length === 0) {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8 space-y-6">
-                 <h2 className="text-2xl font-bold uppercase tracking-tighter">Your Archive is Empty</h2>
-                 <Link href="/" className="bg-primary text-background px-8 py-3 text-[10px] font-bold uppercase tracking-widest">
+                <h2 className="text-2xl font-bold uppercase tracking-tighter">Your Archive is Empty</h2>
+                <Link href="/" className="bg-primary text-background px-8 py-3 text-[10px] font-bold uppercase tracking-widest">
                     Explore Collections
-                 </Link>
+                </Link>
             </div>
         );
     }
@@ -146,7 +146,7 @@ export default function CheckoutClient() {
                                 <h1 className="text-5xl font-bold uppercase tracking-tighter">Checkout</h1>
                                 <p className="text-secondary uppercase tracking-[0.2em] text-xs font-bold">Refining your acquisition journey.</p>
                             </div>
-                            <button 
+                            <button
                                 onClick={runDiagnostic}
                                 className="bg-secondary/10 hover:bg-secondary/20 text-secondary text-[10px] font-bold uppercase tracking-widest px-4 py-2 border border-secondary/20 transition-colors"
                             >
@@ -160,15 +160,15 @@ export default function CheckoutClient() {
                                 <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/40 border-b border-border pb-4">
                                     {isGuest ? 'Guest Identity & Destination' : 'Shipping Destination'}
                                 </h2>
-                                
+
                                 {isGuest ? (
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Email Address</label>
-                                                <input 
-                                                    type="email" 
-                                                    required 
+                                                <input
+                                                    type="email"
+                                                    required
                                                     value={guestEmail}
                                                     onChange={(e) => setGuestEmail(e.target.value)}
                                                     placeholder="GUEST@EXAMPLE.COM"
@@ -177,9 +177,9 @@ export default function CheckoutClient() {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Full Name</label>
-                                                <input 
-                                                    type="text" 
-                                                    required 
+                                                <input
+                                                    type="text"
+                                                    required
                                                     value={guestName}
                                                     onChange={(e) => setGuestName(e.target.value)}
                                                     placeholder="CURATED IDENTITY"
@@ -189,9 +189,9 @@ export default function CheckoutClient() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Shipping Address</label>
-                                            <input 
-                                                type="text" 
-                                                required 
+                                            <input
+                                                type="text"
+                                                required
                                                 value={guestAddress}
                                                 onChange={(e) => setGuestAddress(e.target.value)}
                                                 placeholder="STREET ADDRESS"
@@ -201,9 +201,9 @@ export default function CheckoutClient() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">City</label>
-                                                <input 
-                                                    type="text" 
-                                                    required 
+                                                <input
+                                                    type="text"
+                                                    required
                                                     value={guestCity}
                                                     onChange={(e) => setGuestCity(e.target.value)}
                                                     placeholder="METROPOLIS"
@@ -212,9 +212,9 @@ export default function CheckoutClient() {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Phone Number</label>
-                                                <input 
-                                                    type="tel" 
-                                                    required 
+                                                <input
+                                                    type="tel"
+                                                    required
                                                     value={guestPhone}
                                                     onChange={(e) => setGuestPhone(e.target.value)}
                                                     placeholder="+234 ..."
@@ -225,9 +225,9 @@ export default function CheckoutClient() {
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">State</label>
-                                                <input 
-                                                    type="text" 
-                                                    required 
+                                                <input
+                                                    type="text"
+                                                    required
                                                     value={guestState}
                                                     onChange={(e) => setGuestState(e.target.value)}
                                                     placeholder="STATE"
@@ -236,9 +236,9 @@ export default function CheckoutClient() {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Zip/Postal Code</label>
-                                                <input 
-                                                    type="text" 
-                                                    required 
+                                                <input
+                                                    type="text"
+                                                    required
                                                     value={guestZip}
                                                     onChange={(e) => setGuestZip(e.target.value)}
                                                     placeholder="100001"
@@ -247,9 +247,9 @@ export default function CheckoutClient() {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Country</label>
-                                                <input 
-                                                    type="text" 
-                                                    required 
+                                                <input
+                                                    type="text"
+                                                    required
                                                     value={guestCountry}
                                                     onChange={(e) => setGuestCountry(e.target.value)}
                                                     placeholder="COUNTRY"
@@ -261,12 +261,11 @@ export default function CheckoutClient() {
                                 ) : addresses.length > 0 ? (
                                     <div className="grid grid-cols-1 gap-4">
                                         {addresses.map((addr) => (
-                                            <div 
+                                            <div
                                                 key={addr.id}
                                                 onClick={() => setSelectedAddress(addr.id)}
-                                                className={`p-6 border cursor-pointer transition-all ${
-                                                    selectedAddress === addr.id ? 'border-primary ring-1 ring-primary/20 bg-primary/5' : 'border-border hover:border-secondary'
-                                                }`}
+                                                className={`p-6 border cursor-pointer transition-all ${selectedAddress === addr.id ? 'border-primary ring-1 ring-primary/20 bg-primary/5' : 'border-border hover:border-secondary'
+                                                    }`}
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <p className="text-xs font-bold uppercase">{addr.full_name}</p>
@@ -276,7 +275,7 @@ export default function CheckoutClient() {
                                             </div>
                                         ))}
                                         <Link href="/dashboard/user/addresses" className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 hover:underline">
-                                           <Plus className="w-3 h-3" /> Add New Destination
+                                            <Plus className="w-3 h-3" /> Add New Destination
                                         </Link>
                                     </div>
                                 ) : (
@@ -294,7 +293,7 @@ export default function CheckoutClient() {
                                 <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/40 border-b border-border pb-4">
                                     Secure Instrument
                                 </h2>
-                                
+
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-4 p-6 bg-secondary/5 border border-border">
                                         <div className="p-3 bg-background border border-border">
@@ -303,11 +302,11 @@ export default function CheckoutClient() {
                                         <div className="space-y-1 pt-1 flex-1">
                                             <p className="text-xs font-bold uppercase">Paystack Secure Checkout</p>
                                             <p className="text-[10px] text-secondary/60 uppercase tracking-widest">Cards, Bank Transfer, Apple Pay.</p>
-                                            
+
                                             <div className="pt-6 flex items-center gap-3">
-                                                <input 
-                                                    type="checkbox" 
-                                                    id="save_card" 
+                                                <input
+                                                    type="checkbox"
+                                                    id="save_card"
                                                     checked={saveCard}
                                                     onChange={(e) => setSaveCard(e.target.checked)}
                                                     className="w-4 h-4 accent-primary"
@@ -322,9 +321,13 @@ export default function CheckoutClient() {
                             </div>
 
                             <div className="pt-8 block">
-                                <button 
-                                    type="submit" 
-                                    disabled={loading || (!isGuest && addresses.length > 0 && !selectedAddress) || (isGuest && !guestEmail)}
+                                <button
+                                    type="submit"
+                                    disabled={
+                                        loading ||
+                                        (!isGuest && !selectedAddress) ||
+                                        (isGuest && (!guestEmail || !guestAddress || !guestName || !guestPhone || !guestCity || !guestState))
+                                    }
                                     className="w-full bg-primary text-background py-5 font-bold uppercase tracking-[0.2em] text-sm hover:bg-secondary transition-all disabled:opacity-50"
                                 >
                                     {loading ? 'Processing Acquisition...' : `Commit Payment ₦${cartTotal.toLocaleString()}`}
@@ -338,7 +341,7 @@ export default function CheckoutClient() {
 
                     {/* Summary Section */}
                     <div className="space-y-12">
-                         <div className="bg-secondary/5 p-8 md:p-12 h-fit border border-border">
+                        <div className="bg-secondary/5 p-8 md:p-12 h-fit border border-border">
                             <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-12 text-secondary/40">Order Summary</h3>
                             <div className="space-y-8">
                                 {items.map(item => (

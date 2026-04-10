@@ -730,6 +730,18 @@ class InitializePaymentView(APIView):
                 'shipping_country': request.data.get('shipping_country', 'Nigeria'),
             }
 
+            # ── VALIDATION: Ensure required manual shipping details are present ─────
+            required_fields = [
+                'shipping_full_name', 'shipping_phone_number', 
+                'shipping_address_line1', 'shipping_city', 'shipping_state'
+            ]
+            missing = [f for f in required_fields if not shipping_data.get(f)]
+            if missing:
+                return Response({
+                    "error": f"Missing required shipping information: {', '.join(missing)}",
+                    "details": "Please provide either an address_id or full shipping details."
+                }, status=400)
+
         total_amount = 0
         
         from django.db import transaction
