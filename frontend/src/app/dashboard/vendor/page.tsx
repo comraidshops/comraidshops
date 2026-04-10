@@ -41,6 +41,14 @@ interface BackendOrder {
     net_earning: string;
     status: string;
   };
+  shipping_full_name?: string;
+  shipping_phone_number?: string;
+  shipping_address_line1?: string;
+  shipping_address_line2?: string;
+  shipping_city?: string;
+  shipping_state?: string;
+  shipping_zip_code?: string;
+  shipping_country?: string;
 }
 
 interface BackendNotification {
@@ -70,22 +78,22 @@ export default function VendorDashboard() {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (res.ok) {
           const data = await res.json();
           if (isMounted) {
             setMetrics(data);
             setError(null);
-            
+
             if (data.recent_notifications && data.recent_notifications.length > 0) {
-                const highestId = Math.max(...data.recent_notifications.map((n: BackendNotification) => n.id));
-                if (isBackground && lastNotificationId.current > 0 && highestId > lastNotificationId.current) {
-                    const newAlerts = data.recent_notifications.filter((n: BackendNotification) => n.id > lastNotificationId.current && !n.read);
-                    if (newAlerts.length > 0) {
-                        notify('info', 'New Alert', `You have ${newAlerts.length} new notification${newAlerts.length > 1 ? 's' : ''}.`);
-                    }
+              const highestId = Math.max(...data.recent_notifications.map((n: BackendNotification) => n.id));
+              if (isBackground && lastNotificationId.current > 0 && highestId > lastNotificationId.current) {
+                const newAlerts = data.recent_notifications.filter((n: BackendNotification) => n.id > lastNotificationId.current && !n.read);
+                if (newAlerts.length > 0) {
+                  notify('info', 'New Alert', `You have ${newAlerts.length} new notification${newAlerts.length > 1 ? 's' : ''}.`);
                 }
-                lastNotificationId.current = highestId;
+              }
+              lastNotificationId.current = highestId;
             }
           }
         } else {
@@ -108,12 +116,12 @@ export default function VendorDashboard() {
     fetchMetrics(false);
 
     const intervalId = setInterval(() => {
-        fetchMetrics(true);
+      fetchMetrics(true);
     }, 30000);
 
     return () => {
-        isMounted = false;
-        clearInterval(intervalId);
+      isMounted = false;
+      clearInterval(intervalId);
     };
   }, [notify]);
 
@@ -122,7 +130,7 @@ export default function VendorDashboard() {
     if (metrics) {
       setMetrics({
         ...metrics,
-        recent_notifications: metrics.recent_notifications.map(n => 
+        recent_notifications: metrics.recent_notifications.map(n =>
           n.id.toString() === id ? { ...n, read: true } : n
         )
       });
@@ -131,12 +139,12 @@ export default function VendorDashboard() {
     try {
       const token = localStorage.getItem('access_token');
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/notifications/${id}/mark_read/`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       window.dispatchEvent(new Event('notifications_updated'));
     } catch (error) {
-        console.error("Failed to mark read", error);
+      console.error("Failed to mark read", error);
     }
   };
 
@@ -163,7 +171,15 @@ export default function VendorDashboard() {
     earnings: o.financials?.net_earning ? Number(o.financials.net_earning) : 0,
     payment_status: o.payment_status as Order['payment_status'],
     order_status: o.order_status as Order['order_status'],
-    date: new Date(o.created_at).toLocaleDateString()
+    date: new Date(o.created_at).toLocaleDateString(),
+    shipping_full_name: o.shipping_full_name,
+    shipping_phone_number: o.shipping_phone_number,
+    shipping_address_line1: o.shipping_address_line1,
+    shipping_address_line2: o.shipping_address_line2,
+    shipping_city: o.shipping_city,
+    shipping_state: o.shipping_state,
+    shipping_zip_code: o.shipping_zip_code,
+    shipping_country: o.shipping_country,
   }));
 
   const formattedNotifications: Notification[] = (metrics?.recent_notifications || []).map((n: BackendNotification) => ({
@@ -177,8 +193,8 @@ export default function VendorDashboard() {
   return (
     <div className="space-y-5 md:space-y-8 pb-8 md:pb-12">
       <div className="flex justify-end">
-        <Link 
-          href="/dashboard/vendor/withdrawals" 
+        <Link
+          href="/dashboard/vendor/withdrawals"
           className="bg-primary text-background font-bold uppercase tracking-widest text-[10px] md:text-xs px-5 md:px-6 py-3 md:py-4 rounded-none hover:bg-primary/90 transition-colors shadow-sm w-full md:w-auto text-center active:scale-[0.98]"
         >
           Request Withdrawal
@@ -187,27 +203,27 @@ export default function VendorDashboard() {
 
       {/* Top row: Core sales stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        <StatCard 
-          title="Total Revenue" 
-          value={formatCurrency(metrics?.total_revenue)} 
+        <StatCard
+          title="Total Revenue"
+          value={formatCurrency(metrics?.total_revenue)}
           icon={<Banknote className="w-4 h-4" />}
           description="Gross sales across all time"
         />
-        <StatCard 
-          title="Total Orders" 
-          value={metrics?.total_orders || 0} 
+        <StatCard
+          title="Total Orders"
+          value={metrics?.total_orders || 0}
           icon={<ShoppingCart className="w-4 h-4" />}
           description={`${metrics?.orders_today} orders today`}
         />
-        <StatCard 
-          title="Vendor Balance" 
-          value={formatCurrency(metrics?.vendor_balance)} 
+        <StatCard
+          title="Vendor Balance"
+          value={formatCurrency(metrics?.vendor_balance)}
           icon={<CreditCard className="w-4 h-4" />}
           description="Available for withdrawal"
         />
-        <StatCard 
-          title="Pending Payout" 
-          value={formatCurrency(metrics?.pending_payout)} 
+        <StatCard
+          title="Pending Payout"
+          value={formatCurrency(metrics?.pending_payout)}
           icon={<ClockIcon />}
           description="Currently processing"
         />
@@ -215,19 +231,19 @@ export default function VendorDashboard() {
 
       {/* Second row: Product stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-        <StatCard 
-          title="Active Products" 
-          value={metrics?.approved_products || 0} 
+        <StatCard
+          title="Active Products"
+          value={metrics?.approved_products || 0}
           icon={<Package className="w-4 h-4" />}
         />
-        <StatCard 
-          title="Pending Review" 
-          value={metrics?.pending_products || 0} 
+        <StatCard
+          title="Pending Review"
+          value={metrics?.pending_products || 0}
           description="Awaiting admin approval"
         />
-        <StatCard 
-          title="Total Commission Paid" 
-          value={formatCurrency(metrics?.total_commission)} 
+        <StatCard
+          title="Total Commission Paid"
+          value={formatCurrency(metrics?.total_commission)}
         />
       </div>
 
@@ -238,10 +254,10 @@ export default function VendorDashboard() {
           </div>
           <OrdersTable orders={formattedOrders} />
         </div>
-        
+
         <div className="lg:col-span-1">
-          <NotificationsPanel 
-            notifications={formattedNotifications} 
+          <NotificationsPanel
+            notifications={formattedNotifications}
             onMarkRead={handleMarkRead}
           />
         </div>
@@ -253,7 +269,7 @@ export default function VendorDashboard() {
 function ClockIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock w-4 h-4">
-      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
     </svg>
   );
 }
