@@ -72,7 +72,6 @@ export default function ProfilePage() {
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
                     Manage your personal details and contact information to ensure seamless deliveries.
                 </p>
-            </div>
 
             <motion.div
                 initial={{ opacity: 0, y: 15 }}
