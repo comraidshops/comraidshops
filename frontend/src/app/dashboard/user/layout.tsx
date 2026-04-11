@@ -18,7 +18,7 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
 
     return (
         <UserGuard>
-            <div className="min-h-screen bg-[#fafaf9] flex text-foreground selection:bg-foreground selection:text-background">
+            <div className="min-h-screen bg-background flex text-foreground selection:bg-foreground selection:text-background">
                 <UserSidebar />
 
                 <div className="flex-1 md:ml-64 flex flex-col min-h-screen relative">

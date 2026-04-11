@@ -68,7 +68,7 @@ export default function ProfilePage() {
 
     return (
         <div className="space-y-16 max-w-3xl">
-            <div className="border-b border-foreground/5 pb-10">
+            <div className="border-b border-border pb-10">
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 02</span>
                 <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Identity Manifest</h2>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
@@ -85,7 +85,7 @@ export default function ProfilePage() {
                     <User className="w-48 h-48 rotate-12" />
                 </div>
                 {message && (
-                    <div className={`mb-8 p-4 text-[10px] font-bold uppercase tracking-widest border ${message.type === 'success' ? 'bg-green-50 border-green-100 text-green-600' : 'bg-red-50 border-red-100 text-red-600'
+                    <div className={`mb-8 p-4 text-[10px] font-bold uppercase tracking-widest border ${message.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-red-500/10 border-red-500/20 text-red-500'
                         }`}>
                         {message.text}
                     </div>

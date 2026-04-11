@@ -119,7 +119,7 @@ export default function UserDashboardPage() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-foreground/5 pb-10"
+                className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-border pb-10"
             >
                 <div className="space-y-2">
                     <div className="flex items-center gap-3">

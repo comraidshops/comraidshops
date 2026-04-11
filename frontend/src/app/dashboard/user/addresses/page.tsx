@@ -82,7 +82,7 @@ export default function AddressesPage() {
 
     return (
         <div className="space-y-12">
-            <div className="border-b border-foreground/5 pb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+            <div className="border-b border-border pb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
                 <div>
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 03</span>
                     <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Coordinate Archive</h2>
