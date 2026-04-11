@@ -9,11 +9,11 @@ import { API_BASE_URL } from '@/lib/api';
 import { Order } from '@/types/user';
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-    pending:    { label: 'Order Pending', icon: Clock,        color: 'text-amber-500',  bg: 'bg-amber-500/10'  },
-    processing: { label: 'Processing',    icon: Package,      color: 'text-blue-500',   bg: 'bg-blue-500/10'   },
-    shipped:    { label: 'Shipped',       icon: Truck,        color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    delivered:  { label: 'Delivered',     icon: CheckCircle,  color: 'text-green-500',  bg: 'bg-green-500/10'  },
-    cancelled:  { label: 'Cancelled',     icon: XCircle,      color: 'text-red-500',    bg: 'bg-red-500/10'    },
+    pending: { label: 'Order Pending', icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    processing: { label: 'Processing', icon: Package, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    shipped: { label: 'Shipped', icon: Truck, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    delivered: { label: 'Delivered', icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-500/10' },
+    cancelled: { label: 'Cancelled', icon: XCircle, color: 'text-red-500', bg: 'bg-red-500/10' },
 };
 
 export default function OrdersPage() {
@@ -53,29 +53,33 @@ export default function OrdersPage() {
 
     if (orders.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-24 space-y-6 text-center">
-                <div className="w-16 h-16 bg-secondary/10 border border-border flex items-center justify-center">
-                    <ShoppingBag className="w-7 h-7 text-secondary/40" />
+            <div className="flex flex-col items-center justify-center py-32 space-y-8 text-center bg-background border border-border shadow-sm">
+                <div className="w-20 h-20 bg-foreground/5 border border-foreground/10 flex items-center justify-center rotate-45 group hover:rotate-0 transition-transform duration-700">
+                    <ShoppingBag className="w-8 h-8 text-foreground/20 -rotate-45 group-hover:rotate-0 transition-transform duration-700" />
                 </div>
-                <div className="space-y-2">
-                    <h3 className="font-bold uppercase tracking-tighter text-lg">No Acquisitions Yet</h3>
-                    <p className="text-xs text-secondary/60 uppercase tracking-widest font-bold">Your luxury archive is empty.</p>
+                <div className="space-y-3">
+                    <h3 className="font-black uppercase tracking-tighter text-2xl">Null Acquisitions</h3>
+                    <p className="text-[10px] text-secondary/40 uppercase tracking-[0.3em] font-black italic">The architectural archive is currently empty.</p>
                 </div>
                 <Link
                     href="/shop"
-                    className="bg-primary text-background px-10 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-secondary transition-colors"
+                    className="bg-foreground text-background px-12 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:translate-y-[-2px] transition-transform shadow-xl"
                 >
-                    Explore Collections
+                    Initiate Trade
                 </Link>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8">
-            <div>
-                <h2 className="text-2xl font-bold uppercase tracking-tighter">Acquisition History</h2>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-secondary/50 font-bold mt-1">{orders.length} order{orders.length !== 1 ? 's' : ''} on record</p>
+        <div className="space-y-12">
+            <div className="border-b border-foreground/5 pb-10">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 01</span>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Acquisition Journal</h2>
+                <div className="flex items-center gap-4 mt-4">
+                    <p className="text-[9px] uppercase tracking-[0.3em] text-foreground font-black px-2 py-1 bg-foreground/5 border border-foreground/10">{orders.length} Records Detected</p>
+                    <div className="h-[1px] flex-1 bg-foreground/5" />
+                </div>
             </div>
 
             <div className="space-y-4">
@@ -88,19 +92,23 @@ export default function OrdersPage() {
                     return (
                         <motion.div
                             key={order.id}
-                            initial={{ opacity: 0, y: 8 }}
+                            initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.06 }}
+                            transition={{ delay: i * 0.08 }}
                         >
                             <Link href={`/dashboard/user/orders/${order.id}`}>
-                                <div className="bg-background border border-border hover:border-primary transition-all group p-6">
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                                <div className="bg-background border border-border hover:border-foreground/20 transition-all duration-500 group p-8 relative overflow-hidden shadow-sm hover:shadow-xl">
+                                    <div className="absolute top-0 right-0 p-4 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
+                                        <StatusIcon className="w-32 h-32 rotate-12" />
+                                    </div>
+
+                                    <div className="flex flex-col md:flex-row md:items-center gap-8 relative z-10">
                                         {/* Product thumbnails */}
-                                        <div className="flex -space-x-3 flex-shrink-0">
+                                        <div className="flex -space-x-4 flex-shrink-0">
                                             {order.items?.slice(0, 3).map((item, idx: number) => (
                                                 <div
                                                     key={item.id}
-                                                    className="relative w-14 h-16 bg-secondary/10 border-2 border-background overflow-hidden flex-shrink-0"
+                                                    className="relative w-16 h-20 bg-secondary/5 border-2 border-background overflow-hidden flex-shrink-0 shadow-lg group-hover:scale-105 transition-transform"
                                                     style={{ zIndex: 3 - idx }}
                                                 >
                                                     {item.product_image ? (
@@ -112,13 +120,13 @@ export default function OrdersPage() {
                                                         />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center">
-                                                            <Package className="w-4 h-4 text-secondary/30" />
+                                                            <Package className="w-5 h-5 text-secondary/20" />
                                                         </div>
                                                     )}
                                                 </div>
                                             ))}
                                             {order.items && order.items.length > 3 && (
-                                                <div className="w-14 h-16 bg-secondary/10 border-2 border-background flex items-center justify-center text-[9px] font-black text-secondary/40 uppercase">
+                                                <div className="w-16 h-20 bg-foreground text-background border-2 border-background flex items-center justify-center text-[10px] font-black uppercase shadow-lg">
                                                     +{order.items.length - 3}
                                                 </div>
                                             )}
@@ -126,30 +134,32 @@ export default function OrdersPage() {
 
                                         {/* Order details */}
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex flex-wrap items-start justify-between gap-2">
+                                            <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                                                 <div>
-                                                    <p className="font-bold uppercase tracking-tight text-sm">Order #{order.id}</p>
-                                                    <p className="text-[10px] text-secondary/50 uppercase tracking-widest font-bold mt-0.5">{date}</p>
+                                                    <div className="flex items-center gap-3 mb-1">
+                                                        <p className="font-black uppercase tracking-tight text-lg leading-none">ORDER #{order.id.toString().padStart(5, '0')}</p>
+                                                        <span className={`text-[7px] font-black uppercase tracking-[0.2em] px-2 py-0.5 border border-current leading-none ${cfg.color}`}>{order.order_status}</span>
+                                                    </div>
+                                                    <p className="text-[9px] text-secondary/40 uppercase tracking-[0.3em] font-black">{date} // DISPATCH SECURED</p>
                                                 </div>
-                                                <div className={`flex items-center gap-1.5 px-3 py-1.5 ${cfg.bg} flex-shrink-0`}>
-                                                    <StatusIcon className={`w-3 h-3 ${cfg.color}`} />
-                                                    <span className={`text-[9px] font-black uppercase tracking-[0.15em] ${cfg.color}`}>{cfg.label}</span>
+                                                <div className="text-right">
+                                                    <p className="text-xl font-black tracking-tighter mb-1">₦{Number(order.total_amount).toLocaleString()}</p>
+                                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-secondary/30">{totalQty} UNITS ENCLOSED</p>
                                                 </div>
                                             </div>
 
-                                            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-                                                <span className="text-[10px] text-secondary/60 uppercase tracking-widest font-bold">
-                                                    {totalQty} item{totalQty !== 1 ? 's' : ''}
-                                                </span>
-                                                <span className="text-[10px] text-secondary/30 uppercase font-bold">·</span>
-                                                <span className="text-[10px] font-black uppercase tracking-widest">
-                                                    ₦{Number(order.total_amount).toLocaleString()}
+                                            <div className="flex items-center justify-between pt-6 border-t border-foreground/5">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="flex items-center gap-2">
+                                                        <StatusIcon className={`w-3 h-3 ${cfg.color}`} />
+                                                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-secondary/60">Log: {cfg.label}</span>
+                                                    </div>
+                                                </div>
+                                                <span className="text-[8px] font-black uppercase tracking-[0.3em] text-foreground opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                                                    Access Manifesto Detail <ArrowRight className="inline w-3 h-3 ml-1" />
                                                 </span>
                                             </div>
                                         </div>
-
-                                        {/* Arrow */}
-                                        <ArrowRight className="w-4 h-4 text-secondary/20 group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0 hidden sm:block" />
                                     </div>
                                 </div>
                             </Link>

@@ -5,23 +5,35 @@
 
 <h2>Order Confirmation</h2>
 
-<p>Thank you for your purchase. We have received your order #{{ order.id }} and it is currently being processed.</p>
+<p>Thank you for your purchase. We have received your order #{{ order.id }} and it is currently being processed by our
+    team.</p>
 
-<p><strong>Order Summary:</strong></p>
-<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; color: #cccccc;">
+<p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; margin-top: 40px; color: #ffffff;">Order
+    Summary</p>
+<div class="divider" style="margin: 15px 0 25px 0;"></div>
+
+<table
+    style="width: 100%; border-collapse: collapse; margin-bottom: 30px; color: #e0e0e0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px;">
     {% for item in items %}
     <tr>
-        <td style="padding: 8px 0; border-bottom: 1px solid #333;">{{ item.quantity }}x {{ item.product.name }}</td>
-        <td style="padding: 8px 0; border-bottom: 1px solid #333; text-align: right;">₦{{ item.price }}</td>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a;">
+            <span style="color: #888;">{{ item.quantity }}x</span> {{ item.product.name }}
+        </td>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; text-align: right; letter-spacing: 1px;">
+            ₦{{ item.price }}
+        </td>
     </tr>
     {% endfor %}
     <tr>
-        <td style="padding: 8px 0; font-weight: bold; color: #ffffff;">Total Amount</td>
-        <td style="padding: 8px 0; font-weight: bold; color: #ffffff; text-align: right;">₦{{ order.total_amount }}</td>
+        <td style="padding: 25px 0; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 2px;">
+            Total</td>
+        <td
+            style="padding: 25px 0; font-weight: bold; color: #ffffff; text-align: right; font-size: 18px; letter-spacing: 1px;">
+            ₦{{ order.total_amount }}</td>
     </tr>
 </table>
 
-<p>You will receive another notification once your order has been shipped.</p>
+<p>You will receive an update once your selection has transitioned to the shipping phase.</p>
 
 <div class="btn-container">
     <a href="{{ order_url|default:'https://comraidshops.art/user/orders' }}" class="btn">View Order Details</a>

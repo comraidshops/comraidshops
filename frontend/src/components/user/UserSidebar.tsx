@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-    User, 
-    MapPin, 
-    CreditCard, 
-    ShoppingBag, 
+import {
+    User,
+    MapPin,
+    CreditCard,
+    ShoppingBag,
     Settings,
     LogOut,
     LayoutDashboard,
@@ -15,13 +15,13 @@ import {
 import { motion } from 'framer-motion';
 
 const menuItems = [
-    { title: 'Overview', icon: LayoutDashboard, href: '/dashboard/user' },
-    { title: 'Profile', icon: User, href: '/dashboard/user/profile' },
-    { title: 'Addresses', icon: MapPin, href: '/dashboard/user/addresses' },
-    { title: 'Billing', icon: CreditCard, href: '/dashboard/user/billing' },
-    { title: 'Orders', icon: ShoppingBag, href: '/dashboard/user/orders' },
-    { title: 'Saved', icon: Bookmark, href: '/dashboard/user/saved-fits' },
-    { title: 'Settings', icon: Settings, href: '/dashboard/user/settings' },
+    { title: 'Intel Overview', icon: LayoutDashboard, href: '/dashboard/user' },
+    { title: 'The Identity', icon: User, href: '/dashboard/user/profile' },
+    { title: 'Coordinates', icon: MapPin, href: '/dashboard/user/addresses' },
+    { title: 'Secure Vault', icon: CreditCard, href: '/dashboard/user/billing' },
+    { title: 'Acquisitions', icon: ShoppingBag, href: '/dashboard/user/orders' },
+    { title: 'Archived Fits', icon: Bookmark, href: '/dashboard/user/saved-fits' },
+    { title: 'Access Config', icon: Settings, href: '/dashboard/user/settings' },
 ];
 
 export default function UserSidebar() {
@@ -33,52 +33,63 @@ export default function UserSidebar() {
     };
 
     return (
-        <aside className="w-64 h-screen bg-background border-r border-border fixed left-0 top-0 z-20 hidden md:flex flex-col p-6">
-                <div className="flex items-center gap-2 mb-12 px-2">
-                    <Link href="/" className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-primary flex items-center justify-center">
-                            <span className="text-background font-bold text-xs">C</span>
-                        </div>
-                        <span className="text-sm font-bold uppercase tracking-tighter">My Account</span>
-                    </Link>
-                </div>
+        <aside className="w-64 h-screen bg-background border-r border-border fixed left-0 top-0 z-20 hidden md:flex flex-col p-8 select-none">
+            <div className="flex flex-col gap-1 mb-16">
+                <Link href="/" className="group flex items-center gap-3">
+                    <div className="w-8 h-8 bg-foreground flex items-center justify-center transition-transform group-hover:rotate-12">
+                        <span className="text-background font-black text-sm tracking-tighter">C.</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[11px] font-black uppercase tracking-[0.3em] leading-none">Management</span>
+                        <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-secondary/60">Vanguard Terminal</span>
+                    </div>
+                </Link>
+            </div>
 
-                <nav className="flex-1 space-y-2">
-                    {menuItems.map((item) => {
-                        const isActive = (pathname || '') === item.href;
-                        return (
-                            <Link 
-                                key={item.href} 
-                                href={item.href}
-                                className={`flex items-center gap-3 p-3 text-[10px] font-bold uppercase tracking-widest transition-all group ${
-                                    isActive 
-                                    ? 'bg-primary text-background' 
-                                    : 'text-secondary hover:bg-secondary/5'
+            <nav className="flex-1 space-y-1">
+                {menuItems.map((item) => {
+                    const isActive = (pathname || '') === item.href;
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`flex items-center justify-between p-3.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all group relative ${isActive
+                                    ? 'bg-foreground text-background'
+                                    : 'text-secondary/80 hover:bg-secondary/5 hover:text-foreground'
                                 }`}
-                            >
-                                <item.icon className={`w-4 h-4 ${isActive ? 'text-background' : 'text-secondary group-hover:text-primary transition-colors'}`} />
-                                {item.title}
-                                {isActive && (
-                                    <motion.div 
-                                        layoutId="sidebar-indicator"
-                                        className="ml-auto w-1 h-3 bg-secondary/50"
-                                    />
-                                )}
-                            </Link>
-                        );
-                    })}
-                </nav>
+                        >
+                            <div className="flex items-center gap-3">
+                                <item.icon className={`w-3.5 h-3.5 ${isActive ? 'text-background' : 'group-hover:text-foreground transition-colors'}`} />
+                                <span>{item.title}</span>
+                            </div>
+                            {isActive ? (
+                                <motion.div
+                                    layoutId="sidebar-indicator"
+                                    className="w-1 h-3 bg-background"
+                                />
+                            ) : (
+                                <div className="w-0.5 h-2 bg-foreground/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            )}
+                        </Link>
+                    );
+                })}
+            </nav>
 
-                <div className="pt-6 border-t border-border">
-                    <button 
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 p-3 text-[10px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all group"
-                    >
-                        <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        Secure Logout
-                    </button>
+            <div className="pt-8 border-t border-border">
+                <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-between p-3.5 text-[9px] font-black uppercase tracking-[0.2em] text-secondary/60 hover:text-red-500 hover:bg-red-500/5 transition-all group"
+                >
+                    <div className="flex items-center gap-3">
+                        <LogOut className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+                        <span>Termination</span>
+                    </div>
+                </button>
+                <div className="mt-4 px-3.5">
+                    <p className="text-[7px] font-bold uppercase tracking-[0.2em] text-secondary/30">System v0.4.2</p>
                 </div>
-            </aside>
+            </div>
+        </aside>
     );
 }
 

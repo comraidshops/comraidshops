@@ -1,149 +1,234 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ subject|default:"ComraidShops" }}</title>
+    <!--[if mso]>
+    <style>
+        * { font-family: 'Georgia', serif !important; }
+    </style>
+    <![endif]-->
     <style>
         /* CSS Reset for Email */
-        body, table, td, p, a, h1, h2, h3, h4, h5, h6 {
-            margin: 0; padding: 0;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        body,
+        table,
+        td,
+        p,
+        a,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', 'Times New Roman', Times, serif;
             -webkit-text-size-adjust: 100%;
             -ms-text-size-adjust: 100%;
         }
-        table { border-spacing: 0; border-collapse: collapse; }
-        img { border: 0; line-height: 100%; outline: none; text-decoration: none; display: block; }
-        
-        /* Dark / Minimal / Premium Theme */
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            width: 100% !important;
+        }
+
+        img {
+            border: 0;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* Dark Editorial Theme */
         body {
-            background-color: #0d0d0d;
-            color: #f2f2f2;
-            line-height: 1.6;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.8;
+            letter-spacing: 0.02em;
         }
+
         .wrapper {
-            width: 100%;
-            background-color: #0d0d0d;
-            padding: 40px 0;
+            background-color: #000000;
+            padding: 60px 0;
         }
-        .content-container {
+
+        .container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: #1a1a1a;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #333333;
+            background-color: #000000;
         }
+
+        /* Header */
         .header {
             text-align: center;
-            padding: 40px 20px;
-            border-bottom: 1px solid #333333;
+            padding: 0 0 60px 0;
         }
-        .header h1 {
-            font-family: 'Georgia', serif; /* Editorial feel */
+
+        .logo {
+            display: inline-block;
+            max-width: 200px;
+            height: auto;
+        }
+
+        /* Content Area */
+        .body-content {
+            padding: 0 40px;
+        }
+
+        .body-content h2 {
             font-size: 28px;
             font-weight: normal;
-            letter-spacing: 2px;
+            margin-bottom: 30px;
             color: #ffffff;
             text-transform: uppercase;
+            letter-spacing: 4px;
+            line-height: 1.2;
+            text-align: center;
         }
-        .body-content {
-            padding: 40px 30px;
-        }
-        .body-content h2 {
-            font-size: 20px;
-            font-weight: normal;
-            margin-bottom: 20px;
-            color: #ffffff;
-            font-family: 'Georgia', serif;
-        }
+
         .body-content p {
-            font-size: 15px;
-            color: #cccccc;
-            margin-bottom: 20px;
-            line-height: 1.6;
+            font-size: 16px;
+            color: #e0e0e0;
+            margin-bottom: 25px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 300;
         }
+
+        /* Buttons - Sharp and High Contrast */
         .btn-container {
             text-align: center;
-            margin: 30px 0;
+            margin: 40px 0;
         }
+
         .btn {
             background-color: #ffffff;
             color: #000000 !important;
-            padding: 14px 28px;
+            padding: 18px 40px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            border-radius: 2px;
             display: inline-block;
+            border: 1px solid #ffffff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
+
+        /* Horizontal Divider */
+        .divider {
+            border-top: 1px solid #222222;
+            margin: 40px 0;
+        }
+
+        /* Footer */
         .footer {
             text-align: center;
-            padding: 30px 20px;
-            background-color: #111111;
-            border-top: 1px solid #333333;
+            padding: 60px 40px;
+            border-top: 1px solid #222222;
         }
+
         .footer p {
-            font-size: 12px;
+            font-size: 11px;
             color: #666666;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
+
         .footer a {
             color: #999999;
             text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
         }
+
+        .footer a:hover {
+            border-bottom: 1px solid #999999;
+        }
+
+        .footer .legal {
+            margin-top: 30px;
+            line-height: 2;
+            color: #444444;
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: 10px;
+        }
+
         .greeting {
-            font-size: 16px;
+            font-size: 18px;
             color: #ffffff;
-            margin-bottom: 15px;
+            margin-bottom: 30px;
+            font-style: italic;
         }
-        
-        /* Utility classes */
-        .text-center { text-align: center; }
-        .mt-20 { margin-top: 20px; }
-        .mb-10 { margin-bottom: 10px; }
-        
+
+        /* Responsive */
         @media screen and (max-width: 600px) {
-            .content-container {
-                width: 100% !important;
-                border: none !important;
-                border-radius: 0 !important;
+            .wrapper {
+                padding: 40px 0;
+            }
+
+            .body-content {
+                padding: 0 25px;
+            }
+
+            .logo {
+                max-width: 150px;
+            }
+
+            .body-content h2 {
+                font-size: 22px;
             }
         }
     </style>
 </head>
+
 <body>
     <table class="wrapper" width="100%" cellpadding="0" cellspacing="0">
         <tr>
             <td align="center">
-                <table class="content-container" cellpadding="0" cellspacing="0">
-                    <!-- Header -->
+                <table class="container" cellpadding="0" cellspacing="0">
+                    <!-- Header with Logo -->
                     <tr>
                         <td class="header">
-                            <h1>COMRAIDSHOPS</h1>
+                            <a href="https://comraidshops.art" target="_blank">
+                                <img src="https://comraidshops.art/logo-white.png" alt="ComraidShops" class="logo">
+                            </a>
                         </td>
                     </tr>
-                    
-                    <!-- Body Content -->
+
+                    <!-- Main Body Content -->
                     <tr>
                         <td class="body-content">
                             {% block content %}
                             {% endblock %}
                         </td>
                     </tr>
-                    
-                    <!-- Footer -->
+
+                    <!-- Footer Section -->
                     <tr>
                         <td class="footer">
-                            <p>You received this email from your account at ComraidShops.</p>
                             <p>
-                                <a href="https://comraidshops.art">Website</a> &nbsp;|&nbsp; 
-                                <a href="https://comraidshops.art/contact">Support</a> &nbsp;|&nbsp; 
-                                <a href="https://comraidshops.art/privacy-policy">Privacy</a>
+                                <a href="https://comraidshops.art/magazine">Magazine</a> &nbsp;&bull;&nbsp;
+                                <a href="https://comraidshops.art/collections">Collections</a> &nbsp;&bull;&nbsp;
+                                <a href="https://comraidshops.art/contact">Support</a>
                             </p>
-                            <p style="margin-top:20px; color:#444;">&copy; {{ current_year|default:"2026" }} ComraidShops. All rights reserved.</p>
+
+                            <div class="legal">
+                                <p>This document is sent to you because you are a member of the ComraidShops circle.</p>
+                                <p>If you wish to depart, you may <a
+                                        href="{{ unsubscribe_url|default:'#' }}">unsubscribe</a> at any time.</p>
+                                <p style="margin-top: 20px;">COMRAIDSHOPS HQ &bull; LAGOS, NIGERIA</p>
+                                <p>&copy; {{ current_year|default:"2026" }} ComraidShops &bull; All Rights Reserved.</p>
+                            </div>
                         </td>
                     </tr>
                 </table>
@@ -151,4 +236,5 @@
         </tr>
     </table>
 </body>
+
 </html>

@@ -325,6 +325,83 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
             'order_status': order.order_status,
         })
 
+    @action(detail=True, methods=['post'])
+    def mark_processing(self, request, pk=None):
+        """
+        Admin marks all order items as processing.
+        """
+        order = self.get_object()
+        if order.payment_status != 'confirmed':
+            return Response({'error': 'Payment must be confirmed first.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update all items
+        for item in order.items.all():
+            item.status = 'processing'
+            item.save()
+            
+        return Response({
+            'status': 'order marked as processing',
+            'order_id': order.id,
+            'order_status': order.order_status
+        })
+
+    @action(detail=True, methods=['post'])
+    def mark_shipped(self, request, pk=None):
+        """
+        Admin marks all order items as shipped.
+        """
+        order = self.get_object()
+        # Allow shipping if confirmed, regardless of current order_status to be flexible
+        if order.payment_status != 'confirmed':
+            return Response({'error': 'Payment must be confirmed first.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        for item in order.items.all():
+            item.status = 'shipped'
+            item.save()
+            
+        return Response({
+            'status': 'order marked as shipped',
+            'order_id': order.id,
+            'order_status': order.order_status
+        })
+
+    @action(detail=True, methods=['post'])
+    def mark_delivered(self, request, pk=None):
+        """
+        Admin marks all order items as delivered.
+        """
+        order = self.get_object()
+        if order.payment_status != 'confirmed':
+            return Response({'error': 'Payment must be confirmed first.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        for item in order.items.all():
+            item.status = 'delivered'
+            item.save()
+            
+        return Response({
+            'status': 'order marked as delivered',
+            'order_id': order.id,
+            'order_status': order.order_status
+        })
+
+    @action(detail=True, methods=['post'])
+    def refund_payment(self, request, pk=None):
+        """
+        Admin marks payment as refunded.
+        """
+        order = self.get_object()
+        if order.payment_status == 'refunded':
+            return Response({'error': 'Payment is already refunded.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        order.payment_status = 'refunded'
+        order.save()
+        
+        return Response({
+            'status': 'payment refunded',
+            'order_id': order.id,
+            'payment_status': order.payment_status
+        })
+
 class AdminWithdrawalViewSet(viewsets.ModelViewSet):
     queryset = WithdrawalRequest.objects.all().order_by('-created_at')
     serializer_class = WithdrawalRequestSerializer

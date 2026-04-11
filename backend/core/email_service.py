@@ -21,8 +21,17 @@ def send_platform_email(subject, template_name, context, recipient_list, from_em
     try:
         from_email = from_email or settings.DEFAULT_FROM_EMAIL
         
+        # Enrich context with defaults for basic branding/legal compliance
+        from django.utils import timezone
+        enriched_context = {
+            'current_year': timezone.now().year,
+            'frontend_url': settings.FRONTEND_URL,
+            'unsubscribe_url': f"{settings.FRONTEND_URL}/user/settings",
+            **context
+        }
+        
         # Render the HTML template
-        html_content = render_to_string(f'emails/{template_name}', context)
+        html_content = render_to_string(f'emails/{template_name}', enriched_context)
         
         # Try Resend first
         resend_success = False

@@ -13,20 +13,20 @@ function SectionCard({ title, subtitle, icon: Icon, children }: {
 }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-background border border-border"
+            className="bg-background border border-border shadow-sm overflow-hidden"
         >
-            <div className="flex items-start gap-4 p-8 border-b border-border">
-                <div className="w-10 h-10 bg-secondary/5 border border-border flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-secondary/40" />
+            <div className="flex items-start gap-6 p-10 border-b border-foreground/5 bg-secondary/[0.02]">
+                <div className="w-12 h-12 bg-foreground/5 border border-foreground/10 flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-5 h-5 text-foreground/40" />
                 </div>
                 <div>
-                    <h3 className="font-bold uppercase tracking-tight text-sm">{title}</h3>
-                    <p className="text-[10px] text-secondary/50 uppercase tracking-widest font-bold mt-0.5">{subtitle}</p>
+                    <h3 className="font-black uppercase tracking-tighter text-xl leading-none">{title}</h3>
+                    <p className="text-[9px] text-secondary/40 uppercase tracking-[0.3em] font-black mt-2">{subtitle}</p>
                 </div>
             </div>
-            <div className="p-8">{children}</div>
+            <div className="p-10">{children}</div>
         </motion.div>
     );
 }
@@ -41,9 +41,8 @@ function Feedback({ state }: { state: FeedbackState }) {
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className={`flex items-center gap-3 p-4 border text-xs font-bold uppercase tracking-wide ${
-                    isSuccess ? 'border-green-500/30 bg-green-500/5 text-green-600' : 'border-red-500/30 bg-red-500/5 text-red-600'
-                }`}
+                className={`flex items-center gap-3 p-4 border text-xs font-bold uppercase tracking-wide ${isSuccess ? 'border-green-500/30 bg-green-500/5 text-green-600' : 'border-red-500/30 bg-red-500/5 text-red-600'
+                    }`}
             >
                 {isSuccess
                     ? <CheckCircle className="w-4 h-4 flex-shrink-0" />
@@ -56,10 +55,10 @@ function Feedback({ state }: { state: FeedbackState }) {
 
 function FieldRow({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6 border-b border-border last:border-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-10 border-b border-foreground/5 last:border-0 hover:bg-secondary/[0.01] transition-colors -mx-10 px-10">
             <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.15em]">{label}</p>
-                {hint && <p className="text-[9px] text-secondary/40 uppercase tracking-widest font-bold mt-1">{hint}</p>}
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground">{label}</p>
+                {hint && <p className="text-[9px] text-secondary/40 uppercase tracking-[0.15em] font-black mt-2 leading-relaxed">{hint}</p>}
             </div>
             <div className="md:col-span-2">{children}</div>
         </div>
@@ -77,7 +76,7 @@ function TextInput({ id, value, onChange, placeholder, type = 'text', disabled =
             onChange={e => onChange(e.target.value)}
             placeholder={placeholder}
             disabled={disabled}
-            className="w-full bg-secondary/5 border border-border px-4 py-3 text-xs font-bold uppercase tracking-widest placeholder:text-secondary/30 focus:outline-none focus:border-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full bg-secondary/5 border border-border px-5 py-4 text-[11px] font-bold uppercase tracking-tight placeholder:text-secondary/20 focus:outline-none focus:border-foreground focus:bg-background transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         />
     );
 }
@@ -94,12 +93,13 @@ function PasswordInput({ id, value, onChange, placeholder }: {
                 value={value}
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="w-full bg-secondary/5 border border-border px-4 py-3 pr-12 text-xs font-bold tracking-widest placeholder:text-secondary/30 focus:outline-none focus:border-primary transition-colors"
+                className="w-full bg-secondary/5 border border-border px-5 py-4 pr-14 text-[11px] font-bold tracking-widest placeholder:text-secondary/20 focus:outline-none focus:border-foreground focus:bg-background transition-all"
             />
             <button
                 type="button"
                 onClick={() => setShow(s => !s)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary/40 hover:text-primary transition-colors"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-secondary/30 hover:text-foreground transition-colors"
+                tabIndex={-1}
             >
                 {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -112,10 +112,10 @@ function SaveButton({ loading, label = 'Save Changes' }: { loading: boolean; lab
         <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 bg-primary text-background px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-3 bg-foreground text-background px-12 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:translate-y-[-2px] transition-transform shadow-xl disabled:opacity-50 disabled:cursor-not-allowed group"
         >
-            {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-            {label}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            <span>{label}</span>
         </button>
     );
 }
@@ -154,7 +154,7 @@ export default function SettingsPage() {
             const saved = JSON.parse(localStorage.getItem('notif_prefs') ?? '{}');
             setNotifPrefs(p => ({ ...p, ...saved }));
         } catch { /* ignore */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     /* ── Handlers ── */
@@ -238,12 +238,13 @@ export default function SettingsPage() {
 
     /* ── Render ── */
     return (
-        <div className="space-y-12">
+        <div className="space-y-16">
             {/* Page header */}
-            <div>
-                <h2 className="text-3xl font-bold uppercase tracking-tighter">Settings</h2>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-secondary/50 font-bold mt-1">
-                    Manage your account preferences and security
+            <div className="border-b border-foreground/5 pb-10">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">System Configuration</span>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">System Protocol</h2>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
+                    Personalized terminal configuration. Orchestrate security credentials and notification logic for seamless operational flow.
                 </p>
             </div>
 
@@ -253,7 +254,7 @@ export default function SettingsPage() {
                     <Feedback state={profileFeedback} />
 
                     <FieldRow label="Username" hint="Cannot be changed">
-                        <TextInput id="username" value={profile.username} onChange={() => {}} disabled placeholder="username" />
+                        <TextInput id="username" value={profile.username} onChange={() => { }} disabled placeholder="username" />
                     </FieldRow>
 
                     <FieldRow label="Email Address" hint="Used for notifications and login">
@@ -323,14 +324,13 @@ export default function SettingsPage() {
                                         return (
                                             <div
                                                 key={level}
-                                                className={`h-1 flex-1 transition-colors ${
-                                                    level <= strength
+                                                className={`h-1 flex-1 transition-colors ${level <= strength
                                                         ? strength <= 1 ? 'bg-red-500'
-                                                        : strength <= 2 ? 'bg-amber-500'
-                                                        : strength <= 3 ? 'bg-blue-500'
-                                                        : 'bg-green-500'
+                                                            : strength <= 2 ? 'bg-amber-500'
+                                                                : strength <= 3 ? 'bg-blue-500'
+                                                                    : 'bg-green-500'
                                                         : 'bg-secondary/10'
-                                                }`}
+                                                    }`}
                                             />
                                         );
                                     })}
@@ -367,7 +367,7 @@ export default function SettingsPage() {
 
                     {([
                         { key: 'order_updates', label: 'Order Updates', desc: 'Status changes, shipping and delivery confirmations' },
-                        { key: 'promotions',    label: 'Promotions',    desc: 'Exclusive drops, flash sales and campaign launches' },
+                        { key: 'promotions', label: 'Promotions', desc: 'Exclusive drops, flash sales and campaign launches' },
                         { key: 'platform_news', label: 'Platform News', desc: 'New brands, feature releases and platform announcements' },
                     ] as const).map(item => (
                         <FieldRow key={item.key} label={item.label} hint={item.desc}>

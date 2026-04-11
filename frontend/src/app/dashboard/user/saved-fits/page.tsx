@@ -26,8 +26,8 @@ interface FitFrame {
 }
 
 interface SavedFit {
-        id: number;
-        fitframe: FitFrame;
+    id: number;
+    fitframe: FitFrame;
 }
 
 interface SelectedFit extends FitFrame {
@@ -110,26 +110,29 @@ export default function SavedFitsPage() {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col gap-1">
-                <h2 className="text-3xl font-bold uppercase tracking-tighter">Your Archive</h2>
-                <p className="text-secondary text-xs font-bold uppercase tracking-widest">
-                    Curated fits you&apos;ve saved for later.
+        <div className="space-y-12">
+            <div className="border-b border-foreground/5 pb-10">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 05</span>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Visual Archive</h2>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
+                    Curated aesthetic trajectories for future orchestration. Saved fits and conceptual frameworks.
                 </p>
             </div>
 
             {savedFits.length === 0 ? (
-                <div className="bg-background border border-border p-12 text-center space-y-4">
-                    <Bookmark className="w-8 h-8 text-secondary/30 mx-auto" />
-                    <div>
-                        <p className="text-sm font-bold uppercase tracking-widest text-secondary/70">No saved fits yet</p>
-                        <p className="text-xs text-secondary/40 mt-1">Explore curated looks and add them to your archive.</p>
+                <div className="bg-background border border-border py-40 flex flex-col items-center justify-center text-center space-y-8 shadow-sm">
+                    <div className="w-20 h-20 bg-foreground/5 border border-foreground/10 flex items-center justify-center rotate-45">
+                        <Bookmark className="w-8 h-8 text-foreground/20 -rotate-45" />
+                    </div>
+                    <div className="space-y-3">
+                        <p className="text-xl font-black uppercase tracking-tighter">Null Visuals</p>
+                        <p className="text-[10px] text-secondary/40 font-black uppercase tracking-[0.3em] italic">The conceptual archive is currently empty.</p>
                     </div>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {savedFits.map((sf) => (
-                        <div key={sf.id} className="group relative aspect-[2/3] overflow-hidden bg-black shadow-lg cursor-pointer border border-white/10" onClick={() => openFit(sf)}>
+                        <div key={sf.id} className="group relative aspect-[2/3] overflow-hidden bg-background shadow-lg cursor-pointer border border-foreground/5" onClick={() => openFit(sf)}>
                             {/* Image */}
                             <div className="absolute inset-0 w-full h-full">
                                 {sf.fitframe.cover_image ? (
@@ -137,19 +140,19 @@ export default function SavedFitsPage() {
                                         src={sf.fitframe.cover_image}
                                         alt={sf.fitframe.title}
                                         fill
-                                        className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 group-hover:scale-105"
+                                        className="object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
                                         sizes="(max-width: 768px) 50vw, 25vw"
                                     />
                                 ) : (
-                                    <div className="w-full h-full bg-white/5 flex items-center justify-center">
-                                        <span className="text-white/30 uppercase tracking-widest text-xs font-bold">No Image</span>
+                                    <div className="w-full h-full bg-secondary/5 flex items-center justify-center">
+                                        <span className="text-secondary/20 uppercase tracking-[0.3em] text-[10px] font-black">Null Data</span>
                                     </div>
                                 )}
                             </div>
 
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 z-10" />
 
-                            <button 
+                            <button
                                 onClick={(e) => { e.stopPropagation(); handleUnsaveFit(sf.id); }}
                                 className="absolute top-3 right-3 z-20 p-2 hover:bg-white/20 rounded-full transition-colors"
                                 title="Remove from Archive"
@@ -157,16 +160,16 @@ export default function SavedFitsPage() {
                                 <Bookmark size={18} className="fill-white text-white" />
                             </button>
 
-                            <div className="absolute bottom-4 left-4 right-4 z-20">
-                                <span className="block text-[10px] font-bold uppercase tracking-widest text-white/70 mb-1">
-                                    {sf.fitframe.items?.length || 0} PIECES
+                            <div className="absolute bottom-6 left-6 right-6 z-20">
+                                <span className="block text-[8px] font-black uppercase tracking-[0.4em] text-white/60 mb-2">
+                                    Enclosed: {sf.fitframe.items?.length || 0} Assets
                                 </span>
-                                <span className="text-sm md:text-base font-bold uppercase tracking-tight text-white line-clamp-2">
+                                <span className="text-lg font-black uppercase tracking-tighter text-white line-clamp-2 leading-none">
                                     {sf.fitframe.title}
                                 </span>
                                 {sf.fitframe.brand && (
-                                    <span className="block text-[10px] text-white/50 uppercase mt-1">
-                                        By {sf.fitframe.brand.name}
+                                    <span className="block text-[8px] text-white/40 uppercase tracking-[0.2em] mt-2 font-black">
+                                        Source: {sf.fitframe.brand.name}
                                     </span>
                                 )}
                             </div>
@@ -201,10 +204,10 @@ export default function SavedFitsPage() {
                                 <div className="flex items-center gap-4">
                                     {selectedFit.cover_image && (
                                         <div className="relative w-16 h-20 bg-white/5 border border-white/10 overflow-hidden hidden md:block">
-                                            <Image 
-                                                src={selectedFit.cover_image} 
-                                                alt={selectedFit.title} 
-                                                fill 
+                                            <Image
+                                                src={selectedFit.cover_image}
+                                                alt={selectedFit.title}
+                                                fill
                                                 className="object-cover"
                                             />
                                         </div>

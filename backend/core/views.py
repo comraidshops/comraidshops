@@ -877,28 +877,54 @@ class PaystackWebhookView(APIView):
 
                     # ── Alert all superuser admins about the new payment ──────
                     from .email_service import send_platform_email
+                    import logging
+                    logger = logging.getLogger(__name__)
+
                     frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
                     customer_display = (
                         order.customer.email if order.customer else order.guest_email or 'Guest'
                     )
-                    admin_emails = list(
-                        User.objects.filter(is_superuser=True)
-                        .exclude(email='')
-                        .values_list('email', flat=True)
-                    )
-                    for admin_email in admin_emails:
-                        send_platform_email(
-                            subject=f'Action Required: New Payment — Order #{order.id}',
-                            template_name='order/admin_payment_alert.html',
-                            context={
-                                'order': order,
-                                'customer_display': customer_display,
-                                'admin_orders_url': f'{frontend_url}/dashboard/superuser/orders',
-                            },
-                            recipient_list=[admin_email],
-                        )
+                    
+                    # Notify superusers (In-app and Email)
+                    superusers = User.objects.filter(is_superuser=True)
+                    
+                    for admin in superusers:
+                        # 1. In-app Notification
+                        try:
+                            Notification.objects.create(
+                                user=admin,
+                                title=f'Action Required: Payment Received — Order #{order.id}',
+                                body=(
+                                    f'A new payment of ₦{order.total_amount:,.2f} has been received for Order #{order.id} '
+                                    f'from {customer_display}. Please review and confirm the payment.'
+                                )
+                            )
+                        except Exception as e:
+                            logger.error(f"[webhook] Failed to create in-app notification for admin {admin.id}: {e}")
+
+                        # 2. Email Notification
+                        if admin.email:
+                            try:
+                                send_platform_email(
+                                    subject=f'Action Required: New Payment — Order #{order.id}',
+                                    template_name='order/admin_payment_alert.html',
+                                    context={
+                                        'order': order,
+                                        'customer_display': customer_display,
+                                        'admin_orders_url': f'{frontend_url}/dashboard/superuser/orders',
+                                    },
+                                    recipient_list=[admin.email],
+                                )
+                            except Exception as e:
+                                logger.error(f"[webhook] Failed to send email to admin {admin.email}: {e}")
+                else:
+                    logger.info(f"[webhook] Order #{order.id} payment status is already '{order.payment_status}'")
             except Order.DoesNotExist:
-                pass
+                logger.warning(f"[webhook] Order with ID {order_id} not found")
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"[webhook] General error processing charge.success: {e}")
             
             # Handle "Save Card" if metadata provided
             save_card = event['data']['metadata'].get('save_card')

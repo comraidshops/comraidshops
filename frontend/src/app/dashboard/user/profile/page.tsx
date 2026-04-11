@@ -67,84 +67,89 @@ export default function ProfilePage() {
     if (loading) return null;
 
     return (
-        <div className="space-y-12">
-            <div className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold uppercase tracking-tighter">Identity Settings</h2>
-                <p className="text-secondary text-xs font-bold uppercase tracking-widest">Manage your personal information and security credentials.</p>
+        <div className="space-y-16 max-w-3xl">
+            <div className="border-b border-foreground/5 pb-10">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 02</span>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Identity Manifest</h2>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
+                    Personalized protocol configuration. Maintain terminal accuracy for seamless delivery orchestration.
+                </p>
             </div>
 
-            <motion.div 
-                initial={{ opacity: 0, y: 10 }}
+            <motion.div
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-background border border-border p-8 max-w-2xl"
+                className="bg-background border border-border p-10 shadow-sm relative overflow-hidden"
             >
+                <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none">
+                    <User className="w-48 h-48 rotate-12" />
+                </div>
                 {message && (
-                    <div className={`mb-8 p-4 text-[10px] font-bold uppercase tracking-widest border ${
-                        message.type === 'success' ? 'bg-green-50 border-green-100 text-green-600' : 'bg-red-50 border-red-100 text-red-600'
-                    }`}>
+                    <div className={`mb-8 p-4 text-[10px] font-bold uppercase tracking-widest border ${message.type === 'success' ? 'bg-green-50 border-green-100 text-green-600' : 'bg-red-50 border-red-100 text-red-600'
+                        }`}>
                         {message.text}
                     </div>
                 )}
 
                 <form onSubmit={handleUpdate} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-secondary flex items-center gap-2">
-                                <User className="w-3 h-3" /> First Name
+                        <div className="space-y-3">
+                            <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50 flex items-center gap-3">
+                                <User className="w-3 h-3" /> First Name Asset
                             </label>
-                            <input 
+                            <input
                                 type="text"
                                 value={user.first_name}
                                 onChange={(e) => setUser({ ...user, first_name: e.target.value })}
-                                className="w-full bg-secondary/5 border border-border p-3 text-xs focus:outline-none focus:border-primary transition-colors"
+                                className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-secondary flex items-center gap-2">
-                                <User className="w-3 h-3" /> Last Name
+                        <div className="space-y-3">
+                            <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50 flex items-center gap-3">
+                                <User className="w-3 h-3" /> Last Name Asset
                             </label>
-                            <input 
+                            <input
                                 type="text"
                                 value={user.last_name}
                                 onChange={(e) => setUser({ ...user, last_name: e.target.value })}
-                                className="w-full bg-secondary/5 border border-border p-3 text-xs focus:outline-none focus:border-primary transition-colors"
+                                className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
                             />
                         </div>
 
-                        <div className="space-y-2 md:col-span-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-secondary flex items-center gap-2">
-                                <Mail className="w-3 h-3" /> Email Address
+                        <div className="space-y-3 md:col-span-2">
+                            <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50 flex items-center gap-3">
+                                <Mail className="w-3 h-3" /> Digital Coordinate (Email)
                             </label>
-                            <input 
+                            <input
                                 type="email"
                                 value={user.email}
                                 onChange={(e) => setUser({ ...user, email: e.target.value })}
-                                className="w-full bg-secondary/5 border border-border p-3 text-xs focus:outline-none focus:border-primary transition-colors"
+                                className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
                             />
                         </div>
 
-                        <div className="space-y-2 md:col-span-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-secondary flex items-center gap-2">
-                                <Shield className="w-3 h-3" /> Username (Static)
+                        <div className="space-y-3 md:col-span-2">
+                            <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/30 flex items-center gap-3">
+                                <Shield className="w-3 h-3" /> Terminal Identifier (Static)
                             </label>
-                            <input 
+                            <input
                                 disabled
                                 type="text"
                                 value={user.username}
-                                className="w-full bg-secondary/5 border border-border p-3 text-xs opacity-50 cursor-not-allowed"
+                                className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-black uppercase tracking-tight opacity-30 cursor-not-allowed"
                             />
                         </div>
                     </div>
 
-                    <div className="pt-6 border-t border-border">
-                        <button 
+                    <div className="pt-10 border-t border-foreground/5 flex justify-end">
+                        <button
                             disabled={saving}
                             type="submit"
-                            className="bg-primary text-background px-8 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-primary/90 transition-all flex items-center gap-2 disabled:opacity-50"
+                            className="bg-foreground text-background px-12 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:translate-y-[-2px] transition-all flex items-center gap-3 disabled:opacity-50 shadow-xl"
                         >
-                            <Save className="w-4 h-4" />
-                            {saving ? 'Saving...' : 'Sync Profile'}
+                            <Save className="w-3.5 h-3.5" />
+                            {saving ? 'Synchronizing...' : 'Update Manifest'}
                         </button>
                     </div>
                 </form>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Check, X, Eye } from 'lucide-react';
+import { FileText, Check, X, Eye, Package, Truck, CheckCircle, RotateCcw } from 'lucide-react';
 import { safeFetch } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
 import { AdminModal } from '@/components/admin/AdminForms';
@@ -69,7 +69,7 @@ export default function AdminOrders() {
     async function handleCancelOrder(orderId: number) {
         setActionLoading(true);
         try {
-            await safeFetch(`/admin-api/orders/${orderId}/cancel_order/`, { 
+            await safeFetch(`/admin-api/orders/${orderId}/cancel_order/`, {
                 method: 'POST',
                 body: JSON.stringify({ reason: 'Cancelled by admin.' })
             });
@@ -80,6 +80,45 @@ export default function AdminOrders() {
             notify('success', 'Order Cancelled', 'Order has been cancelled and stock returned.');
         } catch (error: unknown) {
             notify('error', 'Cancellation Failed', (error as Error)?.message || "Failed to cancel order");
+        } finally {
+            setActionLoading(false);
+        }
+    }
+
+    async function handleUpdateOrderStatus(orderId: number, status: 'processing' | 'shipped' | 'delivered') {
+        const actionMap = {
+            'processing': 'mark_processing',
+            'shipped': 'mark_shipped',
+            'delivered': 'mark_delivered'
+        };
+        const endpoint = `/admin-api/orders/${orderId}/${actionMap[status]}/`;
+
+        setActionLoading(true);
+        try {
+            await safeFetch(endpoint, { method: 'POST' });
+            setOrders(orders.map(o => o.id === orderId ? { ...o, order_status: status } : o));
+            if (selectedOrder?.id === orderId) {
+                setSelectedOrder({ ...selectedOrder, order_status: status });
+            }
+            notify('success', 'Status Updated', `Order status has been updated to ${status}.`);
+        } catch (error: unknown) {
+            notify('error', 'Update Failed', (error as Error)?.message || `Failed to update status to ${status}`);
+        } finally {
+            setActionLoading(false);
+        }
+    }
+
+    async function handleRefundPayment(orderId: number) {
+        setActionLoading(true);
+        try {
+            await safeFetch(`/admin-api/orders/${orderId}/refund_payment/`, { method: 'POST' });
+            setOrders(orders.map(o => o.id === orderId ? { ...o, payment_status: 'refunded' } : o));
+            if (selectedOrder?.id === orderId) {
+                setSelectedOrder({ ...selectedOrder, payment_status: 'refunded' });
+            }
+            notify('success', 'Order Refunded', 'Order payment has been marked as refunded.');
+        } catch (error: unknown) {
+            notify('error', 'Refund Failed', (error as Error)?.message || "Failed to refund payment");
         } finally {
             setActionLoading(false);
         }
@@ -110,7 +149,7 @@ export default function AdminOrders() {
                     <tbody>
                         <AnimatePresence mode="popLayout">
                             {orders.map((order, idx) => (
-                                <motion.tr 
+                                <motion.tr
                                     key={order.id}
                                     initial={{ opacity: 0, scale: 0.98 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -125,12 +164,12 @@ export default function AdminOrders() {
                                     </td>
                                     <td className="px-8 py-6 font-bold text-lg">₦{parseFloat(order.total_amount).toLocaleString()}</td>
                                     <td className="px-8 py-6">
-                                        <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
-                                            order.payment_status === 'confirmed' ? 'bg-primary/10 text-primary' : 
-                                            order.payment_status === 'paid' ? 'bg-orange-400/10 text-orange-400 border border-orange-400/20' :
-                                            order.payment_status === 'failed' ? 'bg-red-500/10 text-red-500' :
-                                            'bg-white/5 text-white/40'
-                                        }`}>
+                                        <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${order.payment_status === 'confirmed' ? 'bg-primary/10 text-primary' :
+                                                order.payment_status === 'paid' ? 'bg-orange-400/10 text-orange-400 border border-orange-400/20' :
+                                                    order.payment_status === 'refunded' ? 'bg-purple-500/10 text-purple-500' :
+                                                        order.payment_status === 'failed' ? 'bg-red-500/10 text-red-500' :
+                                                            'bg-white/5 text-white/40'
+                                            }`}>
                                             {order.payment_status}
                                             {order.payment_status === 'paid' && ' (Action Required)'}
                                         </span>
@@ -141,16 +180,16 @@ export default function AdminOrders() {
                                     <td className="px-8 py-6 text-[10px] font-bold text-white/40">{new Date(order.created_at).toLocaleDateString()}</td>
                                     <td className="px-8 py-6 text-right">
                                         <div className="flex justify-end items-center gap-2 transition-opacity">
-                                            <button 
+                                            <button
                                                 onClick={() => { setSelectedOrder(order); setIsViewModalOpen(true); }}
                                                 className="p-3 rounded-xl bg-white/5 text-white/40 hover:text-white transition-all"
                                                 title="View Details"
                                             >
                                                 <Eye className="w-4 h-4" />
                                             </button>
-                                            
+
                                             {(order.payment_status === 'paid' || order.payment_status === 'pending') && (
-                                                <button 
+                                                <button
                                                     onClick={() => handleConfirmPayment(order.id)}
                                                     className="p-3 rounded-xl bg-primary/20 text-primary hover:bg-primary hover:text-black transition-all"
                                                     title="Confirm Payment"
@@ -158,8 +197,49 @@ export default function AdminOrders() {
                                                     <Check className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            {order.order_status !== 'cancelled' && (
-                                                <button 
+
+                                            {order.payment_status === 'confirmed' && order.order_status === 'pending' && (
+                                                <button
+                                                    onClick={() => handleUpdateOrderStatus(order.id, 'processing')}
+                                                    className="p-3 rounded-xl bg-white/10 text-white hover:bg-white hover:text-black transition-all"
+                                                    title="Mark Processing"
+                                                >
+                                                    <Package className="w-4 h-4" />
+                                                </button>
+                                            )}
+
+                                            {order.order_status === 'processing' && (
+                                                <button
+                                                    onClick={() => handleUpdateOrderStatus(order.id, 'shipped')}
+                                                    className="p-3 rounded-xl bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all"
+                                                    title="Mark Shipped"
+                                                >
+                                                    <Truck className="w-4 h-4" />
+                                                </button>
+                                            )}
+
+                                            {order.order_status === 'shipped' && (
+                                                <button
+                                                    onClick={() => handleUpdateOrderStatus(order.id, 'delivered')}
+                                                    className="p-3 rounded-xl bg-green-500/20 text-green-400 hover:bg-green-500 hover:text-white transition-all"
+                                                    title="Mark Delivered"
+                                                >
+                                                    <CheckCircle className="w-4 h-4" />
+                                                </button>
+                                            )}
+
+                                            {order.payment_status === 'confirmed' && (
+                                                <button
+                                                    onClick={() => handleRefundPayment(order.id)}
+                                                    className="p-3 rounded-xl bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white transition-all"
+                                                    title="Refund Order"
+                                                >
+                                                    <RotateCcw className="w-4 h-4" />
+                                                </button>
+                                            )}
+
+                                            {order.order_status !== 'cancelled' && order.order_status !== 'delivered' && (
+                                                <button
                                                     onClick={() => handleCancelOrder(order.id)}
                                                     className="p-3 rounded-xl bg-red-400/10 text-red-400 hover:bg-red-400 hover:text-white transition-all"
                                                     title="Cancel Order"
@@ -182,11 +262,10 @@ export default function AdminOrders() {
                     <div key={order.id} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-4">
                         <div className="flex justify-between items-start">
                             <h4 className="text-sm font-bold tracking-tight">Order #{order.id}</h4>
-                            <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
-                                order.payment_status === 'confirmed' ? 'bg-primary/10 text-primary' : 
-                                order.payment_status === 'paid' ? 'bg-orange-400/10 text-orange-400' :
-                                'bg-white/5 text-white/40'
-                            }`}>
+                            <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${order.payment_status === 'confirmed' ? 'bg-primary/10 text-primary' :
+                                    order.payment_status === 'paid' ? 'bg-orange-400/10 text-orange-400' :
+                                        'bg-white/5 text-white/40'
+                                }`}>
                                 {order.payment_status}
                             </span>
                         </div>
@@ -199,6 +278,21 @@ export default function AdminOrders() {
                             {(order.payment_status === 'paid' || order.payment_status === 'pending') && (
                                 <button onClick={() => handleConfirmPayment(order.id)} className="flex-1 py-3 rounded-xl bg-primary text-black text-[10px] font-bold uppercase tracking-widest">
                                     Confirm
+                                </button>
+                            )}
+                            {order.payment_status === 'confirmed' && order.order_status === 'pending' && (
+                                <button onClick={() => handleUpdateOrderStatus(order.id, 'processing')} className="flex-1 py-3 rounded-xl bg-white text-black text-[10px] font-bold uppercase tracking-widest">
+                                    Process
+                                </button>
+                            )}
+                            {order.order_status === 'processing' && (
+                                <button onClick={() => handleUpdateOrderStatus(order.id, 'shipped')} className="flex-1 py-3 rounded-xl bg-blue-500 text-white text-[10px] font-bold uppercase tracking-widest">
+                                    Ship
+                                </button>
+                            )}
+                            {order.order_status === 'shipped' && (
+                                <button onClick={() => handleUpdateOrderStatus(order.id, 'delivered')} className="flex-1 py-3 rounded-xl bg-green-500 text-white text-[10px] font-bold uppercase tracking-widest">
+                                    Deliver
                                 </button>
                             )}
                         </div>
@@ -214,9 +308,9 @@ export default function AdminOrders() {
             )}
 
             {/* View Order Modal */}
-            <AdminModal 
-                isOpen={isViewModalOpen && selectedOrder !== null} 
-                onClose={() => setIsViewModalOpen(false)} 
+            <AdminModal
+                isOpen={isViewModalOpen && selectedOrder !== null}
+                onClose={() => setIsViewModalOpen(false)}
                 title={`Order #${selectedOrder?.id}`}
                 loading={actionLoading}
             >
@@ -233,10 +327,9 @@ export default function AdminOrders() {
                             </div>
                             <div>
                                 <label className="text-[8px] font-black uppercase tracking-widest text-white/20 block mb-1">Payment Status</label>
-                                <div className={`text-[10px] font-black uppercase tracking-widest ${
-                                    selectedOrder.payment_status === 'confirmed' ? 'text-primary' : 
-                                    selectedOrder.payment_status === 'paid' ? 'text-orange-400' : 'text-white/40'
-                                }`}>
+                                <div className={`text-[10px] font-black uppercase tracking-widest ${selectedOrder.payment_status === 'confirmed' ? 'text-primary' :
+                                        selectedOrder.payment_status === 'paid' ? 'text-orange-400' : 'text-white/40'
+                                    }`}>
                                     {selectedOrder.payment_status}
                                 </div>
                             </div>
@@ -276,6 +369,63 @@ export default function AdminOrders() {
                                 <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Total Amount</span>
                                 <span className="text-xl font-bold text-primary">₦{parseFloat(selectedOrder.total_amount).toLocaleString()}</span>
                             </div>
+                        </div>
+
+                        {/* Modal Actions */}
+                        <div className="flex flex-wrap gap-3 pt-6 border-t border-white/10">
+                            {(selectedOrder.payment_status === 'paid' || selectedOrder.payment_status === 'pending') && (
+                                <button
+                                    onClick={() => handleConfirmPayment(selectedOrder.id)}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-black text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-all"
+                                >
+                                    <Check className="w-4 h-4" /> Confirm Payment
+                                </button>
+                            )}
+
+                            {selectedOrder.payment_status === 'confirmed' && selectedOrder.order_status === 'pending' && (
+                                <button
+                                    onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'processing')}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-black text-[10px] font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
+                                >
+                                    <Package className="w-4 h-4" /> Start Processing
+                                </button>
+                            )}
+
+                            {selectedOrder.order_status === 'processing' && (
+                                <button
+                                    onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'shipped')}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-blue-600 transition-all"
+                                >
+                                    <Truck className="w-4 h-4" /> Mark Shipped
+                                </button>
+                            )}
+
+                            {selectedOrder.order_status === 'shipped' && (
+                                <button
+                                    onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'delivered')}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-green-600 transition-all"
+                                >
+                                    <CheckCircle className="w-4 h-4" /> Mark Delivered
+                                </button>
+                            )}
+
+                            {selectedOrder.payment_status === 'confirmed' && (
+                                <button
+                                    onClick={() => handleRefundPayment(selectedOrder.id)}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-purple-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-purple-600 transition-all"
+                                >
+                                    <RotateCcw className="w-4 h-4" /> Refund Payment
+                                </button>
+                            )}
+
+                            {selectedOrder.order_status !== 'cancelled' && selectedOrder.order_status !== 'delivered' && (
+                                <button
+                                    onClick={() => handleCancelOrder(selectedOrder.id)}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                                >
+                                    <X className="w-4 h-4" /> Cancel Order
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
