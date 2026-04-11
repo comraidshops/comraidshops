@@ -51,24 +51,23 @@ export default function BillingPage() {
 
     return (
         <div className="space-y-16">
-            <div className="border-b border-foreground/5 pb-10">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 04</span>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Vault & Liquidity</h2>
+            <div className="border-b border-border pb-10">
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter font-cormorant italic">Payment Methods</h2>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
-                    Secure instrument synchronization. Manage high-grade tokenized assets for seamless trade execution.
+                    Manage your saved credit cards for seamless checkouts.
                 </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-8">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/40">Registered Instruments</h3>
+                    <h3 className="text-xl font-cormorant italic tracking-tight font-bold">Saved Cards</h3>
 
                     {cards.length === 0 ? (
                         <div className="bg-background border border-border border-dashed p-12 flex flex-col items-center justify-center text-center space-y-4">
                             <div className="p-4 bg-secondary/5 rounded-full">
                                 <CreditCard className="w-6 h-6 text-secondary/30" />
                             </div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/50">No saved instruments found in your vault.</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-secondary/50">No saved cards found in your wallet.</p>
                             <p className="text-[8px] uppercase tracking-widest text-secondary/30 max-w-[200px]">Save a card during your next checkout to enable one-click purchases.</p>
                         </div>
                     ) : (
@@ -77,7 +76,7 @@ export default function BillingPage() {
                                 <motion.div
                                     key={card.id}
                                     layout
-                                    className="bg-background border border-border p-8 flex items-center justify-between group hover:border-foreground/20 hover:shadow-xl transition-all duration-500 relative overflow-hidden"
+                                    className="bg-background border-t-[0.5px] border-b-[0.5px] border-border py-10 px-8 flex items-center justify-between group hover:border-foreground/20 transition-all duration-500 relative overflow-hidden"
                                 >
                                     <div className="flex items-center gap-8 relative z-10">
                                         <div className="w-14 h-9 bg-foreground/5 flex items-center justify-center border border-foreground/10 group-hover:scale-110 transition-transform">
@@ -111,16 +110,16 @@ export default function BillingPage() {
                             <ShieldCheck className="w-7 h-7" />
                         </div>
                         <div className="space-y-4">
-                            <h4 className="text-2xl font-black uppercase tracking-tighter">Secured Protocol</h4>
+                            <h4 className="text-2xl font-black uppercase tracking-tighter font-cormorant italic">Secured Payments</h4>
                             <p className="text-[10px] font-black leading-relaxed text-secondary opacity-60 uppercase tracking-[0.3em]">
-                                Your full financial identity remains encrypted and isolated. We employ high-grade tokenization via Paystack Orchestration to ensure absolute system integrity.
+                                Your payment information is fully encrypted and securely tokenized.
                             </p>
                         </div>
                     </div>
 
                     <div className="pt-10 border-t border-white/10 flex items-center gap-4 relative z-10">
                         <Lock className="w-3.5 h-3.5 text-secondary/40" />
-                        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40">PCI DSS COMPLIANT // VANGUARD SECURE</span>
+                        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40">PCI DSS COMPLIANT // SECURE CHECKOUT</span>
                     </div>
                 </div>
             </div>

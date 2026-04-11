@@ -240,11 +240,10 @@ export default function SettingsPage() {
     return (
         <div className="space-y-16">
             {/* Page header */}
-            <div className="border-b border-foreground/5 pb-10">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">System Configuration</span>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">System Protocol</h2>
+            <div className="border-b border-border pb-10">
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter font-cormorant italic">Preferences</h2>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
-                    Personalized terminal configuration. Orchestrate security credentials and notification logic for seamless operational flow.
+                    Manage your account settings and email preferences.
                 </p>
             </div>
 

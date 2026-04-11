@@ -84,10 +84,9 @@ export default function AddressesPage() {
         <div className="space-y-12">
             <div className="border-b border-border pb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
                 <div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 03</span>
-                    <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Coordinate Archive</h2>
+                    <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter font-cormorant italic">Saved Addresses</h2>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
-                        Precision logistics synchronization. Maintain terminal accuracy for seamless object trajectory.
+                        Manage your shipping destinations for seamless delivery.
                     </p>
                 </div>
                 <button
@@ -95,7 +94,7 @@ export default function AddressesPage() {
                     className="bg-foreground text-background px-10 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:translate-y-[-2px] transition-transform shadow-xl flex items-center justify-center gap-3"
                 >
                     <Plus className="w-4 h-4" />
-                    Archive New Coordinate
+                    Add New Address
                 </button>
             </div>
 
@@ -109,36 +108,36 @@ export default function AddressesPage() {
                     >
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-3">
-                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">Full Recipient Identity</label>
-                                <input required value={formData.full_name} onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
+                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">Full Name</label>
+                                <input required value={formData.full_name} onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
                             </div>
                             <div className="space-y-3">
-                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">Terminal Phone Connection</label>
-                                <input required value={formData.phone_number} onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
+                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">Phone Number</label>
+                                <input required value={formData.phone_number} onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
                             </div>
                             <div className="space-y-3 md:col-span-2">
-                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">Primary Trajectory Address</label>
-                                <input required value={formData.address_line1} onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })} className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
+                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">Street Address</label>
+                                <input required value={formData.address_line1} onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })} className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
                             </div>
                             <div className="space-y-3">
-                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">City Module</label>
-                                <input required value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
+                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">City</label>
+                                <input required value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
                             </div>
                             <div className="space-y-3">
-                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">State // Province Sector</label>
-                                <input required value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })} className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
+                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">State / Province</label>
+                                <input required value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })} className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
                             </div>
                             <div className="space-y-3">
-                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">Zip Code Intel</label>
-                                <input required value={formData.zip_code} onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })} className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
+                                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50">Zip / Postal Code</label>
+                                <input required value={formData.zip_code} onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })} className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background" />
                             </div>
                             <div className="space-y-4 md:col-span-2 flex items-center gap-4 py-4">
                                 <input type="checkbox" id="is_default" checked={formData.is_default} onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })} className="w-4 h-4 accent-foreground" />
-                                <label htmlFor="is_default" className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50 cursor-pointer">Set as Primary Logistics Coordinate</label>
+                                <label htmlFor="is_default" className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50 cursor-pointer">Set as Default Shipping Address</label>
                             </div>
                             <div className="pt-10 md:col-span-2 border-t border-foreground/5 flex gap-6 justify-end">
-                                <button type="button" onClick={() => setShowForm(false)} className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/40 hover:text-foreground transition-colors px-6">Cancel Protocol</button>
-                                <button type="submit" className="bg-foreground text-background px-12 py-4 text-[10px] font-black uppercase tracking-[0.3em] shadow-xl hover:translate-y-[-2px] transition-transform">Commit Coordinate</button>
+                                <button type="button" onClick={() => setShowForm(false)} className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/40 hover:text-foreground transition-colors px-6">Cancel</button>
+                                <button type="submit" className="bg-foreground text-background px-12 py-4 text-[10px] font-black uppercase tracking-[0.3em] shadow-xl hover:translate-y-[-2px] transition-transform">Save Address</button>
                             </div>
                         </form>
                     </motion.div>
@@ -150,8 +149,7 @@ export default function AddressesPage() {
                     <motion.div
                         key={address.id}
                         layout
-                        className={`bg-background border p-8 flex flex-col justify-between group transition-all duration-500 shadow-sm hover:shadow-xl relative overflow-hidden ${address.is_default ? 'border-foreground/20' : 'border-border hover:border-foreground/10'
-                            }`}
+                        className={`bg-background px-8 py-10 flex flex-col justify-between group transition-all duration-500 shadow-sm hover:shadow-xl relative overflow-hidden border-t-[0.5px] border-b-[0.5px] border-border hover:border-foreground/20`}
                     >
                         <div className="absolute top-0 right-0 p-4 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
                             <MapPin className="w-24 h-24 rotate-12" />
@@ -163,7 +161,7 @@ export default function AddressesPage() {
                                     <MapPin className="w-4 h-4 text-foreground/40" />
                                 </div>
                                 {address.is_default && (
-                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-foreground px-2 py-1 bg-foreground/5 border border-foreground/10">Primary System Coordinate</span>
+                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-foreground px-2 py-1 bg-foreground/5 border-[0.5px] border-foreground/10">Default Address</span>
                                 )}
                             </div>
                             <div className="space-y-2">

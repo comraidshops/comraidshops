@@ -111,11 +111,10 @@ export default function SavedFitsPage() {
 
     return (
         <div className="space-y-12">
-            <div className="border-b border-foreground/5 pb-10">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 05</span>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Visual Archive</h2>
+            <div className="border-b border-border pb-10">
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter font-cormorant italic">Saved Items</h2>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
-                    Curated aesthetic trajectories for future orchestration. Saved fits and conceptual frameworks.
+                    Your saved looks and curated pieces for future shopping.
                 </p>
             </div>
 
@@ -125,8 +124,8 @@ export default function SavedFitsPage() {
                         <Bookmark className="w-8 h-8 text-foreground/20 -rotate-45" />
                     </div>
                     <div className="space-y-3">
-                        <p className="text-xl font-black uppercase tracking-tighter">Null Visuals</p>
-                        <p className="text-[10px] text-secondary/40 font-black uppercase tracking-[0.3em] italic">The conceptual archive is currently empty.</p>
+                        <p className="text-xl font-black uppercase tracking-tighter font-cormorant italic">No Saved Items</p>
+                        <p className="text-[10px] text-secondary/40 font-black uppercase tracking-[0.3em] italic">You haven't saved any looks yet.</p>
                     </div>
                 </div>
             ) : (
@@ -145,7 +144,7 @@ export default function SavedFitsPage() {
                                     />
                                 ) : (
                                     <div className="w-full h-full bg-secondary/5 flex items-center justify-center">
-                                        <span className="text-secondary/20 uppercase tracking-[0.3em] text-[10px] font-black">Null Data</span>
+                                        <span className="text-secondary/20 uppercase tracking-[0.3em] text-[10px] font-black">No Image</span>
                                     </div>
                                 )}
                             </div>
@@ -162,7 +161,7 @@ export default function SavedFitsPage() {
 
                             <div className="absolute bottom-6 left-6 right-6 z-20">
                                 <span className="block text-[8px] font-black uppercase tracking-[0.4em] text-white/60 mb-2">
-                                    Enclosed: {sf.fitframe.items?.length || 0} Assets
+                                    {sf.fitframe.items?.length || 0} Items
                                 </span>
                                 <span className="text-lg font-black uppercase tracking-tighter text-white line-clamp-2 leading-none">
                                     {sf.fitframe.title}

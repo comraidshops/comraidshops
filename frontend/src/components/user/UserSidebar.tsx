@@ -15,13 +15,13 @@ import {
 import { motion } from 'framer-motion';
 
 const menuItems = [
-    { title: 'Intel Overview', icon: LayoutDashboard, href: '/dashboard/user' },
-    { title: 'The Identity', icon: User, href: '/dashboard/user/profile' },
-    { title: 'Coordinates', icon: MapPin, href: '/dashboard/user/addresses' },
-    { title: 'Secure Vault', icon: CreditCard, href: '/dashboard/user/billing' },
-    { title: 'Acquisitions', icon: ShoppingBag, href: '/dashboard/user/orders' },
-    { title: 'Archived Fits', icon: Bookmark, href: '/dashboard/user/saved-fits' },
-    { title: 'Access Config', icon: Settings, href: '/dashboard/user/settings' },
+    { title: 'Overview', icon: LayoutDashboard, href: '/dashboard/user' },
+    { title: 'Account Details', icon: User, href: '/dashboard/user/profile' },
+    { title: 'Address Book', icon: MapPin, href: '/dashboard/user/addresses' },
+    { title: 'Payment Methods', icon: CreditCard, href: '/dashboard/user/billing' },
+    { title: 'Order History', icon: ShoppingBag, href: '/dashboard/user/orders' },
+    { title: 'Saved Items', icon: Bookmark, href: '/dashboard/user/saved-fits' },
+    { title: 'Preferences', icon: Settings, href: '/dashboard/user/settings' },
 ];
 
 export default function UserSidebar() {
@@ -41,7 +41,7 @@ export default function UserSidebar() {
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[11px] font-black uppercase tracking-[0.3em] leading-none">Management</span>
-                        <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-secondary/60">Vanguard Terminal</span>
+                        <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-secondary/60">Dashboard</span>
                     </div>
                 </Link>
             </div>
@@ -82,7 +82,7 @@ export default function UserSidebar() {
                 >
                     <div className="flex items-center gap-3">
                         <LogOut className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-                        <span>Termination</span>
+                        <span>Sign Out</span>
                     </div>
                 </button>
                 <div className="mt-4 px-3.5">

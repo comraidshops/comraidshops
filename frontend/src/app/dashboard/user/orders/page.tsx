@@ -58,14 +58,14 @@ export default function OrdersPage() {
                     <ShoppingBag className="w-8 h-8 text-foreground/20 -rotate-45 group-hover:rotate-0 transition-transform duration-700" />
                 </div>
                 <div className="space-y-3">
-                    <h3 className="font-black uppercase tracking-tighter text-2xl">Null Acquisitions</h3>
-                    <p className="text-[10px] text-secondary/40 uppercase tracking-[0.3em] font-black italic">The architectural archive is currently empty.</p>
+                    <h3 className="font-black uppercase tracking-tighter text-2xl font-cormorant italic">No Orders Found</h3>
+                    <p className="text-[10px] text-secondary/40 uppercase tracking-[0.3em] font-black italic">Your order history is currently empty.</p>
                 </div>
                 <Link
                     href="/shop"
                     className="bg-foreground text-background px-12 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:translate-y-[-2px] transition-transform shadow-xl"
                 >
-                    Initiate Trade
+                    Start Shopping
                 </Link>
             </div>
         );
@@ -73,11 +73,10 @@ export default function OrdersPage() {
 
     return (
         <div className="space-y-12">
-            <div className="border-b border-foreground/5 pb-10">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 01</span>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Acquisition Journal</h2>
+            <div className="border-b border-border pb-10">
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter font-cormorant italic">Order History</h2>
                 <div className="flex items-center gap-4 mt-4">
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-foreground font-black px-2 py-1 bg-foreground/5 border border-foreground/10">{orders.length} Records Detected</p>
+                    <p className="text-[9px] uppercase tracking-[0.3em] text-foreground font-black px-2 py-1 bg-foreground/5 border-[0.5px] border-foreground/10">{orders.length} Orders</p>
                     <div className="h-[1px] flex-1 bg-foreground/5" />
                 </div>
             </div>
@@ -97,7 +96,7 @@ export default function OrdersPage() {
                             transition={{ delay: i * 0.08 }}
                         >
                             <Link href={`/dashboard/user/orders/${order.id}`}>
-                                <div className="bg-background border border-border hover:border-foreground/20 transition-all duration-500 group p-8 relative overflow-hidden shadow-sm hover:shadow-xl">
+                                <div className="bg-background border-t-[0.5px] border-b-[0.5px] border-border hover:border-foreground/20 transition-all duration-500 group py-10 px-8 relative overflow-hidden shadow-sm hover:shadow-xl">
                                     <div className="absolute top-0 right-0 p-4 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
                                         <StatusIcon className="w-32 h-32 rotate-12" />
                                     </div>
@@ -138,13 +137,13 @@ export default function OrdersPage() {
                                                 <div>
                                                     <div className="flex items-center gap-3 mb-1">
                                                         <p className="font-black uppercase tracking-tight text-lg leading-none">ORDER #{order.id.toString().padStart(5, '0')}</p>
-                                                        <span className={`text-[7px] font-black uppercase tracking-[0.2em] px-2 py-0.5 border border-current leading-none ${cfg.color}`}>{order.order_status}</span>
+                                                        <span className={`text-[7px] font-black uppercase tracking-[0.2em] px-2 py-0.5 border-[0.5px] border-current leading-none ${cfg.color}`}>{order.order_status}</span>
                                                     </div>
-                                                    <p className="text-[9px] text-secondary/40 uppercase tracking-[0.3em] font-black">{date} // DISPATCH SECURED</p>
+                                                    <p className="text-[9px] text-secondary/40 uppercase tracking-[0.3em] font-black">{date}</p>
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="text-xl font-black tracking-tighter mb-1">₦{Number(order.total_amount).toLocaleString()}</p>
-                                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-secondary/30">{totalQty} UNITS ENCLOSED</p>
+                                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-secondary/30">{totalQty} ITEMS</p>
                                                 </div>
                                             </div>
 
@@ -152,11 +151,11 @@ export default function OrdersPage() {
                                                 <div className="flex items-center gap-6">
                                                     <div className="flex items-center gap-2">
                                                         <StatusIcon className={`w-3 h-3 ${cfg.color}`} />
-                                                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-secondary/60">Log: {cfg.label}</span>
+                                                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-secondary/60">Status: {cfg.label}</span>
                                                     </div>
                                                 </div>
                                                 <span className="text-[8px] font-black uppercase tracking-[0.3em] text-foreground opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                                                    Access Manifesto Detail <ArrowRight className="inline w-3 h-3 ml-1" />
+                                                    View Order Details <ArrowRight className="inline w-3 h-3 ml-1" />
                                                 </span>
                                             </div>
                                         </div>

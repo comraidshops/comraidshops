@@ -24,7 +24,7 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
                 <div className="flex-1 md:ml-64 flex flex-col min-h-screen relative">
                     <header className="h-20 bg-background/80 backdrop-blur-md border-b border-border flex items-center justify-between px-8 sticky top-0 z-30 w-full">
                         <div className="flex flex-col">
-                            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-secondary/50 leading-none mb-1">Navigation Sector</span>
+                            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-secondary/50 leading-none mb-1">Navigation</span>
                             <h1 className="font-black uppercase tracking-tight text-[10px] md:text-xs">
                                 {formattedPageName}
                             </h1>
@@ -40,7 +40,7 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
                                 className="md:hidden flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-red-500"
                             >
                                 <LogOut className="w-3.5 h-3.5" />
-                                End
+                                Sign Out
                             </button>
                             <div className="h-9 w-9 bg-foreground text-background flex items-center justify-center text-[10px] font-black uppercase shadow-xl">
                                 US

@@ -107,10 +107,10 @@ export default function UserDashboardPage() {
     };
 
     const overviewCards = [
-        { title: 'The Identity', val: profile?.username || '...', icon: User, href: '/dashboard/user/profile', label: 'Profile Config' },
-        { title: 'Coordinates', val: stats.addresses, icon: MapPin, href: '/dashboard/user/addresses', label: 'Shipping Intel' },
-        { title: 'Secure Vault', val: stats.cards, icon: CreditCard, href: '/dashboard/user/billing', label: 'Stored Assets' },
-        { title: 'Market Activity', val: stats.orders, icon: ShoppingBag, href: '/dashboard/user/orders', label: 'Order History' },
+        { title: 'Account Details', val: profile?.username || '...', icon: User, href: '/dashboard/user/profile', label: 'Manage Profile' },
+        { title: 'Address Book', val: stats.addresses, icon: MapPin, href: '/dashboard/user/addresses', label: 'Shipping Info' },
+        { title: 'Payment Methods', val: stats.cards, icon: CreditCard, href: '/dashboard/user/billing', label: 'Saved Cards' },
+        { title: 'Order History', val: stats.orders, icon: ShoppingBag, href: '/dashboard/user/orders', label: 'All Orders' },
     ];
 
     return (
@@ -123,19 +123,19 @@ export default function UserDashboardPage() {
             >
                 <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-foreground text-background px-2 py-0.5">Vanguard Status</span>
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/40">Established 2026</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-foreground text-background px-2 py-0.5">Comraid Member</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/40">Since 2026</span>
                     </div>
-                    <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none">
-                        MEMBER NO. {profile?.id?.toString().padStart(3, '0') || '001'}
+                    <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none font-cormorant italic pr-4">
+                        Member No. {profile?.id?.toString().padStart(3, '0') || '001'}
                     </h2>
                     <p className="text-secondary/60 text-xs font-bold uppercase tracking-[0.2em] max-w-md">
-                        Current Protocol: Standard Access. Welcome back, {profile?.first_name || profile?.username || 'Curator'}. Your digital atelier is synchronized.
+                        Welcome back, {profile?.first_name || profile?.username || 'Curator'}. Manage your account, preferences, and order history.
                     </p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/30">System Integrity</span>
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#10b981]">Active & Secured</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/30">Account Status</span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#10b981]">Active</span>
                 </div>
             </motion.div>
 
@@ -180,22 +180,21 @@ export default function UserDashboardPage() {
                 <div className="lg:col-span-7 bg-background border border-border shadow-sm">
                     <div className="flex items-center justify-between p-8 border-b border-border">
                         <div className="flex flex-col">
-                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/40 leading-none mb-1">Log 01</span>
-                            <p className="text-[11px] font-black uppercase tracking-[0.2em]">Recent Acquisitions</p>
+                            <h3 className="text-xl font-cormorant italic font-bold tracking-tight">Recent Orders</h3>
                         </div>
                         <Link href="/dashboard/user/orders" className="text-[9px] font-black uppercase tracking-widest text-foreground hover:underline flex items-center gap-2 border border-border px-3 py-1.5 transition-colors hover:bg-secondary/5">
-                            Historical Data <ArrowRight className="w-3 h-3" />
+                            View All <ArrowRight className="w-3 h-3" />
                         </Link>
                     </div>
                     {recentOrders.length === 0 ? (
                         <div className="p-16 text-center space-y-6">
                             <ShoppingBag className="w-12 h-12 text-secondary/10 mx-auto" />
                             <div className="space-y-2">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">Zero Acquisition History Found</p>
-                                <p className="text-[9px] text-secondary/30 uppercase tracking-widest italic">The archive is currently empty.</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">No Order History Found</p>
+                                <p className="text-[9px] text-secondary/30 uppercase tracking-widest italic">You have not placed any orders yet.</p>
                             </div>
                             <Link href="/shop" className="inline-block text-[9px] font-black uppercase tracking-widest bg-foreground text-background px-6 py-3 hover:translate-y-[-2px] transition-transform">
-                                Initialize Trade →
+                                Start Shopping →
                             </Link>
                         </div>
                     ) : (
@@ -221,7 +220,7 @@ export default function UserDashboardPage() {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-black tracking-tight mb-0.5">{formatCurrency(order.total_amount)}</p>
-                                            <span className="text-[8px] font-black uppercase tracking-widest text-secondary/40 group-hover:text-foreground transition-colors">Manifesto Details →</span>
+                                            <span className="text-[8px] font-black uppercase tracking-widest text-secondary/40 group-hover:text-foreground transition-colors">Order Details →</span>
                                         </div>
                                     </Link>
                                 );
@@ -234,9 +233,8 @@ export default function UserDashboardPage() {
                 <div className="lg:col-span-5 bg-background border border-border shadow-sm">
                     <div className="flex items-center justify-between p-8 border-b border-border">
                         <div className="flex flex-col">
-                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/40 leading-none mb-1">Signal 02</span>
                             <div className="flex items-center gap-3">
-                                <p className="text-[11px] font-black uppercase tracking-[0.2em]">System Intel</p>
+                                <h3 className="text-xl font-cormorant italic font-bold tracking-tight">Notifications</h3>
                                 {unreadCount > 0 && (
                                     <span className="w-5 h-5 bg-foreground text-background text-[9px] font-black flex items-center justify-center rounded-full shadow-lg">
                                         {unreadCount}
@@ -246,14 +244,14 @@ export default function UserDashboardPage() {
                         </div>
                         {unreadCount > 0 && (
                             <button onClick={markAllRead} className="text-[9px] font-black uppercase tracking-widest text-secondary hover:text-foreground transition-colors border border-border px-3 py-1.5 hover:bg-secondary/5">
-                                Clear Stack
+                                Clear All
                             </button>
                         )}
                     </div>
                     {notifications.length === 0 ? (
                         <div className="p-16 text-center space-y-4">
                             <Bell className="w-12 h-12 text-secondary/10 mx-auto" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">Zero Intel Updates</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">No New Notifications</p>
                         </div>
                     ) : (
                         <div className="divide-y divide-border">

@@ -68,18 +68,16 @@ export default function ProfilePage() {
 
     return (
         <div className="space-y-16 max-w-3xl">
-            <div className="border-b border-border pb-10">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/30 mb-2 block">Archive Sector 02</span>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">Identity Manifest</h2>
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter font-cormorant italic">Account Details</h2>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/50 mt-4 leading-relaxed">
-                    Personalized protocol configuration. Maintain terminal accuracy for seamless delivery orchestration.
+                    Manage your personal details and contact information to ensure seamless deliveries.
                 </p>
             </div>
 
             <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-background border border-border p-10 shadow-sm relative overflow-hidden"
+                className="bg-background border-t-[0.5px] border-b-[0.5px] border-border py-10 shadow-sm relative overflow-hidden"
             >
                 <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none">
                     <User className="w-48 h-48 rotate-12" />
@@ -95,49 +93,49 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-3">
                             <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50 flex items-center gap-3">
-                                <User className="w-3 h-3" /> First Name Asset
+                                <User className="w-3 h-3" /> First Name
                             </label>
                             <input
                                 type="text"
                                 value={user.first_name}
                                 onChange={(e) => setUser({ ...user, first_name: e.target.value })}
-                                className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
+                                className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
                             />
                         </div>
 
                         <div className="space-y-3">
                             <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50 flex items-center gap-3">
-                                <User className="w-3 h-3" /> Last Name Asset
+                                <User className="w-3 h-3" /> Last Name
                             </label>
                             <input
                                 type="text"
                                 value={user.last_name}
                                 onChange={(e) => setUser({ ...user, last_name: e.target.value })}
-                                className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
+                                className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
                             />
                         </div>
 
                         <div className="space-y-3 md:col-span-2">
                             <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/50 flex items-center gap-3">
-                                <Mail className="w-3 h-3" /> Digital Coordinate (Email)
+                                <Mail className="w-3 h-3" /> Email Address
                             </label>
                             <input
                                 type="email"
                                 value={user.email}
                                 onChange={(e) => setUser({ ...user, email: e.target.value })}
-                                className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
+                                className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-bold uppercase tracking-tight focus:outline-none focus:border-foreground transition-all focus:bg-background"
                             />
                         </div>
 
                         <div className="space-y-3 md:col-span-2">
                             <label className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary/30 flex items-center gap-3">
-                                <Shield className="w-3 h-3" /> Terminal Identifier (Static)
+                                <Shield className="w-3 h-3" /> Account Username (Static)
                             </label>
                             <input
                                 disabled
                                 type="text"
                                 value={user.username}
-                                className="w-full bg-secondary/5 border border-border p-4 text-[11px] font-black uppercase tracking-tight opacity-30 cursor-not-allowed"
+                                className="w-full bg-secondary/5 border-b border-border p-4 text-[11px] font-black uppercase tracking-tight opacity-30 cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -149,7 +147,7 @@ export default function ProfilePage() {
                             className="bg-foreground text-background px-12 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:translate-y-[-2px] transition-all flex items-center gap-3 disabled:opacity-50 shadow-xl"
                         >
                             <Save className="w-3.5 h-3.5" />
-                            {saving ? 'Synchronizing...' : 'Update Manifest'}
+                            {saving ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
                 </form>
