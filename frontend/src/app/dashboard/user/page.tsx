@@ -127,7 +127,7 @@ export default function UserDashboardPage() {
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/40">Since 2026</span>
                     </div>
                     <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none font-cormorant italic pr-4">
-                        Member No. {profile?.id?.toString().padStart(3, '0') || '001'}
+                        Archive Entry: #{profile?.id?.toString().padStart(3, '0') || '001'}
                     </h2>
                     <p className="text-secondary/60 text-xs font-bold uppercase tracking-[0.2em] max-w-md">
                         Welcome back, {profile?.first_name || profile?.username || 'Curator'}. Manage your account, preferences, and order history.
