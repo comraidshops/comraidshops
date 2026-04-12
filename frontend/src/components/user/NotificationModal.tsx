@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { X, Clock, Bell, CheckCheck, Sparkles } from 'lucide-react';
 
 interface Notification {
@@ -53,12 +53,12 @@ export default function NotificationModal({ isOpen, onClose, notifications, unre
         };
     }, [isOpen, onClose]);
 
-    const backdropVariants = {
+    const backdropVariants: Variants = {
         hidden: { opacity: 0 },
         visible: { opacity: 1 },
     };
 
-    const panelVariants = {
+    const panelVariants: Variants = {
         hidden: { opacity: 0, x: 40, scale: 0.98 },
         visible: {
             opacity: 1,
@@ -74,12 +74,12 @@ export default function NotificationModal({ isOpen, onClose, notifications, unre
         },
     };
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 12 },
         visible: (i: number) => ({
             opacity: 1,
             y: 0,
-            transition: { delay: 0.08 + i * 0.05, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
+            transition: { delay: 0.08 + (i * 0.05), duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
         }),
     };
 
