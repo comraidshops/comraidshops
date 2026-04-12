@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { User, ShoppingBag, MapPin, CreditCard, ArrowRight, Bell, Clock, CheckCircle, Truck, XCircle, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import { API_BASE_URL } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
 import { UserProfile, Order, Notification, OrderItem } from '@/types/user';
 import { formatCurrency } from '@/lib/format';
+import { useDashboardNotifications } from './layout';
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string }> = {
     pending: { label: 'Order Pending', icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10' },
@@ -21,25 +22,22 @@ export default function UserDashboardPage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [stats, setStats] = useState({ orders: 0, addresses: 0, cards: 0 });
     const [recentOrders, setRecentOrders] = useState<Order[]>([]);
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [unreadCount, setUnreadCount] = useState(0);
     const { notify } = useNotification();
-    const lastNotificationId = useRef<number>(0);
+    const { notifications, unreadCount, markAllRead } = useDashboardNotifications();
 
     useEffect(() => {
         let isMounted = true;
 
-        const fetchOverview = async (isBackground = false) => {
+        const fetchOverview = async () => {
             const token = localStorage.getItem('access_token');
             const headers = { Authorization: `Bearer ${token}` };
 
             try {
-                const [pRes, aRes, cRes, oRes, nRes] = await Promise.all([
+                const [pRes, aRes, cRes, oRes] = await Promise.all([
                     fetch(`${API_BASE_URL}/user/profile/`, { headers }),
                     fetch(`${API_BASE_URL}/addresses/`, { headers }),
                     fetch(`${API_BASE_URL}/saved-cards/`, { headers }),
                     fetch(`${API_BASE_URL}/orders/`, { headers }),
-                    fetch(`${API_BASE_URL}/user/notifications/`, { headers }),
                 ]);
 
                 if (!isMounted) return;
@@ -61,50 +59,20 @@ export default function UserDashboardPage() {
                     setStats(s => ({ ...s, orders: sorted.length }));
                     setRecentOrders(sorted.slice(0, 3));
                 }
-                if (nRes.ok) {
-                    const d = await nRes.json();
-                    const list: Notification[] = Array.isArray(d) ? d : d.results ?? [];
-                    setNotifications(list.slice(0, 4));
-                    setUnreadCount(list.filter((n) => !n.is_read).length);
-
-                    if (list.length > 0) {
-                        const highestId = Math.max(...list.map(n => n.id));
-                        if (isBackground && lastNotificationId.current > 0 && highestId > lastNotificationId.current) {
-                            const newAlerts = list.filter(n => n.id > lastNotificationId.current && !n.is_read);
-                            if (newAlerts.length > 0) {
-                                notify('info', 'Comraid Update', `You have ${newAlerts.length} new notification${newAlerts.length > 1 ? 's' : ''}.`);
-                            }
-                        }
-                        lastNotificationId.current = highestId;
-                    }
-                }
             } catch (err) {
                 console.error("Failed to fetch user dashboard data", err);
             }
         };
 
-        fetchOverview(false);
-
-        const pollInterval = setInterval(() => {
-            fetchOverview(true);
-        }, 30000); // Increased to 30s to reduce load
+        fetchOverview();
 
         return () => {
             isMounted = false;
-            clearInterval(pollInterval);
         };
     }, [notify]);
 
 
-    const markAllRead = async () => {
-        const token = localStorage.getItem('access_token');
-        await fetch(`${API_BASE_URL}/user/notifications/mark_all_read/`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        setNotifications(n => n.map(x => ({ ...x, is_read: true })));
-        setUnreadCount(0);
-    };
+
 
     const overviewCards = [
         { title: 'Account Details', val: profile?.username || '...', icon: User, href: '/dashboard/user/profile', label: 'Manage Profile' },
@@ -229,51 +197,67 @@ export default function UserDashboardPage() {
                     )}
                 </div>
 
-                {/* Notifications */}
-                <div className="lg:col-span-5 bg-background border border-border shadow-sm">
-                    <div className="flex items-center justify-between p-8 border-b border-border">
-                        <div className="flex flex-col">
+                {/* Notifications — Editorial Teaser Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="lg:col-span-5 bg-background border border-border shadow-sm relative overflow-hidden group"
+                >
+                    {/* Decorative gradient strip */}
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+
+                    <div className="p-8 border-b border-border">
+                        <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-xl font-cormorant italic font-bold tracking-tight">Notifications</h3>
-                                {unreadCount > 0 && (
-                                    <span className="w-5 h-5 bg-foreground text-background text-[9px] font-black flex items-center justify-center rounded-full shadow-lg">
-                                        {unreadCount}
-                                    </span>
-                                )}
+                                <div className="w-8 h-8 bg-foreground/5 border border-border flex items-center justify-center">
+                                    <Bell className="w-3.5 h-3.5 text-secondary/60" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <h3 className="text-xl font-cormorant italic font-bold tracking-tight">Notifications</h3>
+                                </div>
                             </div>
+                            {unreadCount > 0 && (
+                                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground bg-foreground/5 border border-border px-2.5 py-1">
+                                    {unreadCount} Unread
+                                </span>
+                            )}
                         </div>
-                        {unreadCount > 0 && (
-                            <button onClick={markAllRead} className="text-[9px] font-black uppercase tracking-widest text-secondary hover:text-foreground transition-colors border border-border px-3 py-1.5 hover:bg-secondary/5">
-                                Clear All
-                            </button>
-                        )}
                     </div>
+
                     {notifications.length === 0 ? (
                         <div className="p-16 text-center space-y-4">
                             <Bell className="w-12 h-12 text-secondary/10 mx-auto" />
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary/40">No New Notifications</p>
+                            <p className="text-[9px] text-secondary/30 uppercase tracking-widest italic">You&apos;re all caught up.</p>
                         </div>
                     ) : (
                         <div className="divide-y divide-border">
-                            {notifications.map((n) => (
-                                <div key={n.id} className={`p-6 flex gap-5 items-start transition-colors relative ${!n.is_read ? 'bg-foreground/[0.02]' : ''}`}>
-                                    <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5 ${!n.is_read ? 'bg-foreground ring-4 ring-foreground/5' : 'bg-secondary/20'}`} />
-                                    <div className="min-w-0">
-                                        <p className="text-[11px] font-black uppercase tracking-tight mb-1">{n.title}</p>
-                                        <p className="text-[10px] text-secondary/70 leading-relaxed font-medium">{n.body}</p>
-                                        <div className="flex items-center gap-2 mt-3">
-                                            <Clock className="w-2.5 h-2.5 text-secondary/40" />
-                                            <p className="text-[8px] text-secondary/40 uppercase tracking-[0.2em] font-black">
-                                                {new Date(n.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                                            </p>
-                                        </div>
+                            {notifications.slice(0, 3).map((n) => (
+                                <div key={n.id} className={`px-8 py-5 flex gap-4 items-start transition-colors relative ${!n.is_read ? 'bg-foreground/[0.02]' : ''}`}>
+                                    <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-1 ${!n.is_read ? 'bg-foreground shadow-[0_0_6px_rgba(0,0,0,0.2)]' : 'bg-secondary/20'}`} />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-[11px] font-black uppercase tracking-tight mb-0.5 truncate">{n.title}</p>
+                                        <p className="text-[10px] text-secondary/50 leading-relaxed font-medium line-clamp-1">{n.body}</p>
                                     </div>
+                                    <span className="text-[8px] font-bold text-secondary/30 uppercase tracking-wider flex-shrink-0 pt-0.5">
+                                        {new Date(n.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                                    </span>
                                     {!n.is_read && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-foreground" />}
                                 </div>
                             ))}
                         </div>
                     )}
-                </div>
+
+                    {/* Footer — Open Modal Prompt */}
+                    {notifications.length > 0 && (
+                        <div className="px-8 py-5 border-t border-border bg-foreground/[0.01]">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-secondary/40 text-center">
+                                Tap the <Bell className="w-3 h-3 inline-block text-secondary/50 -mt-0.5" /> icon for full view
+                            </p>
+                        </div>
+                    )}
+                </motion.div>
             </div>
         </div>
     );

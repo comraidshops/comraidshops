@@ -887,44 +887,39 @@ class PaystackWebhookView(APIView):
             return Response({"error": "Invalid signature"}, status=400)
 
         event = json.loads(payload)
+        import logging
+        logger = logging.getLogger(__name__)
+        from .email_service import send_platform_email
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
         
-        # Handle Successful Payment
+        # ── 1. Handle Successful Payment ──────────────────────────────────────
         if event['event'] == 'charge.success':
             order_id = event['data']['metadata'].get('order_id')
             try:
                 order = Order.objects.get(id=order_id)
                 if order.payment_status == 'pending':
                     order.payment_status = 'paid'
+                    order.order_status = 'processing' # Automated transition
                     order.save()
 
-                    # ── Alert all superuser admins about the new payment ──────
-                    from .email_service import send_platform_email
-                    import logging
-                    logger = logging.getLogger(__name__)
-
-                    frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
                     customer_display = (
                         order.customer.email if order.customer else order.guest_email or 'Guest'
                     )
                     
-                    # Notify superusers (In-app and Email)
+                    # A. Notify Superusers (Admins)
                     superusers = User.objects.filter(is_superuser=True)
-                    
                     for admin in superusers:
-                        # 1. In-app Notification
+                        # In-app
                         try:
                             Notification.objects.create(
                                 user=admin,
                                 title=f'Action Required: Payment Received — Order #{order.id}',
-                                body=(
-                                    f'A new payment of ₦{order.total_amount:,.2f} has been received for Order #{order.id} '
-                                    f'from {customer_display}. Please review and confirm the payment.'
-                                )
+                                body=f'A new payment of ₦{order.total_amount:,.2f} has been received for Order #{order.id} from {customer_display}.'
                             )
                         except Exception as e:
-                            logger.error(f"[webhook] Failed to create in-app notification for admin {admin.id}: {e}")
+                            logger.error(f"[webhook] Admin Notification error: {e}")
 
-                        # 2. Email Notification
+                        # Email
                         if admin.email:
                             try:
                                 send_platform_email(
@@ -938,17 +933,41 @@ class PaystackWebhookView(APIView):
                                     recipient_list=[admin.email],
                                 )
                             except Exception as e:
-                                logger.error(f"[webhook] Failed to send email to admin {admin.email}: {e}")
+                                logger.error(f"[webhook] Admin Email error: {e}")
+
+                    # B. Notify Customer (Immediate Feedback)
+                    user_email = (order.customer.email if order.customer else order.guest_email)
+                    if user_email:
+                        try:
+                            # 1. In-app Notification for registered users
+                            if order.customer:
+                                Notification.objects.create(
+                                    user=order.customer,
+                                    title=f'Transmission Received: Order #{order.id}',
+                                    body=f'Your payment of ₦{order.total_amount:,.2f} has been detected. Our Vanguard team is now verifying the transaction.'
+                                )
+                            
+                            # 2. Email Confirmation (Registered and Guest)
+                            send_platform_email(
+                                subject=f'Payment Received — Order #{order.id}',
+                                template_name='order/payment_received.html',
+                                context={
+                                    'user': order.customer,
+                                    'order': order,
+                                    'order_url': f'{frontend_url}/dashboard/user/orders',
+                                },
+                                recipient_list=[user_email],
+                            )
+                        except Exception as e:
+                            logger.error(f"[webhook] Customer Notification error: {e}")
                 else:
                     logger.info(f"[webhook] Order #{order.id} payment status is already '{order.payment_status}'")
             except Order.DoesNotExist:
                 logger.warning(f"[webhook] Order with ID {order_id} not found")
             except Exception as e:
-                import logging
-                logger = logging.getLogger(__name__)
                 logger.error(f"[webhook] General error processing charge.success: {e}")
             
-            # Handle "Save Card" if metadata provided
+            # Handle "Save Card"
             save_card = event['data']['metadata'].get('save_card')
             if save_card:
                 customer_id = event['data']['metadata'].get('customer_id')
@@ -969,7 +988,47 @@ class PaystackWebhookView(APIView):
                 except User.DoesNotExist:
                     pass
 
+        # ── 2. Handle Failed Payment ──────────────────────────────────────────
+        elif event['event'] == 'charge.failed':
+            order_id = event['data']['metadata'].get('order_id')
+            try:
+                order = Order.objects.get(id=order_id)
+                if order.payment_status == 'pending':
+                    order.payment_status = 'failed'
+                    order.order_status = 'cancelled' # Automated transition
+                    order.save()
+
+                    user_email = (order.customer.email if order.customer else order.guest_email)
+                    if user_email:
+                        try:
+                            # 1. In-app Notification
+                            if order.customer:
+                                Notification.objects.create(
+                                    user=order.customer,
+                                    title=f'Payment Failed: Order #{order.id}',
+                                    body=f'The payment transmission for your acquisition #{order.id} was interrupted. Please review your billing details.'
+                                )
+                            
+                            # 2. Email Notification
+                            send_platform_email(
+                                subject=f'Payment Signal Interrupted — Order #{order.id}',
+                                template_name='order/payment_failed.html',
+                                context={
+                                    'user': order.customer,
+                                    'order': order,
+                                    'order_url': f'{frontend_url}/dashboard/user/orders',
+                                },
+                                recipient_list=[user_email],
+                            )
+                        except Exception as e:
+                            logger.error(f"[webhook] Customer Failure Notification error: {e}")
+            except Order.DoesNotExist:
+                logger.warning(f"[webhook] Order with ID {order_id} not found for failure event")
+            except Exception as e:
+                logger.error(f"[webhook] General error processing charge.failed: {e}")
+
         return Response({"status": "success"}, status=200)
+
 
 from .email_service import send_platform_email
 

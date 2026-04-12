@@ -297,14 +297,6 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
         reason = request.data.get('reason', 'Cancelled by admin.')
 
         with transaction.atomic():
-            # Atomically restore stock for each item
-            from django.db.models import F
-            from .models import Product as ProductModel
-            for item in order.items.all():
-                ProductModel.objects.filter(pk=item.product_id).update(
-                    stock=F('stock') + item.quantity
-                )
-
             order.payment_status = 'failed'
             order.order_status = 'cancelled'
             order.save()

@@ -233,7 +233,23 @@ def handle_order_status_change(sender, instance, created, **kwargs):
                     recipient_list=[user_email],
                 )
 
-    # ─── 3. DELIVERED — SETTLE VENDOR EARNINGS ───────────────────────────────
+    # ─── 3. STOCK RESTORATION — CANCELLED ORDERS ─────────────────────────────
+    if instance.order_status == 'cancelled' and prev_order != 'cancelled':
+        from .models import Product as ProductModel
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        try:
+            with transaction.atomic():
+                for item in instance.items.all():
+                    ProductModel.objects.filter(pk=item.product_id).update(
+                        stock=F('stock') + item.quantity
+                    )
+            logger.info(f"[signals] Stock restored for cancelled Order #{instance.id}")
+        except Exception as e:
+            logger.error(f"[signals] Failed to restore stock for Order #{instance.id}: {e}")
+
+    # ─── 4. DELIVERED — SETTLE VENDOR EARNINGS ───────────────────────────────
     if instance.order_status == 'delivered' and prev_order != 'delivered':
         # Only settle earnings that were created (i.e., from confirmed orders)
         pending_earnings = VendorEarning.objects.filter(order=instance, status='pending')

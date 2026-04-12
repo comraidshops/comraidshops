@@ -1,0 +1,35 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Transmission Received, Creator {{ user.username|default:"" }},</p>
+
+<h2>Payment Signal Detected</h2>
+
+<p>Your payment for Order #{{ order.id }} has been successfully transmitted to our terminal. Our Vanguard team is now verifying the transaction.</p>
+
+<p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; margin-top: 40px; color: #ffffff;">Transaction Details</p>
+<div class="divider" style="margin: 15px 0 25px 0;"></div>
+
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; color: #e0e0e0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px;">
+    <tr>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; color: #888;">Order ID</td>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; text-align: right; letter-spacing: 1px;">#{{ order.id }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; color: #888;">Amount Received</td>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; text-align: right; letter-spacing: 1px; color: #ffffff;">₦{{ order.total_amount|floatformat:2 }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; color: #888;">Status</td>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; text-align: right; letter-spacing: 1px; color: #d4af37;">PENDING VERIFICATION</td>
+    </tr>
+</table>
+
+<p>You will receive a final confirmation once our team completes the security audit. You can monitor the progress of your acquisition below.</p>
+
+<div class="btn-container">
+    <a href="{{ order_url|default:'https://comraidshops.art/dashboard/user/orders' }}" class="btn">Monitor Acquisition</a>
+</div>
+
+<p>Best regards,<br>The Vanguard at ComraidShops</p>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<p class="greeting">Transmission Error, Creator {{ user.username|default:"" }},</p>
+
+<h2>Payment Signal Interrupted</h2>
+
+<p>Our terminal was unable to complete the transaction for Order #{{ order.id }}. The payment signal was rejected or interrupted by the financial auxiliary.</p>
+
+<p style="text-transform: uppercase; letter-spacing: 2px; font-size: 14px; margin-top: 40px; color: #ffffff;">Transaction Intelligence</p>
+<div class="divider" style="margin: 15px 0 25px 0;"></div>
+
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; color: #e0e0e0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px;">
+    <tr>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; color: #888;">Order ID</td>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; text-align: right; letter-spacing: 1px;">#{{ order.id }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; color: #888;">Attempted Amount</td>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; text-align: right; letter-spacing: 1px;">₦{{ order.total_amount|floatformat:2 }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; color: #888;">Reason</td>
+        <td style="padding: 15px 0; border-bottom: 1px solid #1a1a1a; text-align: right; letter-spacing: 1px; color: #ff3b30;">SIGNAL REJECTED</td>
+    </tr>
+</table>
+
+<p>Your order remains saved in our terminal as "Failed". You may return to the dashboard to re-initialize the payment transmission.</p>
+
+<div class="btn-container">
+    <a href="{{ order_url|default:'https://comraidshops.art/dashboard/user/orders' }}" class="btn">Return to Order Terminal</a>
+</div>
+
+<p>Best regards,<br>The Vanguard at ComraidShops</p>
+{% endblock %}
