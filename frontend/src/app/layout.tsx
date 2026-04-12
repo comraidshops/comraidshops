@@ -112,7 +112,7 @@ export const metadata: Metadata = {
 };
 
 import InstallPrompt from "@/components/pwa/InstallPrompt";
-import HeaderVisibilityWrapper from "@/components/layout/HeaderVisibilityWrapper";
+import HeaderVisibilityWrapper, { GlobalHeaderPadding } from "@/components/layout/HeaderVisibilityWrapper";
 
 export default function RootLayout({
   children,
