@@ -22,16 +22,16 @@ export default function CartClient() {
         return (
             <div className="min-h-screen bg-background pt-48 px-6 text-center">
                 <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter mb-8">
-                    Archive Empty.
+                    The Canvas is Blank.
                 </h1>
                 <p className="text-secondary uppercase tracking-[0.2em] text-sm mb-12">
-                    Your collection has no active acquisitions.
+                    Your vault currently holds no selections. Time to curate your next masterpiece.
                 </p>
                 <Link 
                     href="/shop" 
                     className="inline-block bg-primary text-background px-12 py-4 font-bold uppercase tracking-widest text-sm hover:bg-secondary transition-colors"
                 >
-                    Explore Shop
+                    Explore the Archives
                 </Link>
             </div>
         );
@@ -42,7 +42,7 @@ export default function CartClient() {
             <div className="max-w-[1920px] mx-auto">
                 <header className="mb-16 border-b border-border pb-8">
                     <h1 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter">
-                        Your Archive
+                        Your Vault
                     </h1>
                 </header>
 
@@ -131,7 +131,7 @@ export default function CartClient() {
                                 href="/checkout"
                                 className="w-full bg-primary text-background flex items-center justify-center gap-3 py-6 font-bold uppercase tracking-[0.2em] text-sm hover:bg-secondary transition-all group"
                             >
-                                Begin Checkout <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                Secure Acquisition <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </Link>
 
                             <div className="space-y-4 pt-4">

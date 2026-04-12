@@ -58,14 +58,14 @@ export default function OrdersPage() {
                     <ShoppingBag className="w-8 h-8 text-foreground/20 -rotate-45 group-hover:rotate-0 transition-transform duration-700" />
                 </div>
                 <div className="space-y-3">
-                    <h3 className="font-black uppercase tracking-tighter text-2xl font-cormorant italic">No Orders Found</h3>
-                    <p className="text-[10px] text-secondary/40 uppercase tracking-[0.3em] font-black italic">Your order history is currently empty.</p>
+                    <h3 className="font-black uppercase tracking-tighter text-2xl font-cormorant italic">Awaiting Genesis</h3>
+                    <p className="text-[10px] text-secondary/40 uppercase tracking-[0.3em] font-black italic">No acquisitions have been executed yet. The grid is currently quiet.</p>
                 </div>
                 <Link
                     href="/shop"
                     className="bg-foreground text-background px-12 py-4 text-[10px] font-black uppercase tracking-[0.3em] hover:translate-y-[-2px] transition-transform shadow-xl"
                 >
-                    Start Shopping
+                    Initiate First Sequence
                 </Link>
             </div>
         );
@@ -74,9 +74,9 @@ export default function OrdersPage() {
     return (
         <div className="space-y-12">
             <div className="border-b border-border pb-10">
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter font-cormorant italic">Order History</h2>
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter font-cormorant italic">Acquisition History</h2>
                 <div className="flex items-center gap-4 mt-4">
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-foreground font-black px-2 py-1 bg-foreground/5 border-[0.5px] border-foreground/10">{orders.length} Orders</p>
+                    <p className="text-[9px] uppercase tracking-[0.3em] text-foreground font-black px-2 py-1 bg-foreground/5 border-[0.5px] border-foreground/10">{orders.length} Acquisitions</p>
                     <div className="h-[1px] flex-1 bg-foreground/5" />
                 </div>
             </div>
@@ -136,7 +136,7 @@ export default function OrdersPage() {
                                             <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                                                 <div>
                                                     <div className="flex items-center gap-3 mb-1">
-                                                        <p className="font-black uppercase tracking-tight text-lg leading-none">ORDER #{order.id.toString().padStart(5, '0')}</p>
+                                                        <p className="font-black uppercase tracking-tight text-lg leading-none">ACQUISITION #{order.id.toString().padStart(5, '0')}</p>
                                                         <span className={`text-[7px] font-black uppercase tracking-[0.2em] px-2 py-0.5 border-[0.5px] border-current leading-none ${cfg.color}`}>{order.order_status}</span>
                                                     </div>
                                                     <p className="text-[9px] text-secondary/40 uppercase tracking-[0.3em] font-black">{date}</p>
@@ -155,7 +155,7 @@ export default function OrdersPage() {
                                                     </div>
                                                 </div>
                                                 <span className="text-[8px] font-black uppercase tracking-[0.3em] text-foreground opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                                                    View Order Details <ArrowRight className="inline w-3 h-3 ml-1" />
+                                                    View Acquisition Details <ArrowRight className="inline w-3 h-3 ml-1" />
                                                 </span>
                                             </div>
                                         </div>

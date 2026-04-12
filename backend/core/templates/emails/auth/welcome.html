@@ -1,19 +1,21 @@
 {% extends "emails/base.html" %}
 
 {% block content %}
-<p class="greeting">Hello {{ user.username }},</p>
+<p class="greeting">Welcome, Creator {{ user.username }},</p>
 
-<h2>Welcome to ComraidShops.</h2>
+<h2>Access Granted.</h2>
 
-<p>Thank you for joining our community. We have created a space dedicated to curated, premium fashion and lifestyle pieces.</p>
+<p>It is always a privilege to open our doors to an individual with an uncompromising eye for aesthetics.</p>
 
-<p>Your account has been successfully created. We invite you to explore the latest editorial exhibitions and curated collections.</p>
+<p>You are not here for the ordinary, and neither are we. ComraidShops was built as an infrastructure for those who curate their reality. By joining us, you have confirmed one thing: your taste is rare, and it belongs here.</p>
+
+<p>The terminal is now yours to command. Let’s build something extraordinary together.</p>
 
 <div class="btn-container">
-    <a href="{{ login_url|default:'https://comraidshops.art/login' }}" class="btn">Sign In to Your Account</a>
+    <a href="{{ login_url|default:'https://comraidshops.art/login' }}" class="btn">Initialize Dashboard</a>
 </div>
 
-<p>If you have any questions or require assistance, our support team is available.</p>
+<p>If you require assistance navigating the grid, our support protocol is active.</p>
 
-<p>Best regards,<br>The ComraidShops Team</p>
+<p>Best regards,<br>The Vanguard at ComraidShops</p>
 {% endblock %}

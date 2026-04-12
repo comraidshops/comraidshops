@@ -330,7 +330,7 @@ export default function CheckoutClient() {
                                     }
                                     className="w-full bg-primary text-background py-5 font-bold uppercase tracking-[0.2em] text-sm hover:bg-secondary transition-all disabled:opacity-50"
                                 >
-                                    {loading ? 'Processing Acquisition...' : `Commit Payment ₦${cartTotal.toLocaleString()}`}
+                                    {loading ? 'Processing Acquisition...' : `Execute Protocol ₦${cartTotal.toLocaleString()}`}
                                 </button>
                                 <p className="text-[9px] text-center mt-6 text-secondary/40 uppercase font-black tracking-[0.3em]">
                                     SECURE TLS ENCRYPTED TRANSACTION
