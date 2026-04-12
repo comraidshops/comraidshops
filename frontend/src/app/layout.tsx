@@ -112,6 +112,7 @@ export const metadata: Metadata = {
 };
 
 import InstallPrompt from "@/components/pwa/InstallPrompt";
+import HeaderVisibilityWrapper from "@/components/layout/HeaderVisibilityWrapper";
 
 export default function RootLayout({
   children,
@@ -130,12 +131,22 @@ export default function RootLayout({
               <Suspense fallback={null}>
                 <RouteChangeIndicator />
               </Suspense>
-              <Header />
-              <main className="flex-grow pt-16 pb-20 md:pb-0 w-full overflow-x-hidden">
-                {children}
-              </main>
-              <Footer />
-              <MobileBottomNav />
+              
+              <HeaderVisibilityWrapper>
+                <Header />
+              </HeaderVisibilityWrapper>
+
+              <GlobalHeaderPadding>
+                <main className="flex-grow pb-20 md:pb-0 w-full overflow-x-hidden">
+                  {children}
+                </main>
+              </GlobalHeaderPadding>
+
+              <HeaderVisibilityWrapper>
+                <Footer />
+                <MobileBottomNav />
+              </HeaderVisibilityWrapper>
+              
               <InstallPrompt />
             </CartProvider>
           </PWAProvider>
