@@ -21,6 +21,14 @@ export default function ArticleLikeButton({ slug, initialLikes, initialIsLiked }
     const router = useRouter();
 
     const handleToggleLike = async () => {
+        // Immediate check for auth token to avoid network roundtrip delay for guest users
+        const isAuthenticated = typeof window !== 'undefined' && !!localStorage.getItem('access_token');
+        
+        if (!isAuthenticated) {
+            setShowAuthModal(true);
+            return;
+        }
+
         // Optimistic update
         setIsLiked(!isLiked);
         setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
