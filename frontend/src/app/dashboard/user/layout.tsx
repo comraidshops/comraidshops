@@ -101,16 +101,16 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
                                 <button
                                     id="notification-bell"
                                     onClick={() => setIsNotifOpen(true)}
-                                    className="relative w-10 h-10 flex items-center justify-center hover:bg-secondary/5 transition-all duration-300 group border border-transparent hover:border-border"
+                                    className="relative w-11 h-11 flex items-center justify-center bg-foreground/[0.05] hover:bg-foreground/10 transition-all duration-300 group border border-border/50 hover:border-border"
                                 >
-                                    <Bell className="w-4 h-4 text-secondary/60 group-hover:text-foreground transition-colors duration-300" />
+                                    <Bell className="w-[18px] h-[18px] text-foreground/70 group-hover:text-foreground transition-colors duration-300" />
                                     <AnimatePresence>
                                         {unreadCount > 0 && (
                                             <motion.span
                                                 initial={{ scale: 0, opacity: 0 }}
                                                 animate={{ scale: 1, opacity: 1 }}
                                                 exit={{ scale: 0, opacity: 0 }}
-                                                className="absolute -top-0.5 -right-0.5 w-[18px] h-[18px] bg-foreground text-background text-[8px] font-black flex items-center justify-center rounded-full shadow-lg ring-2 ring-background"
+                                                className="absolute -top-1 -right-1 w-[20px] h-[20px] bg-foreground text-background text-[8px] font-black flex items-center justify-center rounded-full shadow-lg ring-2 ring-background"
                                             >
                                                 {unreadCount > 9 ? '9+' : unreadCount}
                                             </motion.span>
@@ -118,7 +118,7 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
                                     </AnimatePresence>
                                     {/* Subtle pulse when unread */}
                                     {unreadCount > 0 && (
-                                        <span className="absolute -top-0.5 -right-0.5 w-[18px] h-[18px] bg-foreground/30 rounded-full animate-ping" />
+                                        <span className="absolute -top-1 -right-1 w-[20px] h-[20px] bg-foreground/30 rounded-full animate-ping" />
                                     )}
                                 </button>
 
