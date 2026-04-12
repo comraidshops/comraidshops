@@ -144,8 +144,9 @@ export default function RootLayout({
 
               <HeaderVisibilityWrapper>
                 <Footer />
-                <MobileBottomNav />
               </HeaderVisibilityWrapper>
+              
+              <MobileBottomNav />
               
               <InstallPrompt />
             </CartProvider>
