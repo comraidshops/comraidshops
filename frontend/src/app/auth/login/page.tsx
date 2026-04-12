@@ -19,10 +19,17 @@ function LoginForm() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     useEffect(() => {
+        // Redirect if already logged in
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            router.replace('/dashboard/user');
+            return;
+        }
+
         if (searchParams?.get('registered')) {
             setSuccessMessage('Registration successful. Please login to continue.');
         }
-    }, [searchParams]);
+    }, [searchParams, router]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
