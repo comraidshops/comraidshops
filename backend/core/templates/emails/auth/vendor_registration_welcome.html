@@ -1,11 +1,15 @@
 {% extends "emails/base.html" %}
 
-{% block title %}Welcome to ComraidShops, Vendor!{% end block %}
-{% block header %}Welcome to ComraidShops!{% end block %}
-
 {% block content %}
-<h2>Hello {{ vendor.brand_name }},</h2>
-<p>Your vendor account has been successfully created. You can now log in to the vendor dashboard to start configuring your store, setting up your collections, and assembling your products.</p>
-<p>We are thrilled to have you curate on ComraidShops.</p>
-<a href="{{ login_url }}" class="button" style="display:inline-block; padding:12px 24px; background-color:#333; color:#fff; text-decoration:none; border-radius:4px; margin-top:10px;">Access Dashboard</a>
-{% end block %}
+<p class="greeting">Hello Architect {{ vendor.brand_name }},</p>
+
+<h2>Infrastructure Ready.</h2>
+
+<p>Your vendor account has been successfully initialized. You are now authorized to begin configuring your brand presence, setting up your collections, and assembling your products within the grid.</p>
+
+<p>We are thrilled to have you curate on the ComraidShops Vanguard.</p>
+
+<div class="btn-container">
+    <a href="{{ login_url|default:'https://comraidshops.art/auth/login' }}" class="btn">Initialize Dashboard</a>
+</div>
+{% endblock %}
