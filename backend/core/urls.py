@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     BrandViewSet, CategoryViewSet, ProductViewSet, VendorViewSet, 
     OrderViewSet, VendorProductViewSet, VendorDashboardAPIView, CollectionViewSet,
-    MagazineViewSet, MagazineFeaturedView, ExhibitionViewSet, FitFrameViewSet, SavedFitFrameViewSet,
+    MagazineViewSet, MagazineFeaturedView, ArticleLikeToggleView, ExhibitionViewSet, FitFrameViewSet, SavedFitFrameViewSet,
     VendorOrderViewSet, VendorEarningViewSet, VendorWithdrawalViewSet,
     VendorNotificationViewSet, VendorSettingsView, VendorCommunityView,
     VendorAnalyticsAPIView,
@@ -50,6 +50,7 @@ urlpatterns = [
     path('paystack/initialize/', InitializePaymentView.as_view(), name='paystack-initialize'),
     path('paystack/webhook/', PaystackWebhookView.as_view(), name='paystack-webhook'),
     path('magazine/featured/', MagazineFeaturedView.as_view(), name='magazine-featured'),
+    path('articles/<slug:slug>/like/', ArticleLikeToggleView.as_view(), name='article-like-toggle'),
     path('vendor/dashboard/', VendorDashboardAPIView.as_view(), name='vendor-dashboard'),
     path('vendor/products/', VendorProductViewSet.as_view({'get': 'list'}), name='vendor-products-list'),
     path('vendor/products/create/', VendorProductViewSet.as_view({'post': 'create'}), name='vendor-products-create'),

@@ -107,12 +107,14 @@ class ArticleSerializer(serializers.ModelSerializer):
     product_ids = serializers.PrimaryKeyRelatedField(
         many=True, write_only=True, required=False, source='products', queryset=Product.objects.all()
     )
+    likes_count = serializers.IntegerField(source='likes.count', read_only=True)
+    is_liked_by_user = serializers.SerializerMethodField()
     
     class Meta:
         model = Article
         fields = [
             'id', 'title', 'display_title', 'slug', 'magazine', 'magazine_slug', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at',
-            'video_url', 'video_file', 'video_provider', 'video_thumbnail'
+            'video_url', 'video_file', 'video_provider', 'video_thumbnail', 'likes_count', 'is_liked_by_user'
         ]
         read_only_fields = ['video_provider', 'video_thumbnail']
 
@@ -122,6 +124,14 @@ class ArticleSerializer(serializers.ModelSerializer):
         if obj.magazine:
             return obj.magazine.title
         return f"Article {obj.id}"
+
+    def get_is_liked_by_user(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            # We use likes.filter instead of likes.all so we only do a fast check, but if prefetch is used, checking the prefetched list might be faster.
+            # To be safe and simple:
+            return obj.likes.filter(id=request.user.id).exists()
+        return False
 
     def get_magazine_slug(self, obj):
         if obj.magazine:

@@ -10,6 +10,7 @@ import { Metadata } from 'next';
 import ReadingProgressBar from '@/components/ui/ReadingProgressBar';
 import SocialShare from '@/components/ui/SocialShare';
 import VideoBlock from '@/components/editorial/VideoBlock';
+import ArticleLikeButton from '@/components/editorial/ArticleLikeButton';
 import { stripHtml, cleanContent } from '@/lib/format';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://comraidshops.art';
@@ -191,6 +192,18 @@ export default async function MagazineDetailPage({
                         <span className="text-[8px] uppercase tracking-widest text-secondary/50">Curator</span>
                         <span className="text-[10px] uppercase font-bold tracking-widest">Editorial Team</span>
                     </div>
+                    {primaryArticle && (
+                        <>
+                            <div className="w-[1px] h-8 bg-border/30 hidden sm:block"></div>
+                            <div className="flex items-center justify-center">
+                                <ArticleLikeButton 
+                                    slug={primaryArticle.slug}
+                                    initialLikes={primaryArticle.likes_count || 0}
+                                    initialIsLiked={primaryArticle.is_liked_by_user || false}
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
             </header>
 

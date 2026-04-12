@@ -85,6 +85,28 @@ class MagazineFeaturedView(APIView):
         from .serializers import MagazineSerializer
         return Response(MagazineSerializer(magazine).data)
 
+from .models import Article
+class ArticleLikeToggleView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, slug):
+        try:
+            article = Article.objects.get(slug=slug)
+        except Article.DoesNotExist:
+            return Response({"error": "Article not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if article.likes.filter(id=request.user.id).exists():
+            article.likes.remove(request.user)
+            liked = False
+        else:
+            article.likes.add(request.user)
+            liked = True
+            
+        return Response({
+            "is_liked": liked,
+            "likes_count": article.likes.count()
+        }, status=status.HTTP_200_OK)
+
 class ExhibitionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Exhibition.objects.all()
     def get_queryset(self):

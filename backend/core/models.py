@@ -73,6 +73,7 @@ class Article(models.Model):
     video_thumbnail = models.URLField(max_length=500, null=True, blank=True)
 
     products = models.ManyToManyField('Product', related_name='featured_in_articles', blank=True)
+    likes = models.ManyToManyField(User, related_name='liked_articles', blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 

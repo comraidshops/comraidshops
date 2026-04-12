@@ -66,6 +66,10 @@ export async function leaveBrandCommunity(slug: string): Promise<any> {
     return safeFetch(`${API_BASE_URL}/brands/${slug}/leave/`, { method: 'POST' });
 }
 
+export async function toggleArticleLike(slug: string): Promise<{ is_liked: boolean; likes_count: number }> {
+    return safeFetch(`${API_BASE_URL}/articles/${slug}/like/`, { method: 'POST' });
+}
+
 export async function fetchCategories(): Promise<any[]> { return safeFetch(`${API_BASE_URL}/categories/`); }
 export async function fetchVendorCommunity(): Promise<any> { return safeFetch(`${API_BASE_URL}/vendor/community/`); }
 export async function fetchCollection(slug: string): Promise<any> { return safeFetch(`${API_BASE_URL}/collections/${slug}/`); }
