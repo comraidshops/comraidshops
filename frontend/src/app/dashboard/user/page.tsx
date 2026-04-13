@@ -23,7 +23,7 @@ export default function UserDashboardPage() {
     const [stats, setStats] = useState({ orders: 0, addresses: 0, cards: 0 });
     const [recentOrders, setRecentOrders] = useState<Order[]>([]);
     const { notify } = useNotification();
-    const { notifications, unreadCount, markAllRead } = useDashboardNotifications();
+    const { notifications, unreadCount, markAllRead, openNotificationDetail } = useDashboardNotifications();
 
     useEffect(() => {
         let isMounted = true;
@@ -234,16 +234,21 @@ export default function UserDashboardPage() {
                     ) : (
                         <div className="divide-y divide-border">
                             {notifications.slice(0, 3).map((n) => (
-                                <div key={n.id} className={`px-8 py-5 flex gap-4 items-start transition-colors relative ${!n.is_read ? 'bg-foreground/[0.02]' : ''}`}>
-                                    <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-1 ${!n.is_read ? 'bg-foreground shadow-[0_0_6px_rgba(0,0,0,0.2)]' : 'bg-secondary/20'}`} />
+                                <div
+                                    key={n.id}
+                                    onClick={() => openNotificationDetail(n)}
+                                    className={`px-8 py-5 flex gap-4 items-start transition-all relative cursor-pointer group/notif hover:bg-foreground/[0.04] ${!n.is_read ? 'bg-foreground/[0.02]' : ''}`}
+                                >
+                                    <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-1 transition-transform group-hover/notif:scale-125 ${!n.is_read ? 'bg-foreground shadow-[0_0_6px_rgba(0,0,0,0.2)]' : 'bg-secondary/20'}`} />
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-[11px] font-black uppercase tracking-tight mb-0.5 truncate">{n.title}</p>
+                                        <p className="text-[11px] font-black uppercase tracking-tight mb-0.5 truncate group-hover/notif:underline">{n.title}</p>
                                         <p className="text-[10px] text-secondary/50 leading-relaxed font-medium line-clamp-1">{n.body}</p>
                                     </div>
                                     <span className="text-[8px] font-bold text-secondary/30 uppercase tracking-wider flex-shrink-0 pt-0.5">
                                         {new Date(n.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                                     </span>
                                     {!n.is_read && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-foreground" />}
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-secondary/20 opacity-0 group-hover/notif:opacity-100 transition-opacity flex-shrink-0 pt-0.5">Read →</span>
                                 </div>
                             ))}
                         </div>
@@ -253,7 +258,7 @@ export default function UserDashboardPage() {
                     {notifications.length > 0 && (
                         <div className="px-8 py-5 border-t border-border bg-foreground/[0.01]">
                             <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-secondary/40 text-center">
-                                Tap the <Bell className="w-3 h-3 inline-block text-secondary/50 -mt-0.5" /> icon for full view
+                                Click any notification to read in full
                             </p>
                         </div>
                     )}

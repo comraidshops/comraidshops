@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, createContext, useContext } f
 import { usePathname } from 'next/navigation';
 import UserSidebar from '@/components/user/UserSidebar';
 import NotificationModal from '@/components/user/NotificationModal';
+import NotificationDetailModal from '@/components/user/NotificationDetailModal';
 import UserGuard from '@/components/auth/UserGuard';
 import { LogOut, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,14 +22,18 @@ interface DashboardNotificationContextType {
     notifications: Notification[];
     unreadCount: number;
     markAllRead: () => void;
+    markOneRead: (id: number) => void;
     refreshNotifications: () => void;
+    openNotificationDetail: (notification: Notification) => void;
 }
 
 const DashboardNotificationContext = createContext<DashboardNotificationContextType>({
     notifications: [],
     unreadCount: 0,
     markAllRead: () => {},
+    markOneRead: () => {},
     refreshNotifications: () => {},
+    openNotificationDetail: () => {},
 });
 
 export function useDashboardNotifications() {
@@ -45,6 +50,8 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const lastNotificationId = useRef<number>(0);
+    const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
 
     const fetchNotifications = useCallback(async () => {
         const token = localStorage.getItem('access_token');
@@ -83,6 +90,35 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
         setUnreadCount(0);
     };
 
+    const markOneRead = async (id: number) => {
+        const token = localStorage.getItem('access_token');
+        try {
+            await fetch(`${API_BASE_URL}/user/notifications/${id}/mark_read/`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setNotifications(prev =>
+                prev.map(n => (n.id === id ? { ...n, is_read: true } : n))
+            );
+            setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (err) {
+            console.error('Failed to mark notification as read', err);
+        }
+    };
+
+    const openNotificationDetail = useCallback((notification: Notification) => {
+        setSelectedNotification(notification);
+        setIsDetailOpen(true);
+        if (!notification.is_read) {
+            markOneRead(notification.id);
+        }
+    }, []);
+
+    const closeNotificationDetail = () => {
+        setIsDetailOpen(false);
+        setTimeout(() => setSelectedNotification(null), 300);
+    };
+
     const handleLogout = () => {
         localStorage.clear();
         window.location.href = '/auth/login';
@@ -90,7 +126,7 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
 
     return (
         <UserGuard>
-            <DashboardNotificationContext.Provider value={{ notifications, unreadCount, markAllRead, refreshNotifications: fetchNotifications }}>
+            <DashboardNotificationContext.Provider value={{ notifications, unreadCount, markAllRead, markOneRead, refreshNotifications: fetchNotifications, openNotificationDetail }}>
                 <div className="min-h-screen bg-background flex text-foreground selection:bg-foreground selection:text-background">
                     <UserSidebar />
 
@@ -156,13 +192,24 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
                     </div>
                 </div>
 
-                {/* Notification Glass Modal */}
+                {/* Notification Glass Modal (List View) */}
                 <NotificationModal
                     isOpen={isNotifOpen}
                     onClose={() => setIsNotifOpen(false)}
                     notifications={notifications}
                     unreadCount={unreadCount}
                     onMarkAllRead={markAllRead}
+                    onNotificationClick={(n: Notification) => {
+                        setIsNotifOpen(false);
+                        setTimeout(() => openNotificationDetail(n), 250);
+                    }}
+                />
+
+                {/* Notification Detail Modal (Single Read View) */}
+                <NotificationDetailModal
+                    isOpen={isDetailOpen}
+                    notification={selectedNotification}
+                    onClose={closeNotificationDetail}
                 />
             </DashboardNotificationContext.Provider>
         </UserGuard>

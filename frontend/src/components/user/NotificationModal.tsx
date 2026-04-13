@@ -18,6 +18,7 @@ interface NotificationModalProps {
     notifications: Notification[];
     unreadCount: number;
     onMarkAllRead: () => void;
+    onNotificationClick?: (notification: Notification) => void;
 }
 
 function formatRelativeTime(dateStr: string): string {
@@ -35,7 +36,7 @@ function formatRelativeTime(dateStr: string): string {
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 }
 
-export default function NotificationModal({ isOpen, onClose, notifications, unreadCount, onMarkAllRead }: NotificationModalProps) {
+export default function NotificationModal({ isOpen, onClose, notifications, unreadCount, onMarkAllRead, onNotificationClick }: NotificationModalProps) {
     const panelRef = useRef<HTMLDivElement>(null);
 
     // Close on escape
@@ -187,11 +188,12 @@ export default function NotificationModal({ isOpen, onClose, notifications, unre
                                                 variants={itemVariants}
                                                 initial="hidden"
                                                 animate="visible"
-                                                className={`relative group transition-colors duration-300 ${
+                                                className={`relative group transition-colors duration-300 cursor-pointer ${
                                                     !n.is_read
                                                         ? 'hover:bg-white/[0.04]'
                                                         : 'hover:bg-white/[0.02]'
                                                 }`}
+                                                onClick={() => onNotificationClick?.(n)}
                                             >
                                                 {/* Unread indicator bar */}
                                                 {!n.is_read && (
