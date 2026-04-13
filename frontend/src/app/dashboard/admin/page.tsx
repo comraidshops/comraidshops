@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { 
     TrendingUp, Users, ShoppingBag, 
     AlertCircle, Package, ArrowUpRight,
@@ -97,9 +98,9 @@ export default function AdminDashboard() {
     ];
 
     const alerts = [
-        { label: 'Pending Vendors', value: stats?.pending_vendors || 0, color: 'text-orange-400', icon: Users },
-        { label: 'Pending Approvals', value: stats?.pending_products || 0, color: 'text-primary', icon: AlertCircle },
-        { label: 'Low Stock Alert', value: stats?.low_stock_count || 0, color: 'text-red-400', icon: Package },
+        { label: 'Pending Vendors', value: stats?.pending_vendors || 0, color: 'text-orange-400', icon: Users, href: '/dashboard/admin/users' },
+        { label: 'Pending Approvals', value: stats?.pending_products || 0, color: 'text-primary', icon: AlertCircle, href: '/dashboard/admin/products' },
+        { label: 'Low Stock Alert', value: stats?.low_stock_count || 0, color: 'text-red-400', icon: Package, href: '/dashboard/admin/products' },
     ];
 
     return (
@@ -124,23 +125,35 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:flex lg:gap-4">
-                    {alerts.map((alert, idx) => (
-                        <motion.div
-                            key={alert.label}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.4 + (idx * 0.1) }}
-                            className="bg-white/[0.02] border border-white/5 backdrop-blur-xl px-6 py-4 rounded-2xl flex items-center gap-4"
-                        >
-                            <div className={`${alert.color} bg-current/10 p-2 rounded-lg`}>
-                                <alert.icon className="w-4 h-4" />
+                    {alerts.map((alert, idx) => {
+                        const hasData = alert.value > 0;
+                        const CardContent = (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.4 + (idx * 0.1) }}
+                                className={`bg-white/[0.02] border border-white/5 backdrop-blur-xl px-6 py-4 rounded-2xl flex items-center gap-4 transition-all duration-300 ${hasData ? 'hover:bg-white/[0.05] hover:border-white/10 hover:scale-[1.02] cursor-pointer' : ''}`}
+                            >
+                                <div className={`${alert.color} bg-current/10 p-2 rounded-lg`}>
+                                    <alert.icon className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="block text-[8px] font-bold uppercase tracking-widest text-white/40">{alert.label}</span>
+                                    <span className={`text-xl font-bold ${alert.color}`}>{alert.value}</span>
+                                </div>
+                            </motion.div>
+                        );
+
+                        return hasData ? (
+                            <Link key={alert.label} href={alert.href} className="block">
+                                {CardContent}
+                            </Link>
+                        ) : (
+                            <div key={alert.label} className="block">
+                                {CardContent}
                             </div>
-                            <div>
-                                <span className="block text-[8px] font-bold uppercase tracking-widest text-white/40">{alert.label}</span>
-                                <span className={`text-xl font-bold ${alert.color}`}>{alert.value}</span>
-                            </div>
-                        </motion.div>
-                    ))}
+                        );
+                    })}
                 </div>
             </header>
 
