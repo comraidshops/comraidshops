@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <h2 style="color: #000;">New Checkout Initiated — Order #{{ order.id }}</h2>
+    <p>A user on ComraidShops has just initiated a checkout sequence.</p>
+    
+    <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #ccf381; margin: 20px 0;">
+        <p><strong>Order ID:</strong> #{{ order.id }}</p>
+        <p><strong>Customer:</strong> {{ customer_display }}</p>
+        <p><strong>Total Value:</strong> ₦{{ order.total_amount|floatformat:2 }}</p>
+        <p><strong>Status:</strong> Waiting for Paystack signal</p>
+    </div>
+
+    <p><a href="{{ admin_orders_url }}" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold; display: inline-block;">View in Admin Dashboard</a></p>
+    <p style="font-size: 12px; color: #888; margin-top: 30px;">ComraidShops Automated Dispatch</p>
+</body>
+</html>

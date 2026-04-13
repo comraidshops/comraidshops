@@ -812,6 +812,29 @@ class InitializePaymentView(APIView):
         except ValueError as e:
             return Response({"error": str(e)}, status=400)
 
+        # Notify superuser of order initiation
+        try:
+            from core.email_service import send_platform_email
+            frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
+            superusers = User.objects.filter(is_superuser=True)
+            admin_emails = [admin.email for admin in superusers if admin.email]
+            if admin_emails:
+                customer_display = user_email if not customer else customer.email
+                send_platform_email(
+                    subject=f'New Order Initiated — Order #{order.id}',
+                    template_name='order/admin_order_initiated.html',
+                    context={
+                        'order': order,
+                        'customer_display': customer_display,
+                        'admin_orders_url': f'{frontend_url}/dashboard/admin/orders',
+                    },
+                    recipient_list=admin_emails,
+                )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"[checkout] Admin initiation email error: {e}")
+
         # Using determined user_email (User or Guest)
 
         if total_amount <= 0:
@@ -928,7 +951,7 @@ class PaystackWebhookView(APIView):
                                     context={
                                         'order': order,
                                         'customer_display': customer_display,
-                                        'admin_orders_url': f'{frontend_url}/dashboard/superuser/orders',
+                                        'admin_orders_url': f'{frontend_url}/dashboard/admin/orders',
                                     },
                                     recipient_list=[admin.email],
                                 )
@@ -999,6 +1022,41 @@ class PaystackWebhookView(APIView):
                     order.save()
 
                     user_email = (order.customer.email if order.customer else order.guest_email)
+                    customer_display = user_email or 'Guest'
+                    
+                    # 1. Notify Superusers (Admins) about failure
+                    superusers = User.objects.filter(is_superuser=True)
+                    admin_emails = []
+                    for admin in superusers:
+                        # In-app
+                        try:
+                            Notification.objects.create(
+                                user=admin,
+                                title=f'Payment Failed — Order #{order.id}',
+                                body=f'A payment of ₦{order.total_amount:,.2f} from {customer_display} failed.'
+                            )
+                        except Exception as e:
+                            logger.error(f"[webhook] Admin Failure Notification error: {e}")
+                        
+                        if admin.email:
+                            admin_emails.append(admin.email)
+
+                    if admin_emails:
+                        try:
+                            send_platform_email(
+                                subject=f'Action Warning: Payment Failed — Order #{order.id}',
+                                template_name='order/admin_payment_failed_alert.html',
+                                context={
+                                    'order': order,
+                                    'customer_display': customer_display,
+                                    'admin_orders_url': f'{frontend_url}/dashboard/admin/orders',
+                                },
+                                recipient_list=admin_emails,
+                            )
+                        except Exception as e:
+                            logger.error(f"[webhook] Admin Failure Email error: {e}")
+
+                    # 2. Notify Customer
                     if user_email:
                         try:
                             # 1. In-app Notification
