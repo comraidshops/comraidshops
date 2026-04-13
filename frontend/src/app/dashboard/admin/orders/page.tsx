@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Check, X, Eye, Package, Truck, CheckCircle, RotateCcw } from 'lucide-react';
+import { FileText, Check, X, Eye, Package, Truck, CheckCircle, RotateCcw, XCircle, Clock } from 'lucide-react';
 import { safeFetch } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
 import { AdminModal } from '@/components/admin/AdminForms';
@@ -35,6 +35,41 @@ export default function AdminOrders() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const { notify } = useNotification();
+
+    const renderPaymentBadge = (status: string) => {
+        switch(status) {
+            case 'confirmed':
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-primary/10 text-primary">
+                        <CheckCircle className="w-3 h-3" /> {status}
+                    </span>
+                );
+            case 'paid':
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-orange-400/10 text-orange-400 border border-orange-400/20">
+                        <CheckCircle className="w-3 h-3 text-green-500" /> {status} (Action Required)
+                    </span>
+                );
+            case 'failed':
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-red-500/10 text-red-500">
+                        <XCircle className="w-3 h-3 text-red-500" /> {status}
+                    </span>
+                );
+            case 'refunded':
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-purple-500/10 text-purple-500">
+                        <RotateCcw className="w-3 h-3" /> {status}
+                    </span>
+                );
+            default: // pending
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-white/5 text-white/40">
+                        <Clock className="w-3 h-3" /> {status}
+                    </span>
+                );
+        }
+    };
 
     useEffect(() => {
         async function fetchOrders() {
@@ -164,15 +199,7 @@ export default function AdminOrders() {
                                     </td>
                                     <td className="px-8 py-6 font-bold text-lg">₦{parseFloat(order.total_amount).toLocaleString()}</td>
                                     <td className="px-8 py-6">
-                                        <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${order.payment_status === 'confirmed' ? 'bg-primary/10 text-primary' :
-                                                order.payment_status === 'paid' ? 'bg-orange-400/10 text-orange-400 border border-orange-400/20' :
-                                                    order.payment_status === 'refunded' ? 'bg-purple-500/10 text-purple-500' :
-                                                        order.payment_status === 'failed' ? 'bg-red-500/10 text-red-500' :
-                                                            'bg-white/5 text-white/40'
-                                            }`}>
-                                            {order.payment_status}
-                                            {order.payment_status === 'paid' && ' (Action Required)'}
-                                        </span>
+                                        {renderPaymentBadge(order.payment_status)}
                                     </td>
                                     <td className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-white/40">
                                         {order.order_status}
@@ -262,12 +289,7 @@ export default function AdminOrders() {
                     <div key={order.id} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-4">
                         <div className="flex justify-between items-start">
                             <h4 className="text-sm font-bold tracking-tight">Order #{order.id}</h4>
-                            <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${order.payment_status === 'confirmed' ? 'bg-primary/10 text-primary' :
-                                    order.payment_status === 'paid' ? 'bg-orange-400/10 text-orange-400' :
-                                        'bg-white/5 text-white/40'
-                                }`}>
-                                {order.payment_status}
-                            </span>
+                            {renderPaymentBadge(order.payment_status)}
                         </div>
                         <div className="text-xl font-bold">₦{parseFloat(order.total_amount).toLocaleString()}</div>
                         <div className="text-[10px] text-white/40">{order.customer_email || 'Guest'}</div>
@@ -327,11 +349,7 @@ export default function AdminOrders() {
                             </div>
                             <div>
                                 <label className="text-[8px] font-black uppercase tracking-widest text-white/20 block mb-1">Payment Status</label>
-                                <div className={`text-[10px] font-black uppercase tracking-widest ${selectedOrder.payment_status === 'confirmed' ? 'text-primary' :
-                                        selectedOrder.payment_status === 'paid' ? 'text-orange-400' : 'text-white/40'
-                                    }`}>
-                                    {selectedOrder.payment_status}
-                                </div>
+                                {renderPaymentBadge(selectedOrder.payment_status)}
                             </div>
                             <div>
                                 <label className="text-[8px] font-black uppercase tracking-widest text-white/20 block mb-1">Order Status</label>
