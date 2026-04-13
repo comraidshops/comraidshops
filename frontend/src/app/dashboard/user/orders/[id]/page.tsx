@@ -101,6 +101,15 @@ export default function OrderDetailPage() {
         year: 'numeric' 
     }) : 'N/A';
 
+    const getPaymentColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'pending': return 'border-red-500/20 text-red-500 bg-red-500/5';
+            case 'paid': return 'border-amber-500/20 text-amber-500 bg-amber-500/5';
+            case 'confirmed': return 'border-primary/20 text-primary bg-primary/5';
+            default: return 'border-secondary/20 text-secondary bg-secondary/5';
+        }
+    };
+
     return (
         <motion.div 
             initial={{ opacity: 0 }}
@@ -119,7 +128,7 @@ export default function OrderDetailPage() {
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    <div className={`px-4 py-2 border border-secondary/20 text-secondary bg-secondary/5`}>
+                    <div className={`px-4 py-2 border ${getPaymentColor(order.payment_status)}`}>
                         <p className="text-[10px] font-black uppercase tracking-[0.2em]">Payment: {formatCustomerPaymentStatus(order.payment_status)}</p>
                     </div>
                     <div className={`px-4 py-2 border ${isCancelled ? 'border-red-500/20 text-red-500 bg-red-500/5' : 'border-primary/20 text-primary bg-primary/5'}`}>
