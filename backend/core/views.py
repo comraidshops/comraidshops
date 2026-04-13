@@ -970,7 +970,7 @@ class PaystackWebhookView(APIView):
                                 Notification.objects.create(
                                     user=order.customer,
                                     title=f'Transmission Received: Order #{order.id}',
-                                    body=f'Your payment of ₦{order.total_amount:,.2f} has been detected. Our Vanguard team is now verifying the transaction.'
+                                    body=f'Your payment of ₦{order.total_amount:,.2f} has been detected. Our Comraid team is now verifying the transaction.'
                                 )
                             
                             # 2. Email Confirmation (Registered and Guest)

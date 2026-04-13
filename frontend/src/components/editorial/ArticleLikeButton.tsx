@@ -108,7 +108,7 @@ export default function ArticleLikeButton({ slug, initialLikes, initialIsLiked }
                                 Join to Appreciate
                             </h3>
                             <p className="text-[11px] uppercase tracking-[0.2em] font-medium text-white/50 mb-8 leading-relaxed max-w-xs mx-auto">
-                                Create an account or sign in to like this editorial piece and join the Vanguard Community.
+                                Create an account or sign in to like this editorial piece and join the Comraid Community.
                             </p>
 
                             <div className="w-full flex flex-col gap-3">

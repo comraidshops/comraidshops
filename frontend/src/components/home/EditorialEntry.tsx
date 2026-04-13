@@ -71,7 +71,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                             <div className="space-y-4">
                                 <div className="flex items-center gap-4">
                                     <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-primary/60">
-                                        The Vanguard
+                                        The Comraid
                                     </span>
                                     <div className="h-px w-12 bg-primary/10"></div>
                                 </div>
