@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import {
     User,
     MapPin,
@@ -36,12 +37,17 @@ export default function UserSidebar() {
         <aside className="w-64 h-screen bg-background border-r border-border fixed left-0 top-0 z-20 hidden md:flex flex-col p-8 select-none">
             <div className="flex flex-col gap-1 mb-16">
                 <Link href="/" className="group flex items-center gap-3">
-                    <div className="w-8 h-8 bg-foreground flex items-center justify-center transition-transform group-hover:rotate-12">
-                        <span className="text-background font-black text-sm tracking-tighter">C.</span>
+                    <div className="relative h-8 w-8 flex-shrink-0">
+                        <Image
+                            src="/logo-white.png"
+                            alt="ComraidShops Logo"
+                            fill
+                            className="object-contain"
+                        />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[11px] font-black uppercase tracking-[0.3em] leading-none">Management</span>
-                        <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-secondary/60">Dashboard</span>
+                        <span className="text-[11px] font-black uppercase tracking-[0.3em] leading-none">ComraidShops</span>
+                        <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-secondary/60">Terminal</span>
                     </div>
                 </Link>
             </div>
