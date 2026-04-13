@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatVendorPaymentStatus } from '@/lib/format';
 
 export interface Order {
     id: string;
@@ -148,7 +149,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                         {/* Status badges */}
                         <div className="flex items-center gap-2 flex-wrap">
                             <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${PAYMENT_STATUS_COLORS[order.payment_status] || 'border-border text-secondary'}`}>
-                                {order.payment_status}
+                                {formatVendorPaymentStatus(order.payment_status)}
                             </span>
                             <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${getStatusColor(order.order_status)}`}>
                                 {order.order_status === 'pending' ? 'Order Pending' : order.order_status}
@@ -245,7 +246,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                                 <td className="px-6 py-4 text-right font-medium text-green-600">₦{order.earnings.toLocaleString()}</td>
                                 <td className="px-6 py-4">
                                     <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${PAYMENT_STATUS_COLORS[order.payment_status] || 'border-border text-secondary'}`}>
-                                        {order.payment_status}
+                                        {formatVendorPaymentStatus(order.payment_status)}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4">

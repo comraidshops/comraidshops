@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, Clock, CheckCircle, Truck, ArrowLeft, ShoppingBag, XCircle, AlertCircle } from 'lucide-react';
 import { API_BASE_URL, safeFetch } from '@/lib/api';
+import { formatCustomerPaymentStatus } from '@/lib/format';
 import { Order, OrderItem } from '@/types/user';
 
 const STEPS = [
@@ -119,7 +120,7 @@ export default function OrderDetailPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <div className={`px-4 py-2 border border-secondary/20 text-secondary bg-secondary/5`}>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em]">Payment: {order.payment_status}</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em]">Payment: {formatCustomerPaymentStatus(order.payment_status)}</p>
                     </div>
                     <div className={`px-4 py-2 border ${isCancelled ? 'border-red-500/20 text-red-500 bg-red-500/5' : 'border-primary/20 text-primary bg-primary/5'}`}>
                         <p className="text-[10px] font-black uppercase tracking-[0.2em]">{order.order_status === 'pending' ? 'Order Pending' : order.order_status}</p>

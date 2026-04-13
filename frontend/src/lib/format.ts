@@ -35,3 +35,35 @@ export function cleanContent(html: string): string {
         .replace(/&nbsp;/g, ' ')
         .trim();
 }
+
+/**
+ * Maps backend payment status to customer-facing display text
+ */
+export function formatCustomerPaymentStatus(status: string): string {
+    if (!status) return 'Unknown';
+    const raw = status.toLowerCase();
+    switch (raw) {
+        case 'pending': return 'Awaiting Payment';
+        case 'paid': return 'Payment Received (Processing)';
+        case 'confirmed': return 'Order Confirmed';
+        case 'failed': return 'Payment Failed';
+        case 'refunded': return 'Refunded';
+        default: return status;
+    }
+}
+
+/**
+ * Maps backend payment status to vendor-facing display text to prevent premature fulfillment
+ */
+export function formatVendorPaymentStatus(status: string): string {
+    if (!status) return 'Unknown';
+    const raw = status.toLowerCase();
+    switch (raw) {
+        case 'pending': return 'Awaiting Payment';
+        case 'paid': return 'Payment Received – Do Not Fulfill Yet';
+        case 'confirmed': return 'Ready to Fulfill';
+        case 'failed': return 'Payment Failed';
+        case 'refunded': return 'Refunded';
+        default: return status;
+    }
+}
