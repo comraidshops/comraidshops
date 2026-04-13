@@ -10,10 +10,11 @@ interface HeaderVisibilityWrapperProps {
 // Separate component for the top padding logic to be used on the <main> tag
 export function GlobalHeaderPadding({ children }: HeaderVisibilityWrapperProps) {
   const pathname = usePathname();
-  const isDashboard = pathname?.startsWith('/dashboard');
+  // Only remove padding on User and Vendor dashboards where the global header is hidden
+  const isClippedDashboard = pathname?.startsWith('/dashboard/user') || pathname?.startsWith('/dashboard/vendor');
   
   return (
-    <div className={isDashboard ? "" : "pt-16"}>
+    <div className={isClippedDashboard ? "" : "pt-16"}>
       {children}
     </div>
   );
@@ -22,10 +23,11 @@ export function GlobalHeaderPadding({ children }: HeaderVisibilityWrapperProps) 
 export default function HeaderVisibilityWrapper({ children }: HeaderVisibilityWrapperProps) {
   const pathname = usePathname();
   
-  // Hide global elements on all dashboard routes
-  const isDashboard = pathname?.startsWith('/dashboard');
+  // Hide global elements on User and Vendor dashboards to maintain the "Terminal" feel,
+  // but keep them on the Admin dashboard where superusers need full site access.
+  const hideGlobal = pathname?.startsWith('/dashboard/user') || pathname?.startsWith('/dashboard/vendor');
   
-  if (isDashboard) {
+  if (hideGlobal) {
     return null;
   }
   
