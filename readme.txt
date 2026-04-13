@@ -1,107 +1,64 @@
 ================================================================================
-COMRAIDSHOPS | CURATED BRAND MARKETPLACE
+COMRAIDSHOPS | TECHNICAL DOCUMENTATION
 ================================================================================
 
-1. PROJECT PHILOSOPHY
----------------------
-ComraidShops is not just a marketplace; it is a digital gallery and editorial 
-platform designed for independent and curated brands. The project aims to 
-redefine the e-commerce experience by merging commerce with curation.
+For Creative, Design, and Lexicon guidelines, refer to: branding.txt
 
-Instead of a generic product grid, ComraidShops focuses on the "story" behind 
-the brand and its creations. It bridges the gap between high-end digital 
-magazines and functional marketplaces, giving independent designers a 
-platform that feels as premium as a physical boutique.
+1. PROJECT SUMMARY
+------------------
+ComraidShops is a decoupled headless e-commerce ecosystem. It utilizes a 
+Next.js frontend and a Django REST Framework backend to provide a 
+high-performance, editorial-grade shopping experience.
 
-Core Values:
-- Story-First Commerce: Every brand and product has a narrative (Philosophy, 
-  Manifesto, Founder Bios).
-- Curated Discovery: Features like "Current Rotation" and "Exhibitions" guide 
-  users rather than making them search blindly.
-- Community Archive: The "FitFrame" system allows users to curate and save 
-  looks, turning a shop into a personal moodboard.
-
-
-2. ART DIRECTION & DESIGN AESTHETIC
------------------------------------
-The visual language of ComraidShops is built on "Digital Luxury."
-
-- Color Palette: Strict Monochromatic (High-Contrast Black & White). This 
-  ensures that the product photography is the only source of color, allowing 
-  the clothes to speak for themselves.
-- Design System: Glassmorphism. The UI uses heavy backdrop blurs (20px-30px), 
-  frosted glass surfaces, and subtle rim lighting to create depth.
-- Typography: Uses the Geist font family for a sleek, technical, yet 
-  approachable look. 
-- UI Feel: "Alive" and interactive. Micro-animations (Framer Motion) provide 
-  tactile feedback. The UI uses spring-based physics for transitions to avoid 
-  the "stiff" feeling of traditional web apps.
-- Layout: Asymmetrical grids and editorial-style spacing.
-
-
-3. TECHNICAL STACK
+2. TECHNICAL STACK
 ------------------
 FRONTEND:
-- Framework: Next.js (App Router) - Leveraging Server Components for SEO and 
-  Client Components for interactivity.
-- Styling: Tailwind CSS v4 - Utilizing a high-performance utility-first CSS 
-  engine with custom design tokens.
-- Animations: Framer Motion - Driving the smooth layout transitions and 
-  interactive UI elements.
-- Icons: Lucide React - A consistent, minimalist icon set.
+- Framework: Next.js 15+ (App Router).
+- Styling: Tailwind CSS v4 (High-performance engine).
+- Animations: Framer Motion 12 (Spring-based physics).
+- Icons: Lucide React.
+- State: Custom Context API (Cart, Notification, PWA).
 
 BACKEND:
 - Framework: Django & Django Rest Framework (DRF).
-- Authentication: JWT (SimpleJWT) - Secure, stateless token-based authentication.
-- Database: SQLite (Development) / PostgreSQL (Production).
-- Media: Cloudinary - Global CDN for high-performance image and video delivery.
-- Payments: Paystack Integration - Secure processing for transactions.
+- Auth: JWT (SimpleJWT).
+- Storage: Cloudinary (Global Media CDN).
+- Payments: Paystack Integration.
 
-ARCHITECTURE:
-- Decoupled Headless Setup: The frontend communicates with the backend via a 
-  RESTful API, allowing for a fast, app-like user experience.
+3. KEY ARCHITECTURAL FEATURES
+-----------------------------
+- DASHBOARD ISOLATION: 
+  Global site navigation (Header/Footer) is automatically hidden on 
+  /dashboard routes to provide a focused "Terminal" workspace.
+  
+- GLOBAL NOTIFICATION CENTER: 
+  A centralized NotificationProvider manages unread states and triggers 
+  the premium slide-over center across the entire application.
 
+- PWA SYNC: 
+  Integrated Progressive Web App support for "Install to Home Screen" 
+  functionality across iOS and Android.
 
-4. UI FLOW & KEY FEATURES
--------------------------
-CUSTOMER JOURNEY:
-1. Landing: Enters via the "Hero Statement" or "Editorial Entry."
-2. Discovery: Browses "Current Rotation" or "Featured Labels."
-3. Education: Reads about the brand's philosophy or the "Curator's Note" in 
-   an Exhibition.
-4. Interaction: Fits & Frames allow users to see products in a curated outfit 
-   context.
-5. Purchase: Standard cart flow integrated with Paystack for seamless checkout.
-
-USER DASHBOARD:
-- Overview: Quick look at total orders and saved items.
-- Saved Fits (The Archives): A personal space for users to save FitFrames.
-- Global Mobile Nav: An authenticated-only bottom navigation bar providing 
-  instant access to Home, Dashboard, Archives, Orders, and Profile.
-
-VENDOR DASHBOARD:
-- Product Management: Vendors can create "cinematic" product listings with 
-  360 videos, materials detail, and stories.
-- Analytics: Revenue tracking and order management.
-- Withdrawals: Integrated system for vendors to request payouts.
-
-
-5. PROJECT STRUCTURE
---------------------
+4. CORE DIRECTORY STRUCTURE
+---------------------------
 backend/
-├── core/             # Main Django app (Models, Views, Serializers)
-├── config/           # Django settings and URL configuration
-└── media/            # Local media storage (mirrored on Cloudinary)
+├── core/             # API Logic (Models, Views, Serializers)
+├── config/           # Server Settings
+└── templates/        # Editorial Email Templates
 
 frontend/
 ├── src/
-│   ├── app/         # Next.js App Router (Pages & Layouts)
-│   ├── components/  # Atomic design components (UI, Layout, Brand, Home)
-│   ├── context/     # React Context for Global State (Cart, Notifications)
-│   └── lib/         # API helpers and utilities
-└── public/          # Static assets
+│   ├── app/         # Routes & Layouts
+│   ├── components/  # Atomic UI Library
+│   ├── context/     # Global State Management
+│   └── lib/         # API Fetchers & Utilities
+
+5. DEVELOPMENT
+--------------
+Frontend: cd frontend && npm run dev
+Backend:  cd backend && python manage.py runserver
 
 ================================================================================
 Generated for ComraidShops Development Team
-2026-03-19
+Last Update: 2026-04-13
 ================================================================================

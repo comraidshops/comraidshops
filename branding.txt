@@ -1,0 +1,80 @@
+================================================================================
+COMRAIDSHOPS | THE VANGUARD BRAND BIBLE
+================================================================================
+
+1. THE VANGUARD PHILOSOPHY
+--------------------------
+ComraidShops is a digital cultural ecosystem. It is not just about moving 
+inventory; it is about the "Vanguard Authority"—the idea that curation is 
+the highest form of commerce. 
+
+The platform functions as a "Terminal" for the modern collector, where 
+independent labels are treated with the reverence of a museum exhibition.
+
+2. THE LEXICON (VOICE & TONE)
+-----------------------------
+Never use secondary or generic terminology. Our language is high-end, 
+editorial, and empowering.
+
+- DASHBOARD -> THE VANGUARD TERMINAL
+  (A command center, not just an account page)
+  
+- BOOKMARKS/SAVED -> THE ARCHIVES
+  (Items are being curated into a permanent collection)
+  
+- OUTFITS/LOOKS -> FITFRAMES
+  (A cinematic view of product synergy)
+  
+- PRODUCT LIST -> CURRENT ROTATION
+  (A fluid, curated selection)
+  
+- CATEGORIES -> EXHIBITIONS
+  (Theme-led collections that tell a single story)
+
+- SIGN OUT -> DISCONNECT / EXIT TERMINAL
+  (Reinforcing the "Terminal" experience)
+
+3. VISUAL PILLARS (AESTHETICS)
+------------------------------
+The "Vanguard" look is defined by High-Contrast Digital Luxury.
+
+- COLOR: Forced Dark Mode. 
+  #0a0a0a (Background) / #ededed (Foreground). 
+  Color should ONLY exist within product photography and editorial images.
+
+- THE GLASS CENTER: Glassmorphism is our primary UI texture. 
+  Backdrop Blur (20px-40px). 
+  Subtle border glows (white/10%).
+  The goal is for the UI to feel like it's floating over the content.
+
+- TYPOGRAPHY:
+  * Headers: Cormorant Garamond (Italic, 700wt). 
+    Used for a literary, sophisticated "Magazine" feel.
+  * System/UI: Geist Sans / Inter.
+    Used for technical, high-performance clarity.
+
+4. MOTION DESIGN (THE BREATHING UI)
+-----------------------------------
+The UI must feel "alive" through micro-interactions.
+
+- STAGGERED ENTRIES: 
+  Components should never appear at once. Use 0.05s - 0.1s delays between 
+  items to create a "cascading" reveal effect.
+  
+- SPRING PHYSICS:
+  Avoid linear easing. Use spring-based animations (damping: 30, stiffness: 300) 
+  to mimic physical weight and momentum.
+
+- BLUR TRANSITIONS:
+  Modals (like the Notification slide-over) should use increasing backdrop-blur 
+  animations to transition the user's focus from the shop to the terminal.
+
+5. EDITORIAL STANDARDS
+----------------------
+- IMAGERY: High-fashion, low-distraction. 
+- COPY: Avoid sales jargon. No "Buy Now!" or "Sale!". 
+- Use: "Curate into Collection" or "Enter Exhibition".
+
+================================================================================
+"Vanguard is not a state of being; it is a direction of movement."
+================================================================================
