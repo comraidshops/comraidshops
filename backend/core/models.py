@@ -288,6 +288,7 @@ class Order(models.Model):
     guest_email = models.EmailField(blank=True, null=True, db_index=True)
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, db_index=True)
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending', db_index=True)
+    paystack_reference = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)

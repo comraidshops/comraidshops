@@ -279,6 +279,59 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
         })
 
     @action(detail=True, methods=['post'])
+    def verify_paystack(self, request, pk=None):
+        """
+        Manually verifies the transaction status directly from Paystack API,
+        bypassing webhooks, and corrects the Order status if needed.
+        """
+        order = self.get_object()
+        if not order.paystack_reference:
+            return Response({"error": "No Paystack reference found for this order. It might have been initialized before this update."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        import requests
+        from django.conf import settings
+        secret_key = getattr(settings, 'PAYSTACK_SECRET_KEY', None)
+        if not secret_key:
+            return Response({"error": "Paystack secret key not configured."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        verify_url = f"https://api.paystack.co/transaction/verify/{order.paystack_reference}"
+        headers = {"Authorization": f"Bearer {secret_key}"}
+        
+        try:
+            response = requests.get(verify_url, headers=headers)
+            data = response.json()
+            if data.get('status') and data.get('data'):
+                paystack_status = data['data']['status']
+                
+                # Auto-correct our DB if paystack says success but we are pending
+                if paystack_status == 'success' and order.payment_status == 'pending':
+                    from django.db import transaction
+                    with transaction.atomic():
+                        order.payment_status = 'paid'
+                        order.order_status = 'processing'
+                        order.save(update_fields=['payment_status', 'order_status'])
+                    
+                elif paystack_status in ['failed', 'abandoned'] and order.payment_status == 'pending':
+                    from django.db import transaction
+                    with transaction.atomic():
+                        order.payment_status = 'failed'
+                        order.order_status = 'cancelled'
+                        order.save(update_fields=['payment_status', 'order_status'])
+
+                return Response({
+                    "paystack_status": paystack_status,
+                    "order_payment_status": order.payment_status,
+                    "order_status": order.order_status,
+                })
+            else:
+                return Response({"error": data.get('message', 'Failed to verify transaction')}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"[verify_paystack] error: {str(e)}")
+            return Response({"error": "Error communicating with Paystack."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['post'])
     def cancel_order(self, request, pk=None):
         """
         Admin cancels an order. Sets payment_status=failed and order_status=cancelled.

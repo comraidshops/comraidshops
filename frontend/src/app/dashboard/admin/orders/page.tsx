@@ -159,6 +159,34 @@ export default function AdminOrders() {
         }
     }
 
+    const handleVerifyPaystack = async (orderId: number) => {
+        setActionLoading(true);
+        try {
+            const data = await safeFetch(`/admin-api/orders/${orderId}/verify_paystack/`, {
+                method: 'POST',
+            });
+            
+            if (data.error) {
+                notify('error', 'Verification Failed', data.error);
+            } else {
+                notify(
+                    data.paystack_status === 'success' ? 'success' : 'error',
+                    `Paystack: ${data.paystack_status.toUpperCase()}`,
+                    `Order status updated to ${data.order_payment_status}`
+                );
+                setOrders(orders.map(o => o.id === orderId ? { ...o, payment_status: data.order_payment_status, order_status: data.order_status } : o));
+                if (selectedOrder && selectedOrder.id === orderId) {
+                    setSelectedOrder({ ...selectedOrder, payment_status: data.order_payment_status, order_status: data.order_status });
+                }
+            }
+        } catch (error: any) {
+            console.error('Failed to verify with Paystack:', error);
+            notify('error', 'Error', error.message || 'Error communicating with Paystack API');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-8 lg:space-y-12">
             <header className="flex flex-col justify-between gap-4">
@@ -442,6 +470,15 @@ export default function AdminOrders() {
                                     className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
                                 >
                                     <X className="w-4 h-4" /> Cancel Order
+                                </button>
+                            )}
+
+                            {selectedOrder.payment_status === 'pending' && (
+                                <button
+                                    onClick={() => handleVerifyPaystack(selectedOrder.id)}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#09A5DB]/20 text-[#09A5DB] text-[10px] font-bold uppercase tracking-widest hover:bg-[#09A5DB] hover:text-white transition-all"
+                                >
+                                    Verify on Paystack
                                 </button>
                             )}
                         </div>

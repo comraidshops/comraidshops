@@ -864,6 +864,9 @@ class InitializePaymentView(APIView):
             response = requests.post(paystack_url, headers=headers, json=payload)
             res_data = response.json()
             if res_data.get('status'):
+                order.paystack_reference = res_data['data']['reference']
+                order.save(update_fields=['paystack_reference'])
+                
                 return Response({
                     "authorization_url": res_data['data']['authorization_url'],
                     "reference": res_data['data']['reference']
