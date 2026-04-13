@@ -35,7 +35,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     return (
         <NotificationContext.Provider value={{ notify }}>
             {children}
-            <div className="fixed bottom-12 right-12 z-[100] flex flex-col gap-4 pointer-events-none">
+            <div className="fixed bottom-4 right-4 left-4 md:left-auto md:bottom-12 md:right-12 z-[100] flex flex-col gap-4 pointer-events-none">
                 <AnimatePresence>
                     {notifications.map((n) => (
                         <motion.div
@@ -55,7 +55,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                                 'border-green-400/50 shadow-[0_0_15px_rgba(74,222,128,0.2)]'
                             }`} />
 
-                            <div className="relative px-7 py-5 flex items-center gap-5 min-w-[380px] max-w-[480px]">
+                            <div className="relative px-5 py-4 md:px-7 md:py-5 flex items-center gap-4 md:gap-5 min-w-0 w-full md:min-w-[380px] md:max-w-[480px]">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                                     n.type === 'error' ? 'bg-red-500/10 text-red-500' : 
                                     n.type === 'info' ? 'bg-blue-400/10 text-blue-400' : 
