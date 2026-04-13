@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ShoppingBag, ShoppingCart, User, Bookmark } from 'lucide-react';
+import { Home, ShoppingBag, ShoppingCart, User, Bookmark, ClipboardList } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 
@@ -29,14 +29,21 @@ export default function MobileBottomNav() {
     // Hide on vendor dashboard routes or auth routes
     const isVendorRoute = pathname?.startsWith('/dashboard/vendor') || pathname?.startsWith('/vendor');
     const isAuthRoute = pathname?.startsWith('/auth');
+    const isOnDashboard = pathname?.startsWith('/dashboard/user');
 
     if (!mounted || isVendorRoute || isAuthRoute) return null;
+
+    // On the dashboard: show Bag/Cart (no header cart there)
+    // Outside the dashboard: show Orders (header already has cart)
+    const bagOrOrdersItem = isOnDashboard
+        ? { title: 'Bag', icon: ShoppingCart, href: '/cart', count: cartCount }
+        : { title: 'Orders', icon: ClipboardList, href: isAuthenticated ? '/dashboard/user/orders' : '/auth/login' };
 
     const navItems = [
         { title: 'Home', icon: Home, href: '/' },
         { title: 'Shop', icon: ShoppingBag, href: '/shop' },
         { title: 'Archives', icon: Bookmark, href: isAuthenticated ? '/dashboard/user/saved-fits' : '/auth/login' },
-        { title: 'Bag', icon: ShoppingCart, href: '/cart', count: cartCount },
+        bagOrOrdersItem,
         { title: 'Account', icon: User, href: isAuthenticated ? '/dashboard/user' : '/auth/login' },
     ];
 
