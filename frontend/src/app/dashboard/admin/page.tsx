@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { 
     TrendingUp, Users, ShoppingBag, 
     AlertCircle, Package, ArrowUpRight,
-    LucideIcon
+    LucideIcon, CheckCircle, XCircle, Clock
 } from 'lucide-react';
 import { safeFetch } from '@/lib/api';
 import { formatCurrency } from '@/lib/format';
@@ -19,6 +19,15 @@ interface Stats {
     pending_products: number;
     total_products: number;
     low_stock_count: number;
+}
+
+interface Order {
+    id: number;
+    customer_email: string;
+    total_amount: string;
+    payment_status: string;
+    order_status: string;
+    created_at: string;
 }
 
 const StatCard = ({ title, value, icon: Icon, color, delay }: { 
@@ -51,7 +60,43 @@ const StatCard = ({ title, value, icon: Icon, color, delay }: {
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState<Stats | null>(null);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const renderPaymentBadge = (status: string) => {
+        switch(status) {
+            case 'confirmed':
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-primary/10 text-primary">
+                        <CheckCircle className="w-3 h-3" /> {status}
+                    </span>
+                );
+            case 'paid':
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-orange-400/10 text-orange-400 border border-orange-400/20">
+                        <CheckCircle className="w-3 h-3 text-green-500" /> {status}
+                    </span>
+                );
+            case 'failed':
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-red-500/10 text-red-500">
+                        <XCircle className="w-3 h-3 text-red-500" /> {status}
+                    </span>
+                );
+            case 'refunded':
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-purple-500/10 text-purple-500">
+                        <RotateCcw className="w-3 h-3" /> {status}
+                    </span>
+                );
+            default: // pending
+                return (
+                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-white/5 text-white/40">
+                        <Clock className="w-3 h-3" /> {status}
+                    </span>
+                );
+        }
+    };
 
     useEffect(() => {
         let isMounted = true;
@@ -59,9 +104,14 @@ export default function AdminDashboard() {
         async function getStats(isBackgroundCall = false) {
             if (!isBackgroundCall) setLoading(true);
             try {
-                const data = await safeFetch('/admin-api/stats/');
+                const [statsData, ordersData] = await Promise.all([
+                    safeFetch('/admin-api/stats/'),
+                    safeFetch('/admin-api/orders/')
+                ]);
                 if (isMounted) {
-                    setStats(data);
+                    setStats(statsData);
+                    // Get top 4 recent orders
+                    setOrders((ordersData || []).slice(0, 4));
                 }
             } catch (err) {
                 console.error("Failed to fetch admin stats:", err);
@@ -173,12 +223,31 @@ export default function AdminDashboard() {
                 >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 lg:mb-12">
                         <h2 className="text-xl font-playfair font-medium tracking-tight">Recent Sales Activity</h2>
-                        <button className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors text-left sm:text-right">View All Orders</button>
+                        <Link href="/dashboard/admin/orders" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors text-left sm:text-right">View All Orders</Link>
                     </div>
-                    {/* Placeholder for order list */}
-                    <div className="flex flex-col items-center justify-center h-64 text-white/20">
-                        <ShoppingBag className="w-12 h-12 mb-4 opacity-10" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Activity feed coming soon</span>
+                    <div className="space-y-4">
+                        {orders.length > 0 ? orders.map((order) => (
+                            <Link key={order.id} href="/dashboard/admin/orders" className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors group">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                                        <ShoppingBag className="w-4 h-4 text-white/40 group-hover:text-primary transition-colors" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold">Order #{order.id}</p>
+                                        <p className="text-[10px] text-white/40">{order.customer_email || 'Guest'}</p>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                    <p className="text-sm font-bold text-primary">₦{parseFloat(order.total_amount).toLocaleString()}</p>
+                                    {renderPaymentBadge(order.payment_status)}
+                                </div>
+                            </Link>
+                        )) : (
+                            <div className="flex flex-col items-center justify-center h-64 text-white/20">
+                                <ShoppingBag className="w-12 h-12 mb-4 opacity-10" />
+                                <span className="text-[10px] font-bold uppercase tracking-[0.2em]">No recent orders found</span>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
 
