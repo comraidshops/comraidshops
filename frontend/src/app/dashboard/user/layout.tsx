@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import UserSidebar from '@/components/user/UserSidebar';
 import NotificationModal from '@/components/user/NotificationModal';
 import NotificationDetailModal from '@/components/user/NotificationDetailModal';
@@ -157,6 +159,16 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
                                         <span className="absolute -top-1 -right-1 w-[20px] h-[20px] bg-foreground/30 rounded-full animate-ping" />
                                     )}
                                 </button>
+
+                                {/* Mobile Logo */}
+                                <Link href="/" className="md:hidden relative w-8 h-8 flex-shrink-0 ml-1">
+                                    <Image
+                                        src="/logo-white.png"
+                                        alt="ComraidShops Logo"
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </Link>
 
                                 <div className="h-6 w-px bg-border hidden md:block" />
 
