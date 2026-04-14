@@ -1,12 +1,17 @@
 ================================================================================
-COMRAIDSHOPS | THE VANGUARD BRAND BIBLE
+COMRAIDSHOPS | THE COMRAID TERMINAL BRAND BIBLE
 ================================================================================
 
-1. THE VANGUARD PHILOSOPHY
---------------------------
+1. THE COMRAID PHILOSOPHY
+-------------------------
 ComraidShops is a digital cultural ecosystem. It is not just about moving 
-inventory; it is about the "Vanguard Authority"—the idea that curation is 
+inventory; it is about the "Comraid Authority"—the idea that curation is 
 the highest form of commerce. 
+
+Comraid is not a singular voice; it is a controlled range of expressions 
+where every brand and creator is interpreted through our lens, not imitated. 
+We provide the framework that elevates the specific energy of each entity 
+within the grid.
 
 The platform functions as a "Terminal" for the modern collector, where 
 independent labels are treated with the reverence of a museum exhibition.
@@ -16,7 +21,7 @@ independent labels are treated with the reverence of a museum exhibition.
 Never use secondary or generic terminology. Our language is high-end, 
 editorial, and empowering.
 
-- DASHBOARD -> THE VANGUARD TERMINAL
+- DASHBOARD -> THE COMRAID TERMINAL
   (A command center, not just an account page)
   
 - BOOKMARKS/SAVED -> THE ARCHIVES
@@ -36,7 +41,7 @@ editorial, and empowering.
 
 3. VISUAL PILLARS (AESTHETICS)
 ------------------------------
-The "Vanguard" look is defined by High-Contrast Digital Luxury.
+The "Comraid" look is defined by High-Contrast Digital Luxury.
 
 - COLOR: Forced Dark Mode. 
   #0a0a0a (Background) / #ededed (Foreground). 
@@ -76,5 +81,5 @@ The UI must feel "alive" through micro-interactions.
 - Use: "Curate into Collection" or "Enter Exhibition".
 
 ================================================================================
-"Vanguard is not a state of being; it is a direction of movement."
+"Interpretation, not imitation. A controlled range of expression."
 ================================================================================
