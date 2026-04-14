@@ -159,6 +159,7 @@ class Brand(models.Model):
     editorial_refs = models.ManyToManyField(Magazine, related_name='brands', blank=True)
     exhibition_refs = models.ManyToManyField(Exhibition, related_name='brands', blank=True)
     is_featured = models.BooleanField(default=False, db_index=True)
+    visibility = models.BooleanField(default=True, db_index=True)
     
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 

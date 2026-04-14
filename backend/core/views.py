@@ -188,6 +188,10 @@ class BrandViewSet(viewsets.ReadOnlyModelViewSet):
         if featured == 'true':
             qs = qs.filter(is_featured=True)
             
+        # Visibility Filter - Superusers see all, public sees only visible
+        if not user.is_staff:
+            qs = qs.filter(visibility=True)
+            
         return qs
 
     @method_decorator(cache_page(60 * 15))
@@ -298,6 +302,14 @@ class ProductViewSet(viewsets.ModelViewSet):
             qs = qs.order_by('-price')
         elif sort == 'newest':
             qs = qs.order_by('-created_at')
+
+        # Visibility Filter - Superusers see all products, 
+        # Vendors see their own, public sees only products from visible brands
+        if not user.is_staff:
+            if user.is_authenticated and hasattr(user, 'vendor_profile'):
+                qs = qs.filter(Q(vendor__brand__visibility=True) | Q(vendor__user=user))
+            else:
+                qs = qs.filter(vendor__brand__visibility=True)
 
         return qs
 
