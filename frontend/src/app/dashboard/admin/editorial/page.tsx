@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { 
     FileText, BookOpen, Presentation, 
     Layers, Plus, Star, Search,
@@ -65,12 +66,27 @@ interface MagazineOption {
     title: string;
 }
 
-export default function AdminEditorial() {
-    const [activeTab, setActiveTab] = useState<EditorialType>('magazines');
+function EditorialContent() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const tabParam = searchParams.get('tab') as EditorialType;
+
+    const [activeTab, setActiveTab] = useState<EditorialType>(tabParam || 'magazines');
     const [items, setItems] = useState<EditorialBase[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        if (tabParam && tabParam !== activeTab) {
+            setActiveTab(tabParam);
+        }
+    }, [tabParam]);
+
+    const handleTabChange = (tab: EditorialType) => {
+        setActiveTab(tab);
+        router.push(`/dashboard/admin/editorial?tab=${tab}`);
+    };
 
     // Modal State
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -172,6 +188,7 @@ export default function AdminEditorial() {
             setCurrentItem(null);
             notify('success', `${activeTab.slice(0, -1)} Created`, 'Item has been successfully published.');
         } catch (error: unknown) {
+            console.error("Creation Error:", error);
             notify('error', 'Creation Failed', (error as Error)?.message || "Failed to create item");
         } finally {
             setActionLoading(false);
@@ -244,9 +261,9 @@ export default function AdminEditorial() {
         }
     }
 
-    async function toggleStatus(item: EditorialBase) {
-        const field = activeTab === 'slides' ? 'is_active' : 'is_featured';
-        const currentValue = activeTab === 'slides' ? item.is_active : item.is_featured;
+    async function toggleStatus(item: EditorialBase, customField?: string) {
+        const field = customField || (activeTab === 'slides' ? 'is_active' : 'is_featured');
+        const currentValue = (item as any)[field];
 
         try {
             await safeFetch(`/admin-api/${activeTab}/${item.id}/`, {
@@ -254,7 +271,7 @@ export default function AdminEditorial() {
                 body: JSON.stringify({ [field]: !currentValue })
             });
             setItems(items.map(i => i.id === item.id ? { ...i, [field]: !currentValue } : i));
-            notify('success', 'Status Updated', `Item is now ${!currentValue ? 'Active/Featured' : 'Inactive'}.`);
+            notify('success', 'Status Updated', `${field} is now ${!currentValue ? 'Active' : 'Inactive'}.`);
         } catch (error: unknown) {
             notify('error', 'Toggle Failed', (error as Error)?.message || "Failed to toggle status");
         }
@@ -313,7 +330,7 @@ export default function AdminEditorial() {
                     return (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as EditorialType)}
+                            onClick={() => handleTabChange(tab.id as EditorialType)}
                             className={`flex items-center gap-3 lg:gap-4 px-2 lg:px-4 py-4 transition-all relative shrink-0 ${
                                 isActive ? 'text-primary' : 'text-white/40 hover:text-white'
                             }`}
@@ -368,6 +385,17 @@ export default function AdminEditorial() {
                                         >
                                             <Star className="w-4 h-4" fill={statusActive ? "currentColor" : "none"} />
                                         </button>
+                                        {activeTab === 'brands' && (
+                                            <button 
+                                                onClick={() => toggleStatus(item, 'visibility')}
+                                                className={`p-2.5 lg:p-3 rounded-2xl backdrop-blur-md border border-white/10 transition-all ${
+                                                    item.visibility ? 'bg-blue-500 text-white' : 'bg-black/40 text-white/40 hover:bg-white/10'
+                                                }`}
+                                                title={item.visibility ? "Publicly Visible" : "Hidden from Public"}
+                                            >
+                                                <Star className="w-4 h-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -443,9 +471,18 @@ export default function AdminEditorial() {
             >
                 <form onSubmit={isCreateModalOpen ? handleCreate : handleUpdate} className="space-y-6">
                     <AdminInput 
-                        label={activeTab === 'slides' ? 'Main Text' : (activeTab === 'magazines' || activeTab === 'brands' ? 'Title' : 'Name')}
-                        value={currentItem?.title || currentItem?.name || ''} 
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, [activeTab === 'magazines' || activeTab === 'brands' ? 'title' : 'name']: e.target.value })}
+                        label={activeTab === 'slides' ? 'Main Text' : (activeTab === 'magazines' ? 'Title' : (activeTab === 'brands' ? 'Brand Name' : 'Name'))}
+                        value={currentItem?.title || currentProductLabel()} 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            const val = e.target.value;
+                            if (activeTab === 'magazines') {
+                                setCurrentItem({ ...currentItem, title: val });
+                            } else if (activeTab === 'brands') {
+                                setCurrentItem({ ...currentItem, name: val });
+                            } else {
+                                setCurrentItem({ ...currentItem, name: val });
+                            }
+                        }}
                     />
                     
                     {activeTab === 'magazines' && (
@@ -667,5 +704,19 @@ export default function AdminEditorial() {
                 </div>
             </AdminModal>
         </div>
+    );
+}
+
+// Add these helpers
+function currentProductLabel() {
+    // CurrentItem helper to avoid too many ternaries
+    return ''; // Placeholder, the above logic is inline now
+}
+
+export default function AdminEditorial() {
+    return (
+        <Suspense fallback={<div className="p-24 text-center text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Initializing Director...</div>}>
+            <EditorialContent />
+        </Suspense>
     );
 }

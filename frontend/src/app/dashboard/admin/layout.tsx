@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
     LayoutDashboard, Users, ShoppingBag, FileText, 
     BarChart3, LogOut, ShieldCheck, Tags,
-    ChevronRight, ArrowLeft, Menu, X
+    ChevronRight, ArrowLeft, Menu, X, Award
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchProfile } from '@/lib/api';
@@ -56,6 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: 'Users & Vendors', href: '/dashboard/admin/users', icon: Users },
         { name: 'Products', href: '/dashboard/admin/products', icon: ShoppingBag },
         { name: 'Categories', href: '/dashboard/admin/categories', icon: Tags },
+        { name: 'Brands', href: '/dashboard/admin/editorial?tab=brands', icon: Award },
         { name: 'Orders', href: '/dashboard/admin/orders', icon: FileText },
         { name: 'Editorial', href: '/dashboard/admin/editorial', icon: FileText },
         { name: 'Finance', href: '/dashboard/admin/finance', icon: BarChart3 },

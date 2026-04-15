@@ -55,6 +55,11 @@ export default function VendorOrdersPage() {
                     shipping_state: o.shipping_state,
                     shipping_zip_code: o.shipping_zip_code,
                     shipping_country: o.shipping_country,
+                    items: o.items.map(item => ({
+                        name: item.product_name,
+                        quantity: item.quantity,
+                        status: (item as any).status || 'pending'
+                    }))
                 }));
                 setOrders(formatted);
             }

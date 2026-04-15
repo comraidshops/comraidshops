@@ -331,7 +331,7 @@ class BrandSerializer(serializers.ModelSerializer):
             'established_year', 'origin_country', 'website', 'social_links', 'awards',
             'manifesto', 'featured_quote', 'story',
             'gallery', 'collections', 'editorial_refs', 'exhibition_refs',
-            'is_featured', 'created_at', 'vendor_username', 'vendor_id',
+            'is_featured', 'visibility', 'created_at', 'vendor_username', 'vendor_id',
             'approved_product_count', 'total_product_count', 'featured_products',
             'is_member', 'community_count',
             'meta_title', 'meta_description',

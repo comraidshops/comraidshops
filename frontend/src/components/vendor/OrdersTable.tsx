@@ -20,6 +20,11 @@ export interface Order {
     shipping_state?: string;
     shipping_zip_code?: string;
     shipping_country?: string;
+    items?: {
+        name: string;
+        quantity: number;
+        status: string;
+    }[];
 }
 
 interface OrdersTableProps {
@@ -28,11 +33,11 @@ interface OrdersTableProps {
     updatingId?: string | null;
 }
 
-import { ChevronDown, ChevronUp, MapPin, Phone, User } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronUp, MapPin, Phone, User, Package } from 'lucide-react';
 
 export default function OrdersTable({ orders, onStatusChange, updatingId }: OrdersTableProps) {
     const [expandedOrder, setExpandedOrder] = React.useState<string | null>(null);
-    const ALLOWED_STATUSES: Order['order_status'][] = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    const ALLOWED_STATUSES: Order['order_status'][] = ['processing', 'shipped', 'delivered'];
     const PAYMENT_STATUS_COLORS = {
         paid: 'text-green-700 bg-green-50 border-green-100',
         confirmed: 'text-green-700 bg-green-50 border-green-100',
@@ -61,12 +66,23 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
             );
         }
 
+        if (order.payment_status !== 'confirmed') {
+            return (
+                <div className="flex items-center gap-2 group cursor-help" title="Status updates are locked until payment is confirmed by the Vanguard Protocol.">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 border border-amber-500/30 bg-amber-500/5">
+                        <AlertCircle className="w-3 h-3 text-amber-500" />
+                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-500/80 italic">Awaiting Confirmation</span>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="flex items-center gap-2 flex-wrap">
-                {order.order_status === 'pending' && (order.payment_status === 'paid' || order.payment_status === 'confirmed') && (
+                {order.order_status === 'pending' && (
                     <button 
                         onClick={() => onStatusChange?.(order.id, 'processing')}
-                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-colors active:scale-95"
+                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-colors active:scale-95 shadow-sm"
                     >
                         Process
                     </button>
@@ -74,7 +90,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                 {order.order_status === 'processing' && (
                     <button 
                         onClick={() => onStatusChange?.(order.id, 'shipped')}
-                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-primary text-background hover:bg-primary/90 transition-colors active:scale-95"
+                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-primary text-background hover:bg-primary/90 transition-colors active:scale-95 shadow-sm"
                     >
                         Ship
                     </button>
@@ -82,23 +98,26 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                 {order.order_status === 'shipped' && (
                     <button 
                         onClick={() => onStatusChange?.(order.id, 'delivered')}
-                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 transition-colors active:scale-95"
+                        className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 transition-colors active:scale-95 shadow-sm"
                     >
                         Deliver
                     </button>
                 )}
-                <select 
-                    value={order.order_status}
-                    onChange={(e) => onStatusChange?.(order.id, e.target.value as Order['order_status'])}
-                    className="text-[10px] font-bold uppercase tracking-widest bg-secondary/5 border border-border px-2 py-1.5 focus:ring-0 cursor-pointer text-secondary/60 hover:text-primary transition-colors"
-                >
-                    <option value="" disabled>Change</option>
-                    {ALLOWED_STATUSES.map(s => (
-                        <option key={s} value={s} className="bg-background text-primary uppercase">
-                            {s}
-                        </option>
-                    ))}
-                </select>
+                <div className="relative inline-block group/select">
+                    <select 
+                        value={ALLOWED_STATUSES.includes(order.order_status) ? order.order_status : ""}
+                        onChange={(e) => onStatusChange?.(order.id, e.target.value as Order['order_status'])}
+                        className="text-[10px] font-bold uppercase tracking-widest bg-secondary/5 border border-border px-2 py-1.5 focus:ring-0 cursor-pointer text-secondary/60 hover:text-primary transition-colors appearance-none pr-6"
+                    >
+                        <option value="" disabled>{order.order_status === 'pending' ? 'Change' : order.order_status}</option>
+                        {ALLOWED_STATUSES.map(s => (
+                            <option key={s} value={s} className="bg-background text-primary uppercase font-bold">
+                                {s}
+                            </option>
+                        ))}
+                    </select>
+                    <ChevronDown className="w-2.5 h-2.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-secondary/40 group-hover/select:text-primary" />
+                </div>
             </div>
         );
     };
@@ -283,19 +302,25 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="space-y-6">
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/40 border-b border-border pb-2">Destination Dossier</h4>
-                                                <div className="flex items-start gap-3">
-                                                    <MapPin className="w-4 h-4 text-primary mt-0.5" />
-                                                    <div>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-secondary">Global Logistics Address</p>
-                                                        <div className="text-sm font-bold uppercase mt-1 leading-relaxed">
-                                                            {order.shipping_address_line1 || 'OFF-GRID'}<br />
-                                                            {order.shipping_address_line2 && <>{order.shipping_address_line2}<br /></>}
-                                                            {order.shipping_city}, {order.shipping_state} {order.shipping_zip_code}<br />
-                                                            {order.shipping_country}
+                                            <div className="md:col-span-2 space-y-6">
+                                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary/40 border-b border-border pb-2">Component Fulfillment Status</h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    {order.items?.map((item, idx) => (
+                                                        <div key={idx} className="flex items-center justify-between p-3 border border-border bg-background group/item hover:border-primary/50 transition-colors">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-8 h-8 flex items-center justify-center bg-secondary/10 border border-border/50 text-secondary">
+                                                                    <Package className="w-4 h-4" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-[11px] font-bold uppercase tracking-tight">{item.name}</p>
+                                                                    <p className="text-[9px] text-secondary font-medium">QTY: {item.quantity}</p>
+                                                                </div>
+                                                            </div>
+                                                            <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest border ${getStatusColor(item.status as any)}`}>
+                                                                {item.status}
+                                                            </span>
                                                         </div>
-                                                    </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         </div>

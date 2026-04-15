@@ -48,6 +48,7 @@ interface Category {
 export default function AdminProducts() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [vendors, setVendors] = useState<{id: number, brand_name: string}[]>([]);
     const [actionLoading, setActionLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved'>('all');
@@ -66,12 +67,14 @@ export default function AdminProducts() {
 
     async function fetchData() {
         try {
-            const [productData, categoryData] = await Promise.all([
+            const [productData, categoryData, vendorData] = await Promise.all([
                 safeFetch('/admin-api/products/'),
-                safeFetch('/categories/')
+                safeFetch('/categories/'),
+                safeFetch('/admin-api/vendors/')
             ]);
             setProducts(productData);
             setCategories(categoryData);
+            setVendors(vendorData);
         } catch (err) {
             console.error("Failed to fetch data:", err);
         }
@@ -378,6 +381,16 @@ export default function AdminProducts() {
                             ...categories.map(c => ({ value: c.id, label: c.name }))
                         ]}
                     />
+
+                    <AdminSelect 
+                        label="Assign Vendor (Curator)"
+                        value={currentProduct?.vendor || ''}
+                        onChange={(e) => setCurrentProduct({ ...currentProduct, vendor: parseInt(e.target.value) })}
+                        options={[
+                            { value: '', label: 'Select Vendor' },
+                            ...vendors.map(v => ({ value: v.id, label: v.brand_name }))
+                        ]}
+                    />
                     
                     <div className="grid grid-cols-2 gap-4">
                         <AdminInput 
@@ -512,6 +525,13 @@ export default function AdminProducts() {
                         value={currentProduct?.category || ''}
                         onChange={(e) => setCurrentProduct({ ...currentProduct, category: parseInt(e.target.value) })}
                         options={categories.map(c => ({ value: c.id, label: c.name }))}
+                    />
+
+                    <AdminSelect 
+                        label="Assign Vendor (Curator)"
+                        value={currentProduct?.vendor || ''}
+                        onChange={(e) => setCurrentProduct({ ...currentProduct, vendor: parseInt(e.target.value) })}
+                        options={vendors.map(v => ({ value: v.id, label: v.brand_name }))}
                     />
                     
                     <div className="grid grid-cols-2 gap-4">
