@@ -6,6 +6,7 @@ import { FileText, Check, X, Eye, Package, Truck, CheckCircle, RotateCcw, XCircl
 import { safeFetch } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
 import { AdminModal } from '@/components/admin/AdminForms';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import Image from 'next/image';
 
 interface OrderItem {
@@ -36,40 +37,7 @@ export default function AdminOrders() {
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const { notify } = useNotification();
 
-    const renderPaymentBadge = (status: string) => {
-        switch(status) {
-            case 'confirmed':
-                return (
-                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-primary/10 text-primary">
-                        <CheckCircle className="w-3 h-3" /> {status}
-                    </span>
-                );
-            case 'paid':
-                return (
-                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-orange-400/10 text-orange-400 border border-orange-400/20">
-                        <CheckCircle className="w-3 h-3 text-green-500" /> {status} (Action Required)
-                    </span>
-                );
-            case 'failed':
-                return (
-                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-red-500/10 text-red-500">
-                        <XCircle className="w-3 h-3 text-red-500" /> {status}
-                    </span>
-                );
-            case 'refunded':
-                return (
-                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-purple-500/10 text-purple-500">
-                        <RotateCcw className="w-3 h-3" /> {status}
-                    </span>
-                );
-            default: // pending
-                return (
-                    <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-white/5 text-white/40">
-                        <Clock className="w-3 h-3" /> {status}
-                    </span>
-                );
-        }
-    };
+    const renderPaymentBadge = (status: string) => <StatusBadge status={status} variant="admin" />;
 
     useEffect(() => {
         async function fetchOrders() {

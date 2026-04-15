@@ -8,6 +8,7 @@ import OrdersTable, { Order } from '@/components/vendor/OrdersTable';
 import NotificationsPanel, { Notification } from '@/components/vendor/NotificationsPanel';
 import { useNotification } from '@/context/NotificationContext';
 import { formatCurrency } from '@/lib/format';
+import { safeFetch } from '@/lib/api';
 
 interface DashboardMetrics {
   total_products: number;
@@ -72,15 +73,9 @@ export default function VendorDashboard() {
     const fetchMetrics = async (isBackground = false) => {
       if (!isBackground) setLoading(true);
       try {
-        const token = localStorage.getItem('access_token');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/dashboard/`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const data = await safeFetch('/vendor/dashboard/');
 
-        if (res.ok) {
-          const data = await res.json();
+        if (data) {
           if (isMounted) {
             setMetrics(data);
             setError(null);
@@ -95,13 +90,6 @@ export default function VendorDashboard() {
               }
               lastNotificationId.current = highestId;
             }
-          }
-        } else {
-          try {
-            const errData = await res.json();
-            if (isMounted) setError(errData.error || errData.detail || "Failed to load dashboard metrics.");
-          } catch {
-            if (isMounted) setError(`Failed to load: Error ${res.status}`);
           }
         }
       } catch (err: unknown) {
@@ -137,10 +125,8 @@ export default function VendorDashboard() {
     }
 
     try {
-      const token = localStorage.getItem('access_token');
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/notifications/${id}/mark_read/`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+      await safeFetch(`/vendor/notifications/${id}/mark_read/`, {
+        method: 'POST'
       });
       window.dispatchEvent(new Event('notifications_updated'));
     } catch (error) {

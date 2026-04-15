@@ -4,19 +4,14 @@ import { useState, useEffect } from 'react';
 import { User, ShoppingBag, MapPin, CreditCard, ArrowRight, Bell, Clock, CheckCircle, Truck, XCircle, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, safeFetch } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
 import { UserProfile, Order, Notification, OrderItem } from '@/types/user';
 import { formatCurrency } from '@/lib/format';
 import { useDashboardNotifications } from './layout';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
-const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-    pending: { label: 'Order Pending', icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-    processing: { label: 'Processing', icon: Package, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    shipped: { label: 'Shipped', icon: Truck, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    delivered: { label: 'Delivered', icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-500/10' },
-    cancelled: { label: 'Cancelled', icon: XCircle, color: 'text-red-500', bg: 'bg-red-500/10' },
-};
+// STATUS_CONFIG removed in favor of unified StatusBadge component
 
 export default function UserDashboardPage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -29,32 +24,26 @@ export default function UserDashboardPage() {
         let isMounted = true;
 
         const fetchOverview = async () => {
-            const token = localStorage.getItem('access_token');
-            const headers = { Authorization: `Bearer ${token}` };
-
             try {
-                const [pRes, aRes, cRes, oRes] = await Promise.all([
-                    fetch(`${API_BASE_URL}/user/profile/`, { headers }),
-                    fetch(`${API_BASE_URL}/addresses/`, { headers }),
-                    fetch(`${API_BASE_URL}/saved-cards/`, { headers }),
-                    fetch(`${API_BASE_URL}/orders/`, { headers }),
+                const [profileData, addressesData, cardsData, ordersData] = await Promise.all([
+                    safeFetch('/user/profile/'),
+                    safeFetch('/addresses/'),
+                    safeFetch('/saved-cards/'),
+                    safeFetch('/orders/'),
                 ]);
 
                 if (!isMounted) return;
 
-                if (pRes.ok) setProfile(await pRes.json());
+                if (profileData) setProfile(profileData);
 
-                if (aRes.ok) {
-                    const d = await aRes.json();
-                    setStats(s => ({ ...s, addresses: (Array.isArray(d) ? d : d.results ?? []).length }));
+                if (addressesData) {
+                    setStats(s => ({ ...s, addresses: (Array.isArray(addressesData) ? addressesData : addressesData.results ?? []).length }));
                 }
-                if (cRes.ok) {
-                    const d = await cRes.json();
-                    setStats(s => ({ ...s, cards: (Array.isArray(d) ? d : d.results ?? []).length }));
+                if (cardsData) {
+                    setStats(s => ({ ...s, cards: (Array.isArray(cardsData) ? cardsData : cardsData.results ?? []).length }));
                 }
-                if (oRes.ok) {
-                    const d = await oRes.json();
-                    const list: Order[] = Array.isArray(d) ? d : d.results ?? [];
+                if (ordersData) {
+                    const list: Order[] = Array.isArray(ordersData) ? ordersData : ordersData.results ?? [];
                     const sorted = list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
                     setStats(s => ({ ...s, orders: sorted.length }));
                     setRecentOrders(sorted.slice(0, 3));
@@ -168,20 +157,18 @@ export default function UserDashboardPage() {
                     ) : (
                         <div className="divide-y divide-border">
                             {recentOrders.map((order) => {
-                                const cfg = STATUS_CONFIG[order.order_status] ?? STATUS_CONFIG.pending;
-                                const StatusIcon = cfg.icon;
                                 const date = new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
                                 const totalQty = order.items?.reduce((acc: number, item: OrderItem) => acc + (item.quantity || 1), 0) || 0;
                                 return (
                                     <Link key={order.id} href={`/dashboard/user/orders/${order.id}`} className="flex items-center justify-between p-6 hover:bg-secondary/5 transition-all group">
                                         <div className="flex items-center gap-6">
-                                            <div className={`w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110 ${cfg.bg}`}>
-                                                <StatusIcon className={`w-4 h-4 ${cfg.color}`} />
+                                            <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
+                                                <StatusBadge status={order.order_status} variant="minimal" className="!p-0 border-none opacity-100" />
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2 mb-0.5">
                                                     <p className="text-[11px] font-black uppercase tracking-tight">Order: #{order.id.toString().padStart(5, '0')}</p>
-                                                    <span className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 ${cfg.color} border border-current opacity-70`}>{order.order_status}</span>
+                                                    <StatusBadge status={order.order_status} variant="minimal" />
                                                 </div>
                                                 <p className="text-[9px] text-secondary/50 uppercase tracking-widest font-bold">{date} // {totalQty} UNITS</p>
                                             </div>

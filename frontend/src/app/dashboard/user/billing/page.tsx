@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { CreditCard, Trash2, ShieldCheck, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { API_BASE_URL } from '@/lib/api';
+import { safeFetch } from '@/lib/api';
 
 interface SavedCard {
     id: number;
@@ -20,13 +20,11 @@ export default function BillingPage() {
     const [loading, setLoading] = useState(true);
 
     const fetchCards = async () => {
-        const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE_URL}/saved-cards/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            setCards(data);
+        try {
+            const data = await safeFetch('/saved-cards/');
+            if (data) setCards(data);
+        } catch (err) {
+            console.error("Failed to fetch cards:", err);
         }
         setLoading(false);
     };
@@ -39,12 +37,14 @@ export default function BillingPage() {
     }, []);
 
     const deleteCard = async (id: number) => {
-        const token = localStorage.getItem('access_token');
-        await fetch(`${API_BASE_URL}/saved-cards/${id}/`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        fetchCards();
+        try {
+            await safeFetch(`/saved-cards/${id}/`, {
+                method: 'DELETE'
+            });
+            fetchCards();
+        } catch (err) {
+            console.error("Failed to delete card:", err);
+        }
     };
 
     if (loading) return null;

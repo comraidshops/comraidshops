@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatVendorPaymentStatus } from '@/lib/format';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
 export interface Order {
     id: string;
@@ -38,23 +39,7 @@ import { AlertCircle, ChevronDown, ChevronUp, MapPin, Phone, User, Package } fro
 export default function OrdersTable({ orders, onStatusChange, updatingId }: OrdersTableProps) {
     const [expandedOrder, setExpandedOrder] = React.useState<string | null>(null);
     const ALLOWED_STATUSES: Order['order_status'][] = ['processing', 'shipped', 'delivered'];
-    const PAYMENT_STATUS_COLORS = {
-        paid: 'text-green-700 bg-green-50 border-green-100',
-        confirmed: 'text-green-700 bg-green-50 border-green-100',
-        pending: 'text-amber-700 bg-amber-50 border-amber-100',
-        failed: 'text-red-700 bg-red-50 border-red-100',
-        refunded: 'text-gray-700 bg-gray-50 border-gray-100',
-    };
-
-    const getStatusColor = (status: Order['order_status']) => {
-        switch (status) {
-            case 'delivered': return 'text-green-700 bg-green-50 border-green-100';
-            case 'shipped': return 'text-blue-700 bg-blue-50 border-blue-100';
-            case 'processing': return 'text-amber-700 bg-amber-50 border-amber-100';
-            case 'cancelled': return 'text-red-700 bg-red-50 border-red-100';
-            default: return 'text-secondary bg-secondary/5 border-border';
-        }
-    };
+    // PAYMENT_STATUS_COLORS and getStatusColor removed in favor of StatusBadge
 
     const renderQuickActions = (order: Order) => {
         if (updatingId === order.id) {
@@ -68,12 +53,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
 
         if (order.payment_status !== 'confirmed') {
             return (
-                <div className="flex items-center gap-2 group cursor-help" title="Status updates are locked until payment is confirmed by the Vanguard Protocol.">
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 border border-amber-500/30 bg-amber-500/5">
-                        <AlertCircle className="w-3 h-3 text-amber-500" />
-                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-500/80 italic">Awaiting Confirmation</span>
-                    </div>
-                </div>
+                <StatusBadge status="awaiting confirmation" variant="vanguard" />
             );
         }
 
@@ -167,12 +147,8 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
 
                         {/* Status badges */}
                         <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${PAYMENT_STATUS_COLORS[order.payment_status] || 'border-border text-secondary'}`}>
-                                {formatVendorPaymentStatus(order.payment_status)}
-                            </span>
-                            <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${getStatusColor(order.order_status)}`}>
-                                {order.order_status === 'pending' ? 'Order Pending' : order.order_status}
-                            </span>
+                            <StatusBadge status={order.payment_status} variant="minimal" />
+                            <StatusBadge status={order.order_status} variant="minimal" />
                         </div>
 
                         {/* Actions */}
@@ -264,14 +240,10 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                                 <td className="px-6 py-4 text-right">₦{order.total.toLocaleString()}</td>
                                 <td className="px-6 py-4 text-right font-medium text-green-600">₦{order.earnings.toLocaleString()}</td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${PAYMENT_STATUS_COLORS[order.payment_status] || 'border-border text-secondary'}`}>
-                                        {formatVendorPaymentStatus(order.payment_status)}
-                                    </span>
+                                    <StatusBadge status={order.payment_status} variant="minimal" />
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 text-[9px] font-bold uppercase tracking-widest border ${getStatusColor(order.order_status)}`}>
-                                        {order.order_status === 'pending' ? 'Order Pending' : order.order_status}
-                                    </span>
+                                    <StatusBadge status={order.order_status} variant="minimal" />
                                 </td>
                                 <td className="px-6 py-4">
                                     {renderQuickActions(order)}
@@ -316,9 +288,7 @@ export default function OrdersTable({ orders, onStatusChange, updatingId }: Orde
                                                                     <p className="text-[9px] text-secondary font-medium">QTY: {item.quantity}</p>
                                                                 </div>
                                                             </div>
-                                                            <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest border ${getStatusColor(item.status as any)}`}>
-                                                                {item.status}
-                                                            </span>
+                                                            <StatusBadge status={item.status} variant="minimal" />
                                                         </div>
                                                     ))}
                                                 </div>

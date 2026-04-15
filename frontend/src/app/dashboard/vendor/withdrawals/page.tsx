@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import StatCard from '@/components/vendor/StatCard';
 import { History, Landmark } from 'lucide-react';
+import { safeFetch } from '@/lib/api';
 
 interface Withdrawal {
     id: number;
@@ -37,15 +38,14 @@ export default function WithdrawalsPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = localStorage.getItem('access_token');
-                const headers = { 'Authorization': `Bearer ${token}` };
+                const metricsData = await safeFetch('/vendor/dashboard/');
+                if (metricsData) setMetrics(metricsData);
 
-                const metricsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/dashboard/`, { headers });
-                if (metricsRes.ok) setMetrics(await metricsRes.json());
-
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/withdrawals/`, { headers });
-                if (res.ok) setHistory(await res.json());
-            } catch (e) { console.error(e); }
+                const historyData = await safeFetch('/vendor/withdrawals/');
+                if (historyData) setHistory(historyData);
+            } catch (e) {
+                console.error(e);
+            }
         };
         fetchData();
     }, []);
@@ -68,29 +68,18 @@ export default function WithdrawalsPage() {
         }
 
         try {
-            const token = localStorage.getItem('access_token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/withdrawals/`, {
+            await safeFetch('/vendor/withdrawals/', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify(formData)
             });
 
-            if (res.ok) {
-                setStatus({ type: 'success', message: 'Withdrawal request submitted successfully.' });
-                setFormData({ amount: '', bank_name: '', account_number: '', account_name: '', email: '', phone_number: '' });
-                const updated = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/withdrawals/`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                setHistory(await updated.json());
-            } else {
-                const err = await res.json();
-                setStatus({ type: 'error', message: err.detail || 'Failed to submit request.' });
-            }
-        } catch {
-            setStatus({ type: 'error', message: 'An unexpected error occurred.' });
+            setStatus({ type: 'success', message: 'Withdrawal request submitted successfully.' });
+            setFormData({ amount: '', bank_name: '', account_number: '', account_name: '', email: '', phone_number: '' });
+            
+            const updatedHistory = await safeFetch('/vendor/withdrawals/');
+            if (updatedHistory) setHistory(updatedHistory);
+        } catch (err: any) {
+            setStatus({ type: 'error', message: err.message || 'Failed to submit request.' });
         } finally {
             setLoading(false);
         }

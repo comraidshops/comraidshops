@@ -6,6 +6,7 @@ import { Loader2, Plus, Trash2, Settings } from 'lucide-react';
 import Image from 'next/image';
 import { Product } from '@/types/brand';
 import { ImageCropperModal } from '@/components/ui/ImageCropperModal';
+import { safeFetch } from '@/lib/api';
 
 interface Variant {
   name: string;
@@ -32,6 +33,7 @@ export default function EditProductPage() {
 
     const [variants, setVariants] = useState<Variant[]>([]);
     const [specifications, setSpecifications] = useState<Specification[]>([]);
+    const [deletedImages, setDeletedImages] = useState<number[]>([]);
 
     const addVariant = () => setVariants([...variants, { name: '', stock: '' }]);
     const removeVariant = (index: number) => setVariants(variants.filter((_, i) => i !== index));
@@ -47,6 +49,10 @@ export default function EditProductPage() {
         const next = [...specifications];
         next[index] = { ...next[index], [field]: value };
         setSpecifications(next);
+    };
+    
+    const toggleDeleteImage = (id: number) => {
+        setDeletedImages(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
     };
 
     // Image Cropper State
@@ -76,27 +82,14 @@ export default function EditProductPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('access_token');
-        
         // Fetch dashboard metrics to get commission rate
-        const dashboardRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/dashboard/`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (dashboardRes.ok) {
-          const dashData = await dashboardRes.json();
-          if (dashData.commission_rate) {
-            setCommissionRate(Number(dashData.commission_rate));
-          }
+        const dashData = await safeFetch('/vendor/dashboard/');
+        if (dashData && dashData.commission_rate) {
+          setCommissionRate(Number(dashData.commission_rate));
         }
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/products/${id}/`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
+        const data = await safeFetch(`/vendor/products/${id}/`);
+        if (data) {
           setProduct(data);
           
           if (data.variants && Array.isArray(data.variants)) {
@@ -152,24 +145,16 @@ export default function EditProductPage() {
     formData.append('variants', JSON.stringify(variants));
     formData.append('specifications', JSON.stringify(specifications));
 
+    formData.append('deleted_images', JSON.stringify(deletedImages));
+
     try {
-      const token = localStorage.getItem('access_token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/products/${id}/`, {
+      await safeFetch(`/vendor/products/${id}/`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
         body: formData,
       });
-
-        if (res.ok) {
-        router.push('/dashboard/vendor/products');
-      } else {
-        const data = await res.json();
-        setError(JSON.stringify(data));
-      }
-    } catch {
-      setError('An unexpected error occurred.');
+      router.push('/dashboard/vendor/products');
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred.');
     } finally {
       setSubmitting(false);
     }
@@ -392,16 +377,25 @@ export default function EditProductPage() {
         <div className="space-y-4">
           <label htmlFor="uploaded_images" className="block text-xs font-bold uppercase tracking-widest text-secondary">Additional Gallery Images</label>
           {product.images && product.images.length > 0 && (
-            <div className="flex gap-4 overflow-x-auto pb-2">
+            <div className="flex gap-4 overflow-x-auto pb-4 pt-2">
               {product.images.map(img => (
-                <div key={img.id} className="relative w-20 h-28 bg-secondary/10 border border-border shrink-0">
-                  <Image src={img.image.startsWith('http') ? img.image : `${process.env.NEXT_PUBLIC_API_URL}${img.image}`} alt="Gallery image" fill className="object-cover" />
+                <div key={img.id} className="relative group/img shrink-0">
+                  <div className={`relative w-20 h-28 bg-secondary/10 border ${deletedImages.includes(img.id) ? 'border-red-500 opacity-50' : 'border-border'}`}>
+                    <Image src={img.image.startsWith('http') ? img.image : `${process.env.NEXT_PUBLIC_API_URL}${img.image}`} alt="Gallery image" fill className="object-cover" />
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => toggleDeleteImage(img.id)}
+                    className={`absolute -top-2 -right-2 p-1.5 rounded-full shadow-lg transition-transform hover:scale-110 ${deletedImages.includes(img.id) ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}
+                  >
+                    {deletedImages.includes(img.id) ? <Plus className="w-3 h-3" /> : <Trash2 className="w-3 h-3" />}
+                  </button>
                 </div>
               ))}
             </div>
           )}
           <input type="file" id="uploaded_images" name="uploaded_images" accept="image/*" multiple className="w-full border border-border p-3 bg-secondary/5 focus:outline-none focus:border-primary transition-colors" />
-          <p className="text-[10px] text-secondary uppercase tracking-widest font-bold">Uploading new images will replace the existing gallery.</p>
+          <p className="text-[10px] text-secondary uppercase tracking-widest font-bold">New images will be appended to the existing gallery. Use the buttons above to remove images.</p>
         </div>
 
         <div className="space-y-4">

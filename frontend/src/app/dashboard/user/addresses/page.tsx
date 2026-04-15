@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { MapPin, Plus, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { API_BASE_URL, Address } from '@/lib/api';
+import { safeFetch, Address } from '@/lib/api';
 
 export default function AddressesPage() {
     const [addresses, setAddresses] = useState<Address[]>([]);
@@ -22,13 +22,11 @@ export default function AddressesPage() {
     });
 
     const fetchAddresses = async () => {
-        const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE_URL}/addresses/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            setAddresses(data);
+        try {
+            const data = await safeFetch('/addresses/');
+            if (data) setAddresses(data);
+        } catch (err) {
+            console.error("Failed to fetch addresses:", err);
         }
         setLoading(false);
     };
@@ -42,17 +40,20 @@ export default function AddressesPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE_URL}/addresses/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(formData)
-        });
+        
+        // Basic Validation
+        const phoneRegex = /^[0-9+ \-()]{8,20}$/;
+        if (!phoneRegex.test(formData.phone_number)) {
+            alert("Please enter a valid phone number.");
+            return;
+        }
 
-        if (res.ok) {
+        try {
+            await safeFetch('/addresses/', {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
+
             setShowForm(false);
             setFormData({
                 full_name: '',
@@ -66,16 +67,20 @@ export default function AddressesPage() {
                 is_default: false
             });
             fetchAddresses();
+        } catch (err: any) {
+            alert(err.message || "Failed to save address.");
         }
     };
 
     const deleteAddress = async (id: number) => {
-        const token = localStorage.getItem('access_token');
-        await fetch(`${API_BASE_URL}/addresses/${id}/`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        fetchAddresses();
+        try {
+            await safeFetch(`/addresses/${id}/`, {
+                method: 'DELETE'
+            });
+            fetchAddresses();
+        } catch (err) {
+            console.error("Failed to delete address:", err);
+        }
     };
 
     if (loading) return null;
