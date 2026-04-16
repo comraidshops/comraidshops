@@ -38,6 +38,7 @@ interface Product {
     category_slug: string;
     uploaded_images?: File[];
     uploaded_video_360?: File;
+    vendor?: number;
 }
 
 interface Category {

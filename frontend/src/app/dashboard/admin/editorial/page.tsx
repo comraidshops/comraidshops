@@ -59,6 +59,7 @@ interface EditorialBase {
     magazine_ids?: number[];
     article_ids?: number[];
     linked_article_ids?: number[];
+    visibility?: boolean;
 }
 
 interface MagazineOption {
@@ -69,7 +70,7 @@ interface MagazineOption {
 function EditorialContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const tabParam = searchParams.get('tab') as EditorialType;
+    const tabParam = searchParams?.get('tab') as EditorialType;
 
     const [activeTab, setActiveTab] = useState<EditorialType>(tabParam || 'magazines');
     const [items, setItems] = useState<EditorialBase[]>([]);
