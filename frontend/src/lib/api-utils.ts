@@ -5,29 +5,41 @@
 
 import { API_BASE_URL } from './constants';
 
+let refreshPromise: Promise<string> | null = null;
+
 export async function refreshToken() {
-    const refresh = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
-    if (!refresh) throw new Error("No refresh token available");
+    if (refreshPromise) return refreshPromise;
 
-    const res = await fetch(`${API_BASE_URL}/auth/refresh/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh })
-    });
+    refreshPromise = (async () => {
+        try {
+            const refresh = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+            if (!refresh) throw new Error("No refresh token available");
 
-    if (!res.ok) {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
+            const res = await fetch(`${API_BASE_URL}/auth/refresh/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh })
+            });
+
+            if (!res.ok) {
+                if (typeof window !== 'undefined') {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                }
+                throw new Error("Session expired. Please login again.");
+            }
+
+            const data = await res.json();
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('access_token', data.access);
+            }
+            return data.access;
+        } finally {
+            refreshPromise = null;
         }
-        throw new Error("Session expired. Please login again.");
-    }
+    })();
 
-    const data = await res.json();
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('access_token', data.access);
-    }
-    return data.access;
+    return refreshPromise;
 }
 
 function formatErrorMessage(status: number, detail: string): string {
