@@ -135,22 +135,24 @@ def handle_order_status_change(sender, instance, created, **kwargs):
             return
 
         # ── Notifications & Emails (non-critical — must never crash) ──────
-        try:
-            # ── Notify customer ───────────────────────────────────────────
-            if instance.customer:
-                Notification.objects.get_or_create(
+        # 1. Customer Push Notification
+        if instance.customer:
+            try:
+                Notification.objects.create(
                     user=instance.customer,
                     title=f'Payment Confirmed — Order #{instance.id}',
-                    defaults={
-                        'body': (
-                            f'Great news! Your payment for Order #{instance.id} has been confirmed. '
-                            f'Total: ₦{instance.total_amount:,.2f}. Your vendors are preparing your items.'
-                        )
-                    }
+                    body=(
+                        f'Great news! Your payment for Order #{instance.id} has been confirmed. '
+                        f'Total: ₦{instance.total_amount:,.2f}. Your vendors are preparing your items.'
+                    )
                 )
+            except Exception as e:
+                logger.error(f"[signals] Customer push notification error for Order #{instance.pk}: {e}")
 
-            user_email = getattr(instance.customer, 'email', None) or instance.guest_email
-            if user_email:
+        # 2. Customer Email
+        user_email = getattr(instance.customer, 'email', None) or instance.guest_email
+        if user_email:
+            try:
                 send_platform_email(
                     subject=f'Payment Confirmed — Order #{instance.id}',
                     template_name='order/order_confirmation.html',
@@ -162,42 +164,49 @@ def handle_order_status_change(sender, instance, created, **kwargs):
                     },
                     recipient_list=[user_email],
                 )
+            except Exception as e:
+                logger.error(f"[signals] Customer email error for Order #{instance.pk}: {e}")
 
-            # ── Notify each vendor ────────────────────────────────────────
+        # 3. Vendor Notifications & Emails
+        try:
             vendor_items = {}
             for item in instance.items.select_related('product__vendor').all():
                 vendor = item.product.vendor
                 vendor_items.setdefault(vendor, []).append(item)
 
             for vendor, items in vendor_items.items():
-                VendorNotification.objects.create(
-                    vendor=vendor,
-                    message=(
-                        f'Payment confirmed for Order #{instance.id}. '
-                        f'Please begin processing. Items: {", ".join(i.product.name for i in items)}.'
-                    ),
-                    type='payment_confirmed',
-                    read=False,
-                )
-                if vendor.user.email:
-                    send_platform_email(
-                        subject=f'New Confirmed Order #{instance.id}',
-                        template_name='order/vendor_notification.html',
-                        context={
-                            'vendor': vendor,
-                            'order': instance,
-                            'vendor_items': items,
-                        },
-                        recipient_list=[vendor.user.email],
+                try:
+                    VendorNotification.objects.create(
+                        vendor=vendor,
+                        message=(
+                            f'Payment confirmed for Order #{instance.id}. '
+                            f'Please begin processing. Items: {", ".join(i.product.name for i in items)}.'
+                        ),
+                        type='payment_confirmed',
+                        read=False,
                     )
+                except Exception as e:
+                    logger.error(f"[signals] Vendor Push error for vendor {vendor.id}: {e}")
 
+                if vendor.user.email:
+                    try:
+                        send_platform_email(
+                            subject=f'New Confirmed Order #{instance.id}',
+                            template_name='order/vendor_notification.html',
+                            context={
+                                'vendor': vendor,
+                                'order': instance,
+                                'vendor_items': items,
+                            },
+                            recipient_list=[vendor.user.email],
+                        )
+                    except Exception as e:
+                        logger.error(f"[signals] Vendor Email error for vendor {vendor.id}: {e}")
         except Exception as e:
             import traceback
-            with open("/tmp/comraid_signal_error.log", "w") as f:
-                f.write(f"ERROR IN NOTIFICATION BLOCK:\n{traceback.format_exc()}")
-            logger.error(
-                f"[signals] Non-critical error sending notifications for Order #{instance.pk}: {e}"
-            )         )
+            with open("/tmp/comraid_signal_error_vendor.log", "w") as f:
+                f.write(f"ERROR IN VENDOR NOTIFICATIONS:\n{traceback.format_exc()}")
+            logger.error(f"[signals] Critical Vendor notification prep error: {e}")         )
                 if vendor.user.email:
                     send_platform_email(
                         subject=f'New Confirmed Order #{instance.id}',
