@@ -206,22 +206,7 @@ def handle_order_status_change(sender, instance, created, **kwargs):
             import traceback
             with open("/tmp/comraid_signal_error_vendor.log", "w") as f:
                 f.write(f"ERROR IN VENDOR NOTIFICATIONS:\n{traceback.format_exc()}")
-            logger.error(f"[signals] Critical Vendor notification prep error: {e}")         )
-                if vendor.user.email:
-                    send_platform_email(
-                        subject=f'New Confirmed Order #{instance.id}',
-                        template_name='order/vendor_notification.html',
-                        context={
-                            'vendor': vendor,
-                            'order': instance,
-                            'vendor_items': items,
-                        },
-                        recipient_list=[vendor.user.email],
-                    )
-        except Exception as e:
-            logger.error(
-                f"[signals] Non-critical error sending notifications for Order #{instance.pk}: {e}"
-            )
+            logger.error(f"[signals] Critical Vendor notification prep error: {e}")
 
     # ─── 2. ORDER STATUS CHANGE NOTIFICATIONS ────────────────────────────────
     if instance.order_status != prev_order:
