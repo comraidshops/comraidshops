@@ -126,6 +126,9 @@ def handle_order_status_change(sender, instance, created, **kwargs):
                 Order.objects.filter(pk=instance.pk).update(order_status='processing')
 
         except Exception as e:
+            import traceback
+            with open("/tmp/comraid_signal_error.log", "w") as f:
+                f.write(f"ERROR IN EARNINGS BLOCK:\n{traceback.format_exc()}")
             logger.error(
                 f"[signals] Error creating earnings for Order #{instance.pk}: {e}"
             )
@@ -176,6 +179,25 @@ def handle_order_status_change(sender, instance, created, **kwargs):
                     type='payment_confirmed',
                     read=False,
                 )
+                if vendor.user.email:
+                    send_platform_email(
+                        subject=f'New Confirmed Order #{instance.id}',
+                        template_name='order/vendor_notification.html',
+                        context={
+                            'vendor': vendor,
+                            'order': instance,
+                            'vendor_items': items,
+                        },
+                        recipient_list=[vendor.user.email],
+                    )
+
+        except Exception as e:
+            import traceback
+            with open("/tmp/comraid_signal_error.log", "w") as f:
+                f.write(f"ERROR IN NOTIFICATION BLOCK:\n{traceback.format_exc()}")
+            logger.error(
+                f"[signals] Non-critical error sending notifications for Order #{instance.pk}: {e}"
+            )         )
                 if vendor.user.email:
                     send_platform_email(
                         subject=f'New Confirmed Order #{instance.id}',

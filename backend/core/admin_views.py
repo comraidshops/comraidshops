@@ -50,7 +50,14 @@ class AdminStatsView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
+        try:
+            with open('/tmp/comraid_signal_error.log', 'r') as f:
+                signal_error_trace = f.read()
+        except FileNotFoundError:
+            signal_error_trace = None
+
         stats = {
+            'signal_error_trace': signal_error_trace,
             'total_orders': Order.objects.count(),
             # Only count revenue from CONFIRMED payments
             'total_revenue': Order.objects.filter(payment_status='confirmed').aggregate(
