@@ -76,8 +76,9 @@ def handle_order_status_change(sender, instance, created, **kwargs):
                     vendor = item.product.vendor
                     retail_total = item.price * item.quantity
                     commission_rate = vendor.commission_rate
-                    net_amount = retail_total / (1 + commission_rate)
-                    commission_amount = retail_total - net_amount
+                    # Ensure Decimal precision to 2 places to prevent MySQL Strict Mode truncation crash
+                    net_amount = round(retail_total / (1 + commission_rate), 2)
+                    commission_amount = round(retail_total - net_amount, 2)
 
                     # Commission record per item
                     Commission.objects.create(
@@ -106,9 +107,9 @@ def handle_order_status_change(sender, instance, created, **kwargs):
                         vendor=vendor,
                         order=instance,
                         defaults={
-                            'gross_amount': data['retail_total'],
-                            'commission_amount': data['commission_amount'],
-                            'net_amount': data['net_amount'],
+                            'gross_amount': round(data['retail_total'], 2),
+                            'commission_amount': round(data['commission_amount'], 2),
+                            'net_amount': round(data['net_amount'], 2),
                             'status': 'pending',
                         }
                     )
