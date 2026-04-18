@@ -73,8 +73,8 @@ export default function NotificationsPanel({ notifications, onMarkRead }: Notifi
 
             {/* Notification Modal Preview */}
             {selectedNotification && (
-                <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-background border border-border w-full md:max-w-md p-5 md:p-6 shadow-2xl relative rounded-t-2xl md:rounded-none">
+                <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-0 md:p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-background border border-border w-full md:max-w-md p-5 md:p-6 shadow-2xl relative rounded-b-2xl md:rounded-none">
                         <button 
                             onClick={() => setSelectedNotification(null)}
                             className="absolute top-4 right-4 text-secondary hover:text-primary transition-colors p-1"

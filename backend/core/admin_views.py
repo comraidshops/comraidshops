@@ -44,6 +44,16 @@ class AdminProductSerializer(ProductSerializer):
     class Meta(ProductSerializer.Meta):
         fields = ProductSerializer.Meta.fields
 
+class AdminBrandSerializer(BrandSerializer):
+    """
+    Admin-safe serializer that provides sensible defaults for
+    annotation-backed fields so create/update responses don't crash.
+    """
+    approved_product_count = serializers.IntegerField(read_only=True, default=0)
+    total_product_count = serializers.IntegerField(read_only=True, default=0)
+    community_count = serializers.IntegerField(read_only=True, default=0)
+    is_member = serializers.BooleanField(read_only=True, default=False)
+
 # --- Administrative ViewSets ---
 
 class AdminStatsView(APIView):
@@ -284,98 +294,112 @@ class AdminOrderViewSet(viewsets.ModelViewSet):
             order.payment_status = 'confirmed'
             order.save()
 
-        # ── Fire notifications AFTER the transaction has committed ────────
-        order_id = order.id
-        order_pk = order.pk
+            # ── Fire notifications AFTER the transaction has committed ────────
+            # CRITICAL: on_commit MUST be registered INSIDE the atomic block
+            # so Django ties the callback to THIS transaction's commit.
+            order_id = order.id
+            order_pk = order.pk
 
-        def _send_confirmations():
-            """Runs after the atomic block commits — guaranteed to execute."""
-            from .models import Notification, VendorNotification
-            from .email_service import send_platform_email
-            from django.conf import settings
+            def _send_confirmations():
+                """Runs after the atomic block commits — guaranteed to execute."""
+                from .models import Notification, VendorNotification
+                from .email_service import send_platform_email
+                from django.conf import settings
+                import logging
+                _logger = logging.getLogger(__name__)
 
-            frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
+                frontend_url = getattr(settings, 'FRONTEND_URL', 'https://comraidshops.art')
 
-            # Reload order to get fresh state
-            fresh_order = Order.objects.select_related('customer').prefetch_related(
-                'items__product__vendor__user'
-            ).get(pk=order_pk)
-
-            # 1. Customer In-App Notification
-            if fresh_order.customer:
                 try:
-                    Notification.objects.create(
-                        user=fresh_order.customer,
-                        title=f'Payment Confirmed — Order #{order_id}',
-                        body=(
-                            f'Great news! Your payment for Order #{order_id} has been confirmed. '
-                            f'Total: ₦{fresh_order.total_amount:,.2f}. Your vendors are preparing your items.'
+                    # Reload order to get fresh state
+                    fresh_order = Order.objects.select_related('customer').prefetch_related(
+                        'items__product__vendor__user'
+                    ).get(pk=order_pk)
+                except Order.DoesNotExist:
+                    _logger.error(f"[confirm_payment] Order #{order_pk} not found for notifications")
+                    return
+
+                # 1. Customer In-App Notification
+                if fresh_order.customer:
+                    try:
+                        Notification.objects.create(
+                            user=fresh_order.customer,
+                            title=f'Payment Confirmed — Order #{order_id}',
+                            body=(
+                                f'Great news! Your payment for Order #{order_id} has been confirmed. '
+                                f'Total: ₦{fresh_order.total_amount:,.2f}. Your vendors are preparing your items.'
+                            )
                         )
-                    )
-                    logger.info(f"[confirm_payment] Customer notification created for Order #{order_id}")
-                except Exception as e:
-                    logger.error(f"[confirm_payment] Customer notification error: {e}")
+                        _logger.info(f"[confirm_payment] Customer notification created for Order #{order_id}")
+                    except Exception as e:
+                        _logger.error(f"[confirm_payment] Customer notification error: {e}")
 
-            # 2. Customer Email
-            user_email = getattr(fresh_order.customer, 'email', None) or fresh_order.guest_email
-            if user_email:
-                try:
-                    send_platform_email(
-                        subject=f'Payment Confirmed — Order #{order_id}',
-                        template_name='order/order_confirmation.html',
-                        context={
-                            'user': fresh_order.customer,
-                            'order': fresh_order,
-                            'items': fresh_order.items.all(),
-                            'order_url': f'{frontend_url}/dashboard/user/orders/{order_id}',
-                        },
-                        recipient_list=[user_email],
-                    )
-                    logger.info(f"[confirm_payment] Customer email sent to {user_email}")
-                except Exception as e:
-                    logger.error(f"[confirm_payment] Customer email error: {e}")
-
-            # 3. Vendor In-App Notifications + Emails
-            vendor_items = {}
-            for item in fresh_order.items.select_related('product__vendor__user').all():
-                vendor = item.product.vendor
-                vendor_items.setdefault(vendor, []).append(item)
-
-            for vendor, items in vendor_items.items():
-                # Vendor In-App Notification
-                try:
-                    VendorNotification.objects.create(
-                        vendor=vendor,
-                        message=(
-                            f'Payment confirmed for Order #{order_id}. '
-                            f'Please begin processing. Items: {", ".join(i.product.name for i in items)}.'
-                        ),
-                        type='payment_confirmed',
-                        read=False,
-                    )
-                    logger.info(f"[confirm_payment] VendorNotification created for vendor {vendor.brand_name}")
-                except Exception as e:
-                    logger.error(f"[confirm_payment] Vendor notification error for {vendor.brand_name}: {e}")
-
-                # Vendor Email
-                if vendor.user and vendor.user.email:
+                # 2. Customer Email
+                user_email = getattr(fresh_order.customer, 'email', None) or fresh_order.guest_email
+                if user_email:
                     try:
                         send_platform_email(
-                            subject=f'New Confirmed Order #{order_id}',
-                            template_name='order/vendor_notification.html',
+                            subject=f'Payment Confirmed — Order #{order_id}',
+                            template_name='order/order_confirmation.html',
                             context={
-                                'vendor': vendor,
+                                'user': fresh_order.customer,
                                 'order': fresh_order,
-                                'vendor_items': items,
+                                'items': fresh_order.items.all(),
+                                'order_url': f'{frontend_url}/dashboard/user/orders/{order_id}',
                             },
-                            recipient_list=[vendor.user.email],
+                            recipient_list=[user_email],
                         )
-                        logger.info(f"[confirm_payment] Vendor email sent to {vendor.user.email}")
+                        _logger.info(f"[confirm_payment] Customer email sent to {user_email}")
                     except Exception as e:
-                        logger.error(f"[confirm_payment] Vendor email error for {vendor.brand_name}: {e}")
+                        _logger.error(f"[confirm_payment] Customer email error: {e}")
 
-        # Use on_commit to ensure notifications fire after DB write is finalized
-        transaction.on_commit(_send_confirmations)
+                # 3. Vendor In-App Notifications + Emails
+                vendor_items = {}
+                for item in fresh_order.items.select_related('product__vendor__user').all():
+                    vendor = item.product.vendor
+                    if vendor:
+                        vendor_items.setdefault(vendor, []).append(item)
+
+                _logger.info(f"[confirm_payment] Found {len(vendor_items)} vendor(s) for Order #{order_id}")
+
+                for vendor, items in vendor_items.items():
+                    # Vendor In-App Notification
+                    try:
+                        VendorNotification.objects.create(
+                            vendor=vendor,
+                            message=(
+                                f'Payment confirmed for Order #{order_id}. '
+                                f'Please begin processing. Items: {", ".join(i.product.name for i in items)}.'
+                            ),
+                            type='payment_confirmed',
+                            read=False,
+                        )
+                        _logger.info(f"[confirm_payment] VendorNotification created for vendor {vendor.brand_name}")
+                    except Exception as e:
+                        _logger.error(f"[confirm_payment] Vendor notification error for {vendor.brand_name}: {e}")
+
+                    # Vendor Email
+                    vendor_email = getattr(vendor.user, 'email', None) if vendor.user else None
+                    if vendor_email:
+                        try:
+                            send_platform_email(
+                                subject=f'New Confirmed Order #{order_id}',
+                                template_name='order/vendor_notification.html',
+                                context={
+                                    'vendor': vendor,
+                                    'order': fresh_order,
+                                    'vendor_items': items,
+                                },
+                                recipient_list=[vendor_email],
+                            )
+                            _logger.info(f"[confirm_payment] Vendor email sent to {vendor_email}")
+                        except Exception as e:
+                            _logger.error(f"[confirm_payment] Vendor email error for {vendor.brand_name}: {e}")
+                    else:
+                        _logger.warning(f"[confirm_payment] No email for vendor {vendor.brand_name}, skipping email")
+
+            # Register callback INSIDE atomic block
+            transaction.on_commit(_send_confirmations)
 
         return Response({
             'status': 'payment confirmed',
@@ -619,7 +643,7 @@ class AdminFitFrameViewSet(viewsets.ModelViewSet):
 
 class AdminBrandViewSet(viewsets.ModelViewSet):
     queryset = Brand.objects.all().order_by('name')
-    serializer_class = BrandSerializer
+    serializer_class = AdminBrandSerializer
     permission_classes = [permissions.IsAdminUser]
 
 class AdminBroadcastView(APIView):

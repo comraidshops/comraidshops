@@ -585,6 +585,7 @@ function EditorialContent() {
                     {activeTab === 'brands' && (
                         <div className="space-y-6">
                             <AdminInput label="Tagline" value={currentItem?.tagline || ''} onChange={(e) => setCurrentItem({ ...currentItem, tagline: e.target.value })} />
+                            <AdminTextArea label="Description" value={currentItem?.description || ''} onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })} />
                             <AdminRichText label="Philosophy" value={currentItem?.philosophy || ''} onChange={(val) => setCurrentItem({ ...currentItem, philosophy: val })} />
                             <AdminInput label="Founder Name" value={currentItem?.founder_name || ''} onChange={(e) => setCurrentItem({ ...currentItem, founder_name: e.target.value })} />
                             <AdminTextArea label="Founder Bio" value={currentItem?.founder_bio || ''} onChange={(e) => setCurrentItem({ ...currentItem, founder_bio: e.target.value })} />
