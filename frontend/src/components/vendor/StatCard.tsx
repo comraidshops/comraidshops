@@ -9,7 +9,7 @@ interface StatCardProps {
 
 export default function StatCard({ title, value, description, icon }: StatCardProps) {
     return (
-        <div className="bg-background border border-border p-4 md:p-6 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden">
+        <div className="bg-background border border-border p-5 md:p-6 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden">
             {/* Left accent */}
             <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary/20 group-hover:bg-primary transition-colors duration-300" />
             

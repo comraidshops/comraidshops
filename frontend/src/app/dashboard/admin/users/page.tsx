@@ -284,7 +284,7 @@ export default function AdminUsers() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ delay: idx * 0.05 }}
-                            className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-6"
+                            className="p-5 md:p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-6"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
@@ -292,11 +292,11 @@ export default function AdminUsers() {
                                         {user.username[0].toUpperCase()}
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-bold tracking-tight flex items-center gap-2">
+                                        <h4 className="text-sm font-bold tracking-tight flex items-center gap-2 break-all">
                                             {user.username}
-                                            {user.is_superuser && <Shield className="w-3 h-3 text-primary" />}
+                                            {user.is_superuser && <Shield className="w-3 h-3 text-primary shrink-0" />}
                                         </h4>
-                                        <p className="text-[10px] text-white/40">{user.email}</p>
+                                        <p className="text-[10px] text-white/40 break-all">{user.email}</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">

@@ -76,17 +76,17 @@ export default function UserDashboardPage() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-border pb-10"
+                className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-border pb-8"
             >
-                <div className="space-y-2">
+                <div className="space-y-4 md:space-y-2">
                     <div className="flex items-center gap-3">
                         <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-foreground text-background px-2 py-0.5">Comraid Member</span>
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/40">Since 2026</span>
                     </div>
-                    <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none font-cormorant italic pr-4">
+                    <h2 className="text-4xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none font-cormorant italic pr-4 break-words">
                         Archive Entry: #{profile?.id?.toString().padStart(3, '0') || '001'}
                     </h2>
-                    <p className="text-secondary/60 text-xs font-bold uppercase tracking-[0.2em] max-w-md">
+                    <p className="text-secondary/60 text-xs font-bold uppercase tracking-[0.2em] max-w-sm">
                         Welcome back, {profile?.first_name || profile?.username || 'Curator'}. Manage your account, preferences, and order history.
                     </p>
                 </div>
@@ -104,7 +104,7 @@ export default function UserDashboardPage() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.1 }}
-                            className="bg-background border border-border p-8 hover:bg-foreground hover:text-background transition-all duration-500 group flex flex-col justify-between h-full min-h-[180px] relative overflow-hidden shadow-sm"
+                            className="bg-background border border-border p-6 md:p-8 hover:bg-foreground hover:text-background transition-all duration-500 group flex flex-col justify-between h-full min-h-[180px] relative overflow-hidden shadow-sm"
                         >
                             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                 <card.icon className="w-24 h-24 rotate-12" />

@@ -37,7 +37,7 @@ const StatCard = ({ title, value, icon: Icon, color, delay }: {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="relative group p-6 lg:p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] hover:border-white/10 transition-all duration-500 overflow-hidden"
+        className="relative group p-5 md:p-6 lg:p-8 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] hover:border-white/10 transition-all duration-500 overflow-hidden"
     >
         <div className={`absolute top-0 right-0 w-32 h-32 bg-${color}/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-${color}/20 transition-all duration-700`} />
         
@@ -53,7 +53,7 @@ const StatCard = ({ title, value, icon: Icon, color, delay }: {
             </div>
             
             <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-2">{title}</h3>
-            <p className="text-3xl lg:text-4xl font-playfair font-medium tracking-tight whitespace-nowrap">{value}</p>
+            <p className="text-2xl sm:text-3xl lg:text-4xl font-playfair font-medium tracking-tight break-all md:break-normal">{value}</p>
         </div>
     </motion.div>
 );

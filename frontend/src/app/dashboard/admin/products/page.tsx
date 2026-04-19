@@ -253,7 +253,7 @@ export default function AdminProducts() {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ delay: idx * 0.03 }}
-                            className="bg-white/[0.01] border border-white/5 hover:bg-white/[0.03] transition-all p-4 lg:p-6 rounded-[32px] flex flex-col sm:flex-row items-start sm:items-center gap-6 lg:gap-8 group"
+                            className="bg-white/[0.01] border border-white/5 hover:bg-white/[0.03] transition-all p-5 lg:p-6 rounded-[32px] flex flex-col sm:flex-row items-start sm:items-center gap-6 lg:gap-8 group"
                         >
                             <div className="relative w-20 h-20 lg:w-24 lg:h-24 rounded-2xl overflow-hidden bg-white/5 border border-white/5 shrink-0">
                                 {product.image ? (

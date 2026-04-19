@@ -282,13 +282,13 @@ export default function AdminOrders() {
             {/* Mobile View Placeholder */}
             <div className="lg:hidden space-y-4">
                 {orders.map((order) => (
-                    <div key={order.id} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-4">
-                        <div className="flex justify-between items-start">
-                            <h4 className="text-sm font-bold tracking-tight">Order #{order.id}</h4>
+                    <div className="p-5 md:p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-4">
+                        <div className="flex justify-between items-start gap-4">
+                            <h4 className="text-sm font-bold tracking-tight break-all">Order #{order.id}</h4>
                             {renderPaymentBadge(order.payment_status)}
                         </div>
-                        <div className="text-xl font-bold">₦{parseFloat(order.total_amount).toLocaleString()}</div>
-                        <div className="text-[10px] text-white/40">{order.customer_email || 'Guest'}</div>
+                        <div className="text-xl sm:text-2xl font-bold break-all">₦{parseFloat(order.total_amount).toLocaleString()}</div>
+                        <div className="text-[10px] text-white/40 break-all">{order.customer_email || 'Guest'}</div>
                         <div className="flex gap-2 pt-4 border-t border-white/5">
                             <button onClick={() => { setSelectedOrder(order); setIsViewModalOpen(true); }} className="flex-1 py-3 rounded-xl bg-white/5 text-white text-[10px] font-bold uppercase tracking-widest">
                                 View

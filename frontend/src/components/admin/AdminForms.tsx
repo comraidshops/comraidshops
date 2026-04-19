@@ -35,7 +35,7 @@ export function AdminModal({ isOpen, onClose, title, children, loading }: ModalP
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-[#0a0a0a] border border-white/5 rounded-[40px] p-8 lg:p-12 z-[101] max-h-[90vh] overflow-y-auto no-scrollbar"
+                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-[#0a0a0a] border border-white/5 rounded-[40px] p-6 md:p-8 lg:p-12 z-[101] max-h-[90vh] overflow-y-auto no-scrollbar"
                     >
                         <header className="flex items-center justify-between mb-8">
                             <h2 className="text-3xl font-playfair font-medium tracking-tight">{title}</h2>

@@ -35,7 +35,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
     const previewContent = getLongPreview();
 
     return (
-        <section className="relative w-full py-24 md:py-44 overflow-hidden bg-background">
+        <section className="relative w-full py-20 md:py-44 overflow-hidden bg-background">
             {/* Grain Overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay z-50 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
@@ -76,7 +76,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                                     <div className="h-px w-12 bg-primary/10"></div>
                                 </div>
 
-                                <h2 className="text-6xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tighter leading-[0.85] text-balance font-cormorant italic transition-all duration-700 lg:pr-32">
+                                <h2 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tighter leading-[0.85] text-balance font-cormorant italic transition-all duration-700 lg:pr-32">
                                     {cleanContent(magazine.articles?.[0]?.title || magazine.linked_articles?.[0]?.title || magazine.title || "")}.
                                 </h2>
                             </div>

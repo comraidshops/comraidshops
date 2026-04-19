@@ -35,7 +35,7 @@ export default function CurrentExhibition({ initialExhibition }: CurrentExhibiti
                         <span className="block text-xs font-bold uppercase tracking-[0.4em] text-primary">
                             Featured Exhibition
                         </span>
-                        <h2 className="font-bebas text-5xl md:text-8xl uppercase tracking-wide leading-[0.9] mb-4">
+                        <h2 className="font-bebas text-4xl sm:text-5xl md:text-8xl uppercase tracking-wide leading-[0.9] mb-4">
                             {exhibition.title}
                         </h2>
                         <p className="font-source-serif text-lg md:text-xl text-secondary/80 max-w-xl leading-relaxed mb-8 italic">

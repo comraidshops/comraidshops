@@ -69,7 +69,7 @@ export default function NotificationModal({ isOpen, onClose, notifications, unre
         },
         exit: {
             opacity: 0,
-            x: 40,
+            x: 20,
             scale: 0.97,
             transition: { duration: 0.25, ease: 'easeIn' },
         },
@@ -116,7 +116,7 @@ export default function NotificationModal({ isOpen, onClose, notifications, unre
                         {/* Content */}
                         <div className="relative flex flex-col h-full">
                             {/* Header */}
-                            <div className="px-8 pt-10 pb-6 border-b border-white/[0.06]">
+                            <div className="px-6 md:px-8 pt-10 pb-6 border-b border-white/[0.06]">
                                 <div className="flex items-start justify-between mb-8">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-3">
@@ -204,7 +204,7 @@ export default function NotificationModal({ isOpen, onClose, notifications, unre
                                                     />
                                                 )}
 
-                                                <div className="px-8 py-5">
+                                                <div className="px-6 md:px-8 py-5">
                                                     <div className="flex items-start gap-4">
                                                         {/* Status dot */}
                                                         <div className="pt-1 flex-shrink-0">
@@ -257,7 +257,7 @@ export default function NotificationModal({ isOpen, onClose, notifications, unre
                             </div>
 
                             {/* Footer */}
-                            <div className="px-8 py-5 border-t border-white/[0.06]">
+                            <div className="px-6 md:px-8 py-5 border-t border-white/[0.06]">
                                 <p className="text-[7px] font-bold uppercase tracking-[0.3em] text-white/15 text-center">
                                     Comraid Notification Centre · v0.4.2
                                 </p>
