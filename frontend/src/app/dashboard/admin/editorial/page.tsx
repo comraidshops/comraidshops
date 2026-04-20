@@ -101,6 +101,7 @@ function EditorialContent() {
     const [products, setProducts] = useState<{id: number, name: string}[]>([]);
     const [collections, setCollections] = useState<{id: number, name: string}[]>([]);
     const [articles, setArticles] = useState<{id: number, title: string}[]>([]);
+    const [brands, setBrands] = useState<{id: number, name: string}[]>([]);
 
     const { notify } = useNotification();
 
@@ -126,20 +127,22 @@ function EditorialContent() {
 
         async function fetchExhibitionDeps() {
             try {
-                const [prods, cols, arts] = await Promise.all([
+                const [prods, cols, arts, brnds] = await Promise.all([
                     safeFetch('/admin-api/products/'),
                     safeFetch('/admin-api/collections/'),
-                    safeFetch('/admin-api/articles/')
+                    safeFetch('/admin-api/articles/'),
+                    safeFetch('/admin-api/brands/')
                 ]);
                 setProducts(prods);
                 setCollections(cols);
                 setArticles(arts);
+                setBrands(brnds);
             } catch {}
         }
 
         fetchData();
         if (activeTab === 'articles' || activeTab === 'exhibitions' || activeTab === 'magazines') fetchMagazines();
-        if (activeTab === 'exhibitions' || activeTab === 'magazines') fetchExhibitionDeps();
+        if (activeTab === 'exhibitions' || activeTab === 'magazines' || activeTab === 'collections') fetchExhibitionDeps();
     }, [activeTab]);
 
     async function handleCreate(e: React.FormEvent) {
@@ -178,6 +181,11 @@ function EditorialContent() {
             // Explicit validation for Articles: Magazine ID is REQUIRED
             if (activeTab === 'articles' && !formData.has('magazine')) {
                 throw new Error("Please select a Magazine for this article.");
+            }
+
+            // Explicit validation for Collections: Brand ID is REQUIRED
+            if (activeTab === 'collections' && !formData.has('brand')) {
+                throw new Error("Please select a Brand for this collection.");
             }
 
 
@@ -474,7 +482,7 @@ function EditorialContent() {
                 <form onSubmit={isCreateModalOpen ? handleCreate : handleUpdate} className="space-y-6">
                     <AdminInput 
                         label={activeTab === 'slides' ? 'Main Text' : (activeTab === 'magazines' ? 'Title' : (activeTab === 'brands' ? 'Brand Name' : 'Name'))}
-                        value={(activeTab === 'brands' ? currentItem?.name : currentItem?.title) || ''} 
+                        value={(activeTab === 'magazines' || activeTab === 'articles' ? currentItem?.title : currentItem?.name) || ''} 
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const val = e.target.value;
                             if (activeTab === 'magazines') {
@@ -540,6 +548,18 @@ function EditorialContent() {
                                 ]}
                             />
                         </>
+                    )}
+
+                    {activeTab === 'collections' && (
+                        <AdminSelect 
+                            label="Brand"
+                            value={currentItem?.brand || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCurrentItem({ ...currentItem, brand: parseInt(e.target.value) })}
+                            options={[
+                                { value: '', label: 'Select Brand' },
+                                ...brands.map(b => ({ value: b.id, label: b.name }))
+                            ]}
+                        />
                     )}
 
 

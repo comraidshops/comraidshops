@@ -207,6 +207,18 @@ class Collection(models.Model):
     meta_title = models.CharField(max_length=255, blank=True, null=True, help_text="SEO override title")
     meta_description = models.TextField(blank=True, null=True, help_text="SEO override description")
 
+    def save(self, *args, **kwargs):
+        from django.utils.text import slugify
+        if not self.slug:
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            while Collection.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
     class Meta:
         ordering = ['order']
 
