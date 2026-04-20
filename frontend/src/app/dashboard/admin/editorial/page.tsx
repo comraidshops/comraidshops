@@ -354,7 +354,7 @@ function EditorialContent() {
                 <AnimatePresence mode="popLayout">
                     {filteredItems.map((item, idx) => {
                         const title = item.title || item.name || (activeTab === 'slides' ? `Hero Slide #${item.order}` : 'Untitled');
-                        const thumb = item.thumbnail || item.image || item.cover_image || item.logo || item.hero_image || '/images/placeholder-editorial.jpg';
+                        const thumb = item.preview_image || item.thumbnail || item.image || item.cover_image || item.logo || item.hero_image || '/images/placeholder-editorial.jpg';
                         const statusActive = activeTab === 'slides' ? item.is_active : item.is_featured;
                         
                         return (
