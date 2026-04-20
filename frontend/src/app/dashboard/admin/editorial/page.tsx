@@ -61,8 +61,8 @@ interface EditorialBase {
     article_ids?: number[];
     linked_article_ids?: number[];
     visibility?: boolean;
+    brand?: number | null;
 }
-
 interface MagazineOption {
     id: number;
     title: string;
