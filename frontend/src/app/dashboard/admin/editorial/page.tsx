@@ -473,7 +473,7 @@ function EditorialContent() {
                 <form onSubmit={isCreateModalOpen ? handleCreate : handleUpdate} className="space-y-6">
                     <AdminInput 
                         label={activeTab === 'slides' ? 'Main Text' : (activeTab === 'magazines' ? 'Title' : (activeTab === 'brands' ? 'Brand Name' : 'Name'))}
-                        value={currentItem?.title || currentProductLabel()} 
+                        value={(activeTab === 'brands' ? currentItem?.name : currentItem?.title) || ''} 
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const val = e.target.value;
                             if (activeTab === 'magazines') {
@@ -590,7 +590,15 @@ function EditorialContent() {
                             <AdminInput label="Founder Name" value={currentItem?.founder_name || ''} onChange={(e) => setCurrentItem({ ...currentItem, founder_name: e.target.value })} />
                             <AdminTextArea label="Founder Bio" value={currentItem?.founder_bio || ''} onChange={(e) => setCurrentItem({ ...currentItem, founder_bio: e.target.value })} />
                             <div className="grid grid-cols-2 gap-4">
-                                <AdminInput label="Established Year" type="number" value={currentItem?.established_year || ''} onChange={(e) => setCurrentItem({ ...currentItem, established_year: parseInt(e.target.value) })} />
+                                <AdminInput 
+                                    label="Established Year" 
+                                    type="number" 
+                                    value={currentItem?.established_year || ''} 
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setCurrentItem({ ...currentItem, established_year: val === '' ? null : parseInt(val) });
+                                    }} 
+                                />
                                 <AdminInput label="Origin Country" value={currentItem?.origin_country || ''} onChange={(e) => setCurrentItem({ ...currentItem, origin_country: e.target.value })} />
                             </div>
                             <AdminInput label="Website" value={currentItem?.website || ''} onChange={(e) => setCurrentItem({ ...currentItem, website: e.target.value })} />
