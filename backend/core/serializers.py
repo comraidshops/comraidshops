@@ -300,7 +300,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Collection
-        fields = ['id', 'name', 'slug', 'season', 'description', 'hero_image', 'products', 'is_featured', 'order', 'meta_title', 'meta_description']
+        fields = ['id', 'name', 'slug', 'season', 'description', 'hero_image', 'products', 'brand', 'is_featured', 'order', 'meta_title', 'meta_description']
 
     def get_products(self, obj):
         qs = obj.products.filter(status='approved')
