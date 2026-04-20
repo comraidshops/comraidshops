@@ -49,30 +49,31 @@ export default function HeroStatement({ initialSlides, initialUser }: HeroStatem
 
     const { greeting, buttonText, href } = getRoleContent();
 
-    // Fallback if no dynamic slides exist
-    const displaySlides = slides.length > 0 ? slides : [{ id: 0, image: '/images/selected-not-stocked.jpg' }];
+    const displaySlides = slides;
 
     return (
         <section className="relative h-[calc(100svh-4rem)] w-full overflow-hidden bg-black text-white flex flex-col items-center justify-center">
             {/* Background Media - Dynamic Slideshow */}
             <div className="absolute inset-0 z-0">
                 <AnimatePresence mode="wait">
-                    <motion.div
-                        key={displaySlides[currentIndex]?.id || currentIndex}
-                        initial={{ opacity: 0, scale: 1.1 }}
-                        animate={{ opacity: 0.6, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 1.5, ease: "easeInOut" }}
-                        className="absolute inset-0"
-                    >
-                        <Image
-                            src={displaySlides[currentIndex]?.image}
-                            alt="Brand Gallery"
-                            fill
-                            className="object-cover"
-                            priority={currentIndex === 0}
-                        />
-                    </motion.div>
+                    {displaySlides.length > 0 && displaySlides[currentIndex]?.image && (
+                        <motion.div
+                            key={displaySlides[currentIndex].id || currentIndex}
+                            initial={{ opacity: 0, scale: 1.1 }}
+                            animate={{ opacity: 0.6, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 1.5, ease: "easeInOut" }}
+                            className="absolute inset-0"
+                        >
+                            <Image
+                                src={displaySlides[currentIndex].image}
+                                alt="Brand Gallery"
+                                fill
+                                className="object-cover"
+                                priority={currentIndex === 0}
+                            />
+                        </motion.div>
+                    )}
                 </AnimatePresence>
             </div>
 
