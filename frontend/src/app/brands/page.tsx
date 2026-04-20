@@ -58,7 +58,7 @@ export default async function BrandsPage() {
                                         src={brand.hero_image ? (brand.hero_image.startsWith('http') ? brand.hero_image : `${MEDIA_BASE}${brand.hero_image}`) : '/images/placeholder-editorial.jpg'}
                                         alt={brand.name}
                                         fill
-                                        className="object-cover group-hover:scale-105 transition-transform duration-1000"
+                                        className="object-contain p-8 group-hover:scale-105 transition-transform duration-1000"
                                         priority={brands.indexOf(brand) < 2}
                                         sizes="(max-width: 768px) 100vw, 50vw"
                                     />
