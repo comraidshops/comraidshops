@@ -28,9 +28,11 @@ export default function CollectionsSection({ collections }: { collections?: Coll
                         >
                             <Link href={`/collections/${collection.slug}`} className="block w-full h-full">
                                 <div className="aspect-[4/5] relative overflow-hidden mb-6 bg-secondary/5">
-                                    {collection.hero_image ? (
+                                    {collection.preview_image || collection.hero_image ? (
                                         <Image
-                                            src={collection.hero_image.startsWith('http') ? collection.hero_image : `${API_BASE_URL}${collection.hero_image}`}
+                                            src={(collection.preview_image || collection.hero_image || '').startsWith('http') 
+                                                ? (collection.preview_image || collection.hero_image || '') 
+                                                : `${API_BASE_URL}${collection.preview_image || collection.hero_image}`}
                                             alt={collection.name}
                                             fill
                                             className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"

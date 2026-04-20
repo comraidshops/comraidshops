@@ -163,6 +163,7 @@ export interface Collection {
     season?: string;
     description?: string;
     hero_image?: string | null;
+    preview_image?: string | null;
     products?: Product[];
     is_featured?: boolean;
     order?: number;

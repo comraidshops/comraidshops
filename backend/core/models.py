@@ -199,6 +199,7 @@ class Collection(models.Model):
     season = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
     hero_image = models.ImageField(upload_to="collections/heroes/", null=True, blank=True)
+    preview_image = models.ImageField(upload_to="collections/previews/", null=True, blank=True)
     is_featured = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

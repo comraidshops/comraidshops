@@ -300,7 +300,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Collection
-        fields = ['id', 'name', 'slug', 'season', 'description', 'hero_image', 'products', 'brand', 'is_featured', 'order', 'meta_title', 'meta_description']
+        fields = ['id', 'name', 'slug', 'season', 'description', 'hero_image', 'preview_image', 'products', 'brand', 'is_featured', 'order', 'meta_title', 'meta_description']
         extra_kwargs = {'slug': {'required': False}}
 
     def get_products(self, obj):

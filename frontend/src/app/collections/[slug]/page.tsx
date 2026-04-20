@@ -85,7 +85,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
                             src={collection.hero_image}
                             alt={collection.name}
                             fill
-                            className="object-cover"
+                            className="object-contain bg-black/20"
                             priority
                         />
                     </>

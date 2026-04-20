@@ -525,8 +525,17 @@ function EditorialContent() {
                                 ...currentItem, 
                                 [activeTab === 'magazines' || activeTab === 'exhibitions' ? 'thumbnail' : 
                                  (activeTab === 'articles' || activeTab === 'slides' ? 'image' : 
-                                 (activeTab === 'fitframes' ? 'cover_image' : 'hero_image'))]: file as File
+                                 (activeTab === 'fitframes' ? 'cover_image' : 
+                                 (activeTab === 'collections' ? 'hero_image' : 'hero_image')))]: file as File
                             })}
+                        />
+                    )}
+
+                    {activeTab === 'collections' && (
+                        <AdminImageUpload 
+                            label="Preview Image"
+                            preview={currentItem?.preview_image || undefined}
+                            onChange={(file: File) => setCurrentItem({ ...currentItem, preview_image: file as File })}
                         />
                     )}
 
