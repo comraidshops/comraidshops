@@ -37,10 +37,10 @@ interface EditorialBase {
     philosophy?: string;
     founder_name?: string;
     founder_bio?: string;
-    established_year?: number;
+    established_year?: number | null;
     origin_country?: string;
     website?: string;
-    magazine?: number;
+    magazine?: number | null;
     article?: { content: string };
     video_url?: string;
     video_file?: string | File | null;
