@@ -12,6 +12,7 @@ interface Brand {
     name: string;
     slug: string;
     description?: string;
+    preview_image?: string | null;
     hero_image?: string | null;
     logo?: string | null;
 }
@@ -55,10 +56,10 @@ export default async function BrandsPage() {
                             >
                                 <div className="aspect-[16/10] relative overflow-hidden bg-foreground/5">
                                     <Image 
-                                        src={brand.hero_image ? (brand.hero_image.startsWith('http') ? brand.hero_image : `${MEDIA_BASE}${brand.hero_image}`) : '/images/placeholder-editorial.jpg'}
+                                        src={brand.preview_image ? (brand.preview_image.startsWith('http') ? brand.preview_image : `${MEDIA_BASE}${brand.preview_image}`) : (brand.hero_image ? (brand.hero_image.startsWith('http') ? brand.hero_image : `${MEDIA_BASE}${brand.hero_image}`) : '/images/placeholder-editorial.jpg')}
                                         alt={brand.name}
                                         fill
-                                        className="object-contain p-8 group-hover:scale-105 transition-transform duration-1000"
+                                        className="object-cover group-hover:scale-105 transition-transform duration-1000"
                                         priority={brands.indexOf(brand) < 2}
                                         sizes="(max-width: 768px) 100vw, 50vw"
                                     />

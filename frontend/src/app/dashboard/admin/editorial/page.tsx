@@ -26,6 +26,7 @@ interface EditorialBase {
     image?: string | File | null;
     thumbnail?: string | File | null;
     hero_image?: string | File | null;
+    preview_image?: string | File | null;
     logo?: string | File | null;
     founder_image?: string | File | null;
     is_featured?: boolean;
@@ -373,7 +374,7 @@ function EditorialContent() {
                                         } 
                                         alt={title} 
                                         fill 
-                                        className={`${activeTab === 'brands' ? 'object-contain p-6' : 'object-cover group-hover:scale-110'} transition-transform duration-1000`} 
+                                        className="object-cover group-hover:scale-110 transition-transform duration-1000" 
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                                     
@@ -612,6 +613,11 @@ function EditorialContent() {
                                 label="Hero Image"
                                 preview={currentItem?.hero_image || undefined}
                                 onChange={(file: File) => setCurrentItem({ ...currentItem, hero_image: file as File })}
+                            />
+                            <AdminImageUpload 
+                                label="Preview Image"
+                                preview={currentItem?.preview_image || undefined}
+                                onChange={(file: File) => setCurrentItem({ ...currentItem, preview_image: file as File })}
                             />
                             <AdminImageUpload 
                                 label="Founder Image"

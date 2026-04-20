@@ -326,7 +326,7 @@ class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = [
-            'id', 'name', 'slug', 'description', 'tagline', 'hero_image', 'logo',
+            'id', 'name', 'slug', 'description', 'tagline', 'hero_image', 'preview_image', 'logo',
             'philosophy', 'founder_name', 'founder_bio', 'founder_image',
             'established_year', 'origin_country', 'website', 'social_links', 'awards',
             'manifesto', 'featured_quote', 'story',

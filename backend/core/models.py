@@ -135,6 +135,7 @@ class Brand(models.Model):
     description = models.TextField(blank=True)
     tagline = models.CharField(max_length=255, blank=True)
     hero_image = models.ImageField(upload_to="brands/heroes/", null=True, blank=True)
+    preview_image = models.ImageField(upload_to="brands/previews/", null=True, blank=True)
     logo = models.ImageField(upload_to="brands/logos/", null=True, blank=True)
     
     # SEO Fields
