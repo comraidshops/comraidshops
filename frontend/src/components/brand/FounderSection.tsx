@@ -54,7 +54,7 @@ export default function FounderSection({ name, bio, story, image, establishedYea
 
                     <div className="space-y-12">
                         {bio && (
-                            <div className="space-y-6 text-[18px] md:text-[20px] leading-relaxed text-foreground/80 font-light break-words [overflow-wrap:anywhere]">
+                            <div className="space-y-6 text-[14px] md:text-[20px] leading-relaxed text-foreground/80 font-light break-words [overflow-wrap:anywhere]">
                                 {bio.replace(/[\u00A0]/g, ' ').replace(/&nbsp;/g, ' ').split('\n\n').map((paragraph, idx) => (
                                     <p key={idx}>{paragraph}</p>
                                 ))}
@@ -66,7 +66,7 @@ export default function FounderSection({ name, bio, story, image, establishedYea
                         {story && (
                             <div className="pt-12 border-t border-foreground/5">
                                 <h4 className="text-[10px] uppercase tracking-[0.4em] text-secondary mb-8 font-semibold">The Brand Story</h4>
-                                <div className="space-y-6 text-[18px] md:text-[20px] leading-relaxed text-foreground/70 font-light italic break-words [overflow-wrap:anywhere]">
+                                <div className="space-y-6 text-[14px] md:text-[20px] leading-relaxed text-foreground/70 font-light italic break-words [overflow-wrap:anywhere]">
                                     {story.replace(/[\u00A0]/g, ' ').replace(/&nbsp;/g, ' ').split('\n\n').map((paragraph, idx) => (
                                         <p key={idx}>{paragraph}</p>
                                     ))}

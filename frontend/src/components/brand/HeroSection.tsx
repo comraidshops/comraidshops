@@ -46,7 +46,7 @@ export default function HeroSection({ name, description, heroImage, brandSlug, i
                 </h1>
 
                 {description && (
-                    <p className="text-lg md:text-xl text-foreground max-w-3xl leading-relaxed tracking-wide font-medium drop-shadow-lg break-words [overflow-wrap:anywhere]">
+                    <p className="text-sm md:text-xl text-foreground max-w-3xl leading-relaxed tracking-wide font-medium drop-shadow-lg break-words [overflow-wrap:anywhere]">
                         {description.replace(/[\u00A0]/g, ' ').replace(/&nbsp;/g, ' ')}
                     </p>
                 )}

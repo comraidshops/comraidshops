@@ -299,7 +299,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         Story
                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[1px] h-4 bg-secondary/50"></div>
                     </h2>
-                    <p className="text-lg md:text-2xl text-foreground font-light leading-loose tracking-wide whitespace-pre-line">
+                    <p className="text-sm md:text-2xl text-foreground font-light leading-loose tracking-wide whitespace-pre-line">
                         {story}
                     </p>
                 </section>

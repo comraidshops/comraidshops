@@ -81,7 +81,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                                 </h2>
                             </div>
 
-                            <div className="max-w-xl text-md md:text-lg text-secondary leading-relaxed font-light italic opacity-80 border-l-2 border-primary/20 pl-6 py-2">
+                            <div className="max-w-xl text-sm md:text-lg text-secondary leading-relaxed font-light italic opacity-80 border-l-2 border-primary/20 pl-6 py-2">
                                 <p className="line-clamp-[12] md:line-clamp-none">
                                     {previewContent}
                                 </p>
