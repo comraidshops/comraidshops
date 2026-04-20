@@ -373,7 +373,7 @@ function EditorialContent() {
                                         } 
                                         alt={title} 
                                         fill 
-                                        className="object-cover group-hover:scale-110 transition-transform duration-1000" 
+                                        className={`${activeTab === 'brands' ? 'object-contain p-6' : 'object-cover group-hover:scale-110'} transition-transform duration-1000`} 
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                                     
