@@ -209,22 +209,11 @@ export default async function MagazineDetailPage({
 
             <main className="max-w-3xl mx-auto">
                 <div className="aspect-[16/10] relative mb-24 bg-secondary/5 overflow-hidden group">
-                    {/* Blurred Background Layer */}
-                    <div className="absolute inset-0 z-0 overflow-hidden">
-                        <Image
-                            src={magazine.thumbnail ? (magazine.thumbnail.startsWith('http') ? magazine.thumbnail : `${MEDIA_BASE}${magazine.thumbnail}`) : "/new_image/art_of_suffering.jpg"}
-                            alt=""
-                            fill
-                            className="object-cover blur-[100px] scale-110 opacity-30"
-                            aria-hidden="true"
-                        />
-                    </div>
-
                     <Image
                         src={magazine.thumbnail ? (magazine.thumbnail.startsWith('http') ? magazine.thumbnail : `${MEDIA_BASE}${magazine.thumbnail}`) : "/new_image/art_of_suffering.jpg"}
                         alt={magazine.title}
                         fill
-                        className="object-contain transition-transform duration-1000 group-hover:scale-[1.02] z-10"
+                        className="object-cover md:object-top transition-transform duration-1000 group-hover:scale-[1.02]"
                         priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>

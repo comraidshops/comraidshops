@@ -80,28 +80,14 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
             <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden">
                 {collection.hero_image ? (
                     <>
-                        <div className="absolute inset-0 bg-black/40 z-20"></div>
-                        
-                        {/* Blurred Background Layer */}
-                        <div className="absolute inset-0 z-0 overflow-hidden">
-                            <Image
-                                src={collection.hero_image.startsWith('http') 
-                                    ? collection.hero_image 
-                                    : `${MEDIA_BASE}${collection.hero_image}`}
-                                alt=""
-                                fill
-                                className="object-cover blur-[100px] scale-110 opacity-30"
-                                aria-hidden="true"
-                            />
-                        </div>
-
+                        <div className="absolute inset-0 bg-black/40 z-10"></div>
                         <Image
                             src={collection.hero_image.startsWith('http') 
                                 ? collection.hero_image 
                                 : `${MEDIA_BASE}${collection.hero_image}`}
                             alt={collection.name}
                             fill
-                            className="object-contain bg-black/5 z-10"
+                            className="object-cover md:object-top"
                             priority
                         />
                     </>

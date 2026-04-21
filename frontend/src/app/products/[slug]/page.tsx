@@ -189,7 +189,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 src={image}
                                 alt={name}
                                 fill
-                                className="object-cover md:object-contain z-10"
+                                className="object-cover md:object-top"
                                 priority
                             />
                         ) : (

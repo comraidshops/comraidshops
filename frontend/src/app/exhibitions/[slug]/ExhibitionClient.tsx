@@ -18,28 +18,16 @@ export default function ExhibitionClient({ exhibition }: ExhibitionClientProps) 
                 {/* Immersive Background */}
                 {heroMedia && (
                     <div className="absolute inset-0 z-0">
-                        {/* Blurred Background Layer */}
-                        <div className="absolute inset-0 z-0 overflow-hidden">
-                            <Image
-                                src={heroMedia}
-                                alt=""
-                                fill
-                                unoptimized
-                                className="object-cover blur-[100px] scale-110 opacity-20 mix-blend-luminosity"
-                                aria-hidden="true"
-                            />
-                        </div>
-
                         <Image
                             src={heroMedia}
                             alt={exhibition.title}
                             fill
                             unoptimized
-                            className="object-cover md:object-contain opacity-40 object-center mix-blend-luminosity z-10 scale-105 duration-1000 ease-out animate-in fade-in zoom-in-95"
+                            className="object-cover md:object-top opacity-30 object-center mix-blend-luminosity scale-105 duration-1000 ease-out animate-in fade-in zoom-in-95"
                             priority
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/30 z-20" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] dark:bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] z-20" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/30" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] dark:bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
                     </div>
                 )}
 
