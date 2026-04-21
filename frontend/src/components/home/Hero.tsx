@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export default function Hero() {
     return (
-        <section className="relative h-[85vh] md:h-auto md:aspect-[3/4] lg:aspect-[16/10] xl:aspect-[21/9] w-full overflow-hidden bg-black text-white">
+        <section className="relative h-[85vh] w-full overflow-hidden bg-black text-white">
             {/* Background Image / Video Placeholder */}
             <div className="absolute inset-0 z-0">
                 <Image

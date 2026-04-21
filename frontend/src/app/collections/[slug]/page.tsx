@@ -77,7 +77,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
     return (
         <div className="min-h-screen bg-background text-foreground pb-12">
 
-            <section className="relative w-full h-[60vh] md:h-auto md:aspect-[3/4] lg:aspect-[16/10] xl:aspect-[21/9] flex items-center justify-center overflow-hidden">
+            <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden">
                 {collection.hero_image ? (
                     <>
                         <div className="absolute inset-0 bg-black/40 z-10"></div>

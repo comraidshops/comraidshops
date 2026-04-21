@@ -14,7 +14,7 @@ export default function ExhibitionClient({ exhibition }: ExhibitionClientProps) 
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
             {/* HERO SECTION */}
-            <header className="relative min-h-[85vh] md:min-h-0 md:aspect-[3/4] lg:aspect-[16/10] xl:aspect-[21/9] flex flex-col items-center justify-center pt-24 pb-12 px-6 overflow-hidden">
+            <header className="relative min-h-[85vh] flex flex-col items-center justify-center pt-24 pb-12 px-6 overflow-hidden">
                 {/* Immersive Background */}
                 {heroMedia && (
                     <div className="absolute inset-0 z-0">

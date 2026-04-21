@@ -19,7 +19,7 @@ export default function HeroSection({ name, description, heroImage, brandSlug, i
     const opacity = useTransform(scrollY, [0, 400], [1, 0])
 
     return (
-        <section className="relative w-full h-[85vh] md:h-auto md:aspect-[3/4] lg:aspect-[16/10] xl:aspect-[21/9] flex items-center justify-center overflow-hidden bg-background">
+        <section className="relative w-full h-[85vh] md:h-[100vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-background">
             {heroImage && typeof heroImage === 'string' && heroImage.length > 0 ? (
                 <motion.div style={{ y: y1 }} className="absolute inset-0 z-0 h-full w-full">
                     <Image
