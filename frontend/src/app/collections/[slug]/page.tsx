@@ -82,7 +82,9 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
                     <>
                         <div className="absolute inset-0 bg-black/40 z-10"></div>
                         <Image
-                            src={collection.hero_image}
+                            src={collection.hero_image.startsWith('http') 
+                                ? collection.hero_image 
+                                : `${MEDIA_BASE}${collection.hero_image}`}
                             alt={collection.name}
                             fill
                             className="object-contain bg-black/20"
