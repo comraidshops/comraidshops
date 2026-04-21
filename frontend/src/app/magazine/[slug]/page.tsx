@@ -213,7 +213,7 @@ export default async function MagazineDetailPage({
                         src={magazine.thumbnail ? (magazine.thumbnail.startsWith('http') ? magazine.thumbnail : `${MEDIA_BASE}${magazine.thumbnail}`) : "/new_image/art_of_suffering.jpg"}
                         alt={magazine.title}
                         fill
-                        className="object-cover md:object-top transition-transform duration-1000 group-hover:scale-[1.02]"
+                        className="object-cover transition-transform duration-1000 group-hover:scale-[1.02]"
                         priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>

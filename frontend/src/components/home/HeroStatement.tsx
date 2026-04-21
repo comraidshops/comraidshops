@@ -52,7 +52,7 @@ export default function HeroStatement({ initialSlides, initialUser }: HeroStatem
     const displaySlides = slides;
 
     return (
-        <section className="relative h-[calc(100svh-4rem)] w-full overflow-hidden bg-black text-white flex flex-col items-center justify-center">
+        <section className="relative h-[calc(100svh-4rem)] md:h-auto md:aspect-[3/4] lg:aspect-[16/10] xl:aspect-[21/9] w-full overflow-hidden bg-black text-white flex flex-col items-center justify-center">
             {/* Background Media - Dynamic Slideshow */}
             <div className="absolute inset-0 z-0">
                 <AnimatePresence mode="wait">
@@ -69,7 +69,7 @@ export default function HeroStatement({ initialSlides, initialUser }: HeroStatem
                                 src={displaySlides[currentIndex].image}
                                 alt="Brand Gallery"
                                 fill
-                                className="object-cover md:object-top"
+                                className="object-cover"
                                 priority={currentIndex === 0}
                             />
                         </motion.div>
