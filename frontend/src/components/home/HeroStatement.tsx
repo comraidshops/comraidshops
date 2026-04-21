@@ -65,11 +65,22 @@ export default function HeroStatement({ initialSlides, initialUser }: HeroStatem
                             transition={{ duration: 1.5, ease: "easeInOut" }}
                             className="absolute inset-0"
                         >
+                            {/* Blurred Background Layer */}
+                            <div className="absolute inset-0 z-0 overflow-hidden">
+                                <Image
+                                    src={displaySlides[currentIndex].image}
+                                    alt=""
+                                    fill
+                                    className="object-cover blur-[100px] scale-110 opacity-40"
+                                    aria-hidden="true"
+                                />
+                            </div>
+
                             <Image
                                 src={displaySlides[currentIndex].image}
                                 alt="Brand Gallery"
                                 fill
-                                className="object-cover"
+                                className="object-cover md:object-contain z-10"
                                 priority={currentIndex === 0}
                             />
                         </motion.div>

@@ -9,15 +9,28 @@ export default function Hero() {
         <section className="relative h-[85vh] w-full overflow-hidden bg-black text-white">
             {/* Background Image / Video Placeholder */}
             <div className="absolute inset-0 z-0">
+                {/* Blurred Background Layer to fill space on different aspect ratios */}
+                <div className="absolute inset-0 z-0 overflow-hidden">
+                    <Image
+                        src="/hero-placeholder.jpg"
+                        alt=""
+                        fill
+                        className="object-cover blur-[100px] scale-110 opacity-40"
+                        aria-hidden="true"
+                    />
+                </div>
+                
+                {/* Main Hero Image - Contained on Desktop, Cover on Mobile */}
                 <Image
                     src="/hero-placeholder.jpg"
                     alt="Hero Background"
                     fill
-                    className="object-cover opacity-60"
+                    className="object-cover md:object-contain opacity-80 z-10"
                     priority
                 />
+                
                 {/* Fallback gradient if no image */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 z-20" />
             </div>
 
             <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 max-w-4xl mx-auto space-y-6">

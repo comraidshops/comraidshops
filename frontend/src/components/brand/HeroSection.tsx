@@ -22,16 +22,27 @@ export default function HeroSection({ name, description, heroImage, brandSlug, i
         <section className="relative w-full h-[85vh] md:h-[100vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-background">
             {heroImage && typeof heroImage === 'string' && heroImage.length > 0 ? (
                 <motion.div style={{ y: y1 }} className="absolute inset-0 z-0 h-full w-full">
+                    {/* Blurred Background to prevent cropping gaps on Desktop */}
+                    <div className="absolute inset-0 z-0 overflow-hidden">
+                        <Image
+                            src={heroImage.startsWith('http') ? heroImage : `${API_BASE_URL}${heroImage}`}
+                            alt=""
+                            fill
+                            className="object-cover blur-[100px] scale-110 opacity-30"
+                            aria-hidden="true"
+                        />
+                    </div>
+
                     <Image
                         src={heroImage.startsWith('http') ? heroImage : `${API_BASE_URL}${heroImage}`}
                         alt={name}
                         fill
-                        className="object-cover object-center"
+                        className="object-cover md:object-contain object-center z-10"
                         priority
                         sizes="100vw"
                     />
                     {/* Strengthened dark overlay to improve text readability on bright images */}
-                    <div className="absolute inset-0 bg-black/20 bg-gradient-to-t from-background via-transparent to-black/40 z-10" />
+                    <div className="absolute inset-0 bg-black/20 bg-gradient-to-t from-background via-black/10 to-black/30 z-20" />
                 </motion.div>
             ) : (
                 <div className="absolute inset-0 z-0 bg-secondary/5" />
