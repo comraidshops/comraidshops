@@ -8,12 +8,12 @@ export default function Hero() {
     return (
         <section className="relative h-[85vh] w-full overflow-hidden bg-black text-white">
             {/* Background Image / Video Placeholder */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 xl:p-10 text-center">
                 <Image
                     src="/hero-placeholder.jpg"
                     alt="Hero Background"
                     fill
-                    className="object-cover"
+                    className="object-cover xl:object-contain"
                     priority
                 />
                 {/* Fallback gradient if no image */}

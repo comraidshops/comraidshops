@@ -21,12 +21,12 @@ export default function HeroSection({ name, description, heroImage, brandSlug, i
     return (
         <section className="relative w-full h-[85vh] md:h-[100vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-background">
             {heroImage && typeof heroImage === 'string' && heroImage.length > 0 ? (
-                <motion.div style={{ y: y1 }} className="absolute inset-0 z-0 h-full w-full">
+                <motion.div style={{ y: y1 }} className="absolute inset-0 z-0 h-full w-full xl:p-10">
                     <Image
                         src={heroImage.startsWith('http') ? heroImage : `${API_BASE_URL}${heroImage}`}
                         alt={name}
                         fill
-                        className="object-cover"
+                        className="object-cover xl:object-contain"
                         priority
                         sizes="100vw"
                     />

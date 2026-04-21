@@ -63,13 +63,13 @@ export default function HeroStatement({ initialSlides, initialUser }: HeroStatem
                             animate={{ opacity: 0.6, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ duration: 1.5, ease: "easeInOut" }}
-                            className="absolute inset-0"
+                            className="absolute inset-0 xl:p-10"
                         >
                             <Image
                                 src={displaySlides[currentIndex].image}
                                 alt="Brand Gallery"
                                 fill
-                                className="object-cover"
+                                className="object-cover xl:object-contain"
                                 priority={currentIndex === 0}
                             />
                         </motion.div>

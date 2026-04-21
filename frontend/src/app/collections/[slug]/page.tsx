@@ -77,7 +77,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
     return (
         <div className="min-h-screen bg-background text-foreground pb-12">
 
-            <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden">
+            <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden xl:p-10">
                 {collection.hero_image ? (
                     <>
                         <div className="absolute inset-0 bg-black/40 z-10"></div>
@@ -87,7 +87,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
                                 : `${MEDIA_BASE}${collection.hero_image}`}
                             alt={collection.name}
                             fill
-                            className="object-cover"
+                            className="object-cover xl:object-contain"
                             priority
                         />
                     </>

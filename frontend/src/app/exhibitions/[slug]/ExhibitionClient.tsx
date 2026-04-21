@@ -17,13 +17,13 @@ export default function ExhibitionClient({ exhibition }: ExhibitionClientProps) 
             <header className="relative min-h-[85vh] flex flex-col items-center justify-center pt-24 pb-12 px-6 overflow-hidden">
                 {/* Immersive Background */}
                 {heroMedia && (
-                    <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 z-0 xl:p-10">
                         <Image
                             src={heroMedia}
                             alt={exhibition.title}
                             fill
                             unoptimized
-                            className="object-cover opacity-30 object-center mix-blend-luminosity scale-105 duration-1000 ease-out animate-in fade-in zoom-in-95"
+                            className="object-cover xl:object-contain opacity-30 object-center mix-blend-luminosity scale-105 duration-1000 ease-out animate-in fade-in zoom-in-95"
                             priority
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/30" />
