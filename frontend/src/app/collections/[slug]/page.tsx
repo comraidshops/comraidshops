@@ -77,25 +77,39 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
     return (
         <div className="min-h-screen bg-background text-foreground pb-12">
 
-            <section className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden xl:p-10">
+            <section className="relative w-full h-[85vh] md:h-[100vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-background">
                 {collection.hero_image ? (
                     <>
-                        <div className="absolute inset-0 bg-black/40 z-10"></div>
-                        <Image
-                            src={collection.hero_image.startsWith('http') 
-                                ? collection.hero_image 
-                                : `${MEDIA_BASE}${collection.hero_image}`}
-                            alt={collection.name}
-                            fill
-                            className="object-cover xl:object-contain"
-                            priority
-                        />
+                        <div className="absolute inset-0 z-0 hidden md:block">
+                            <Image
+                                src={collection.hero_image.startsWith('http') 
+                                    ? collection.hero_image 
+                                    : `${MEDIA_BASE}${collection.hero_image}`}
+                                alt={`${collection.name} blurred background`}
+                                fill
+                                className="object-cover opacity-40 blur-[100px] saturate-150 scale-110"
+                                priority
+                            />
+                        </div>
+                        <div className="absolute inset-0 z-10 w-full h-full lg:p-10">
+                            <Image
+                                src={collection.hero_image.startsWith('http') 
+                                    ? collection.hero_image 
+                                    : `${MEDIA_BASE}${collection.hero_image}`}
+                                alt={collection.name}
+                                fill
+                                className="object-contain"
+                                priority
+                                sizes="100vw"
+                            />
+                        </div>
+                        <div className="absolute inset-0 bg-black/40 bg-gradient-to-t from-background via-transparent to-black/40 z-20"></div>
                     </>
                 ) : (
-                    <div className="absolute inset-0 bg-secondary/5"></div>
+                    <div className="absolute inset-0 bg-secondary/5 z-0"></div>
                 )}
 
-                <div className="relative z-20 text-center px-6 max-w-4xl mx-auto flex flex-col items-center">
+                <div className="relative z-30 text-center px-6 max-w-4xl mx-auto flex flex-col items-center mt-12 lg:mt-20">
                     {collection.season && (
                         <span className="text-xs tracking-[0.4em] uppercase text-white/80 mb-6 block">
                             {collection.season}
