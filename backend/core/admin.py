@@ -68,24 +68,31 @@ class CollectionInline(admin.TabularInline):
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'is_featured', 'established_year', 'origin_country', 'created_at')
-    list_filter = ('is_featured', 'origin_country')
+    list_display = ('name', 'slug', 'is_featured', 'visibility', 'established_year', 'origin_country', 'created_at')
+    list_filter = ('is_featured', 'visibility', 'origin_country')
     prepopulated_fields = {'slug': ('name',)}
-    search_fields = ('name', 'philosophy', 'founder_name')
+    search_fields = ('name', 'philosophy', 'founder_name', 'story', 'manifesto')
     inlines = [BrandImageInline, CollectionInline]
     
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'description', 'hero_image', 'is_featured')
+            'fields': ('name', 'slug', 'tagline', 'description', 'hero_image', 'preview_image', 'logo', 'is_featured', 'visibility')
         }),
-        ('Luxury & Positioning', {
-            'fields': ('philosophy', 'established_year', 'origin_country', 'website', 'social_links', 'awards')
+        ('Brand Story & Identity', {
+            'fields': ('philosophy', 'manifesto', 'story', 'featured_quote', 'awards')
+        }),
+        ('Business Details', {
+            'fields': ('established_year', 'origin_country', 'website', 'social_links')
         }),
         ('Founder Info', {
             'fields': ('founder_name', 'founder_bio', 'founder_image')
         }),
         ('Editorial', {
             'fields': ('editorial_refs', 'exhibition_refs')
+        }),
+        ('SEO Metadata', {
+            'fields': ('meta_title', 'meta_description'),
+            'classes': ('collapse',)
         }),
     )
 
