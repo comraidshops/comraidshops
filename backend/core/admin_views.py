@@ -7,7 +7,7 @@ from django.db.models import Sum, Count, Q
 from .models import (
     User, Vendor, Product, Order, Category, Brand, Magazine, Article, 
     Exhibition, Collection, HomepageSlide, WithdrawalRequest, VendorEarning, Commission, GlobalCommission,
-    FitFrame, ProductImage, Product360Video
+    FitFrame, ProductImage, Product360Video, PlatformEvent
 )
 from .serializers import (
     UserSerializer, VendorSerializer, ProductSerializer, OrderSerializer,
@@ -91,6 +91,10 @@ class AdminStatsView(APIView):
             ),
             'active_vendors': User.objects.filter(is_vendor_approved=True).count(),
             'pending_vendors': User.objects.filter(is_vendor=True, is_vendor_approved=False).count(),
+            'pwa_installs': PlatformEvent.objects.filter(event_type='pwa_install').count(),
+            'aov': Order.objects.filter(payment_status='confirmed').aggregate(
+                Sum('total_amount')
+            )['total_amount__sum'] / Order.objects.filter(payment_status='confirmed').count() if Order.objects.filter(payment_status='confirmed').count() > 0 else 0,
             'pending_products': Product.objects.filter(status='pending').count(),
             'total_products': Product.objects.count(),
             'low_stock_count': Product.objects.filter(stock__lt=5).count(),

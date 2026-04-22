@@ -19,6 +19,8 @@ interface Stats {
     pending_products: number;
     total_products: number;
     low_stock_count: number;
+    pwa_installs?: number;
+    aov?: number;
 }
 
 interface Order {
@@ -143,8 +145,10 @@ export default function AdminDashboard() {
     const cards = [
         { title: 'Total Revenue', value: stats ? formatCurrency(stats.total_revenue) : '₦0.00', icon: TrendingUp, color: 'primary', delay: 0 },
         { title: 'Total Orders', value: stats?.total_orders || 0, icon: ShoppingBag, color: 'blue-400', delay: 0.1 },
-        { title: 'Active Vendors', value: stats?.active_vendors || 0, icon: Users, color: 'purple-400', delay: 0.2 },
-        { title: 'Total Products', value: stats?.total_products || 0, icon: Package, color: 'orange-400', delay: 0.3 },
+        { title: 'Avg Order Value', value: stats ? formatCurrency(stats.aov || 0) : '₦0.00', icon: TrendingUp, color: 'green-400', delay: 0.2 },
+        { title: 'Active Vendors', value: stats?.active_vendors || 0, icon: Users, color: 'purple-400', delay: 0.3 },
+        { title: 'Total Products', value: stats?.total_products || 0, icon: Package, color: 'orange-400', delay: 0.4 },
+        { title: 'PWA Installs', value: stats?.pwa_installs || 0, icon: Users, color: 'blue-500', delay: 0.5 },
     ];
 
     const alerts = [
@@ -207,7 +211,7 @@ export default function AdminDashboard() {
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                 {cards.map((card) => (
                     <StatCard key={card.title} {...card} />
                 ))}

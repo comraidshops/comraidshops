@@ -58,10 +58,27 @@ export const PWAProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
+    const handleAppInstalled = async () => {
+      console.log('[PWA] appinstalled event captured');
+      setDeferredPrompt(null);
+      
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics/track/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event_type: 'pwa_install' }),
+        });
+      } catch (err) {
+        console.error('Failed to track PWA install', err);
+      }
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as any);
+    window.addEventListener('appinstalled', handleAppInstalled as any);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt as any);
+      window.removeEventListener('appinstalled', handleAppInstalled as any);
     };
   }, []);
 

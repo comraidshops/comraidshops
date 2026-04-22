@@ -13,6 +13,7 @@ from .views import (
     PasswordResetRequestView, PasswordResetConfirmView, VerifyEmailRequestView,
     GoogleLogin, DiagnosticEmailView
 )
+from .analytics_views import TrackEventAPIView
 
 router = DefaultRouter()
 router.register(r'brands', BrandViewSet)
@@ -64,6 +65,7 @@ urlpatterns = [
     path('vendor/notifications/mark_all_read/', VendorNotificationViewSet.as_view({'post': 'mark_all_read'}), name='vendor-notifications-mark-all-read'),
     path('vendor/settings/', VendorSettingsView.as_view(), name='vendor-settings'),
     path('vendor/analytics/', VendorAnalyticsAPIView.as_view(), name='vendor-analytics'),
+    path('analytics/track/', TrackEventAPIView.as_view(), name='analytics-track'),
     path('auth/diagnostic/', DiagnosticEmailView.as_view(), name='diagnostic-email'),
     
     # --- Administrative Endpoints ---

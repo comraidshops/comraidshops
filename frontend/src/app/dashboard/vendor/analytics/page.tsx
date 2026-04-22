@@ -16,6 +16,8 @@ interface AnalyticsData {
     daily_revenue: { date: string; revenue: number }[];
     top_products: { product__name: string; product__id: number; revenue: number; sales: number }[];
     category_distribution: { category__name: string; count: number }[];
+    total_orders?: number;
+    aov?: number;
 }
 
 export default function AnalyticsPage() {
@@ -53,6 +55,17 @@ export default function AnalyticsPage() {
     return (
         <div className="space-y-5 md:space-y-8 pb-8 md:pb-12">
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter">Analytics</h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
+                <div className="bg-background border border-border p-4 md:p-6 flex flex-col justify-center">
+                    <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest text-secondary mb-2">Total Orders</h3>
+                    <p className="text-3xl font-bold">{data?.total_orders || 0}</p>
+                </div>
+                <div className="bg-background border border-border p-4 md:p-6 flex flex-col justify-center">
+                    <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest text-secondary mb-2">Avg Order Value</h3>
+                    <p className="text-3xl font-bold">₦{Number(data?.aov || 0).toLocaleString()}</p>
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
                 <div className="bg-background border border-border p-4 md:p-6">

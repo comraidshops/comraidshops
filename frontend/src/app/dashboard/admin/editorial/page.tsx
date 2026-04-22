@@ -62,6 +62,11 @@ interface EditorialBase {
     linked_article_ids?: number[];
     visibility?: boolean;
     brand?: number | null;
+    meta_title?: string;
+    meta_description?: string;
+    manifesto?: string;
+    story?: string;
+    featured_quote?: string;
 }
 interface MagazineOption {
     id: number;
@@ -616,7 +621,17 @@ function EditorialContent() {
                         <div className="space-y-6">
                             <AdminInput label="Tagline" value={currentItem?.tagline || ''} onChange={(e) => setCurrentItem({ ...currentItem, tagline: e.target.value })} />
                             <AdminTextArea label="Description" value={currentItem?.description || ''} onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })} />
-                            <AdminRichText label="Philosophy" value={currentItem?.philosophy || ''} onChange={(val) => setCurrentItem({ ...currentItem, philosophy: val })} />
+                            
+                            <div className="py-6 border-y border-white/5 my-6">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6">Brand Narrative</h4>
+                                <div className="space-y-6">
+                                    <AdminRichText label="Brand Story" value={currentItem?.story || ''} onChange={(val) => setCurrentItem({ ...currentItem, story: val })} />
+                                    <AdminRichText label="Manifesto" value={currentItem?.manifesto || ''} onChange={(val) => setCurrentItem({ ...currentItem, manifesto: val })} />
+                                    <AdminTextArea label="Featured Quote" value={currentItem?.featured_quote || ''} onChange={(e) => setCurrentItem({ ...currentItem, featured_quote: e.target.value })} />
+                                    <AdminRichText label="Philosophy" value={currentItem?.philosophy || ''} onChange={(val) => setCurrentItem({ ...currentItem, philosophy: val })} />
+                                </div>
+                            </div>
+
                             <AdminInput label="Founder Name" value={currentItem?.founder_name || ''} onChange={(e) => setCurrentItem({ ...currentItem, founder_name: e.target.value })} />
                             <AdminTextArea label="Founder Bio" value={currentItem?.founder_bio || ''} onChange={(e) => setCurrentItem({ ...currentItem, founder_bio: e.target.value })} />
                             <div className="grid grid-cols-2 gap-4">
@@ -633,27 +648,38 @@ function EditorialContent() {
                             </div>
                             <AdminInput label="Website" value={currentItem?.website || ''} onChange={(e) => setCurrentItem({ ...currentItem, website: e.target.value })} />
                             
-                            <AdminImageUpload 
-                                label="Brand Logo"
-                                preview={currentItem?.logo || undefined}
-                                onChange={(file: File) => setCurrentItem({ ...currentItem, logo: file as File })}
-                            />
-                            <AdminImageUpload 
-                                label="Hero Image"
-                                preview={currentItem?.hero_image || undefined}
-                                onChange={(file: File) => setCurrentItem({ ...currentItem, hero_image: file as File })}
-                            />
-                            <AdminImageUpload 
-                                label="Preview Image"
-                                preview={currentItem?.preview_image || undefined}
-                                onChange={(file: File) => setCurrentItem({ ...currentItem, preview_image: file as File })}
-                            />
-                            <AdminImageUpload 
-                                label="Founder Image"
-                                preview={currentItem?.founder_image || undefined}
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                onChange={(file: File) => setCurrentItem({ ...currentItem, founder_image: file as any })}
-                            />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6 border-t border-white/5 mt-6">
+                                <AdminImageUpload 
+                                    label="Brand Logo"
+                                    preview={currentItem?.logo || undefined}
+                                    onChange={(file: File) => setCurrentItem({ ...currentItem, logo: file as File })}
+                                />
+                                <AdminImageUpload 
+                                    label="Founder Image"
+                                    preview={currentItem?.founder_image || undefined}
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    onChange={(file: File) => setCurrentItem({ ...currentItem, founder_image: file as any })}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-white/5 mb-6">
+                                <AdminImageUpload 
+                                    label="Hero Image"
+                                    preview={currentItem?.hero_image || undefined}
+                                    onChange={(file: File) => setCurrentItem({ ...currentItem, hero_image: file as File })}
+                                />
+                                <AdminImageUpload 
+                                    label="Preview Image"
+                                    preview={currentItem?.preview_image || undefined}
+                                    onChange={(file: File) => setCurrentItem({ ...currentItem, preview_image: file as File })}
+                                />
+                            </div>
+
+                            <div className="space-y-4 pt-4">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">SEO Optimization</h4>
+                                <AdminInput label="Meta Title" value={currentItem?.meta_title || ''} onChange={(e) => setCurrentItem({ ...currentItem, meta_title: e.target.value })} />
+                                <AdminTextArea label="Meta Description" value={currentItem?.meta_description || ''} onChange={(e) => setCurrentItem({ ...currentItem, meta_description: e.target.value })} />
+                            </div>
                         </div>
                     )}
                     

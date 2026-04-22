@@ -1,0 +1,24 @@
+{
+  "magazines": [
+    {
+      "title": "THE ART OF SUFFERING",
+      "url": "https://www.comraidshops.art/magazine/the-art-of-suffering",
+      "content": "There is a quiet lie we’ve all agreed to. That suffering is an error. A miscalculation. A deviation from the intended path. Something to fix. Something to escape. Something that shouldn’t be there in the first place.\n\nBut that assumption collapses under observation. Because nothing meaningful has ever been built without it. Suffering is not the interruption. It is the process.\n\nIn art, the canvas is never the beginning. What you see is resolution, not origin. The origin is tension. Uncertainty. A mind trying to translate something it does not yet understand. Every stroke is a negotiation between intention and limitation. That friction, that discomfort, is where the work is actually made.\n\nWe call it iteration, market resistance, failure, learning curves. But strip the language down, and it is still the same thing. Pressure applied over time without immediate reward.\n\nNo company becomes resilient from ease. No system becomes efficient without breaking first. What scales is not the idea. It is the capacity to endure what the idea demands.\n\nArchitecture understands this best. No structure stands without tension. Load-bearing systems are not designed to avoid stress, they are designed to distribute it. Remove pressure, and the structure becomes meaningless. Introduce it, and suddenly, form has purpose. Strength is not the absence of force. It is the intelligent accommodation of it.\n\nFinance speaks in numbers, but it tells the same story. Volatility is feared, but it is also where opportunity lives. No real return exists without exposure. No growth without fluctuation. Stability, when isolated, does create wealth. Movement does. And movement is never comfortable.\n\nSo why do we keep trying to remove suffering from the equation? Why do we treat it like a flaw in the system when every system that produces value is built on top of it?",
+      "images": [
+        "https://res.cloudinary.com/dzs15xya8/image/upload/v1/media/editorial/thumbnails/file_000000007510724394f313a6aafc4c54_ikjtle"
+      ]
+    }
+  ],
+  "brands": [
+    {
+      "name": "MEZAIQ",
+      "url": "https://www.comraidshops.art/brands/mezaiq",
+      "description": "Mezaiq is a contemporary Nigerian fashion label rooted in cultural translation. Drawing from ceremonial traditions and heritage design systems, the brand crafts garments that carry symbolic weight while remaining wearable in a modern context. Each piece is developed through a process of refinement, where craftsmanship, material exploration, and narrative converge.",
+      "images": [
+        "https://res.cloudinary.com/dzs15xya8/image/upload/v1/media/brands/heroes/Screenshot_2026-04-20_at_03.53.42_rssii5",
+        "https://res.cloudinary.com/dzs15xya8/image/upload/v1/media/brands/founders/Screenshot_2026-04-20_at_03.53.08_gyzavt",
+        "https://res.cloudinary.com/dzs15xya8/image/upload/v1/media/collections/heroes/Screenshot_2026-04-20_at_19.53.56_px4tej"
+      ]
+    }
+  ]
+}

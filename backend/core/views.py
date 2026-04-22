@@ -431,7 +431,6 @@ class VendorAnalyticsAPIView(APIView):
             .order_by('-revenue')[:5]
         )
 
-        # 3. Category Distribution
         category_data = (
             Product.objects.filter(vendor=vendor)
             .values('category__name')
@@ -439,10 +438,24 @@ class VendorAnalyticsAPIView(APIView):
             .order_by('-count')
         )
 
+        vendor_orders = Order.objects.filter(
+            items__product__vendor=vendor,
+            payment_status='confirmed'
+        ).distinct()
+        
+        total_orders = vendor_orders.count()
+        total_vendor_revenue_aggregate = VendorEarning.objects.filter(
+            vendor=vendor, order__payment_status='confirmed'
+        ).aggregate(revenue=Sum('gross_amount'))
+        total_vendor_revenue = total_vendor_revenue_aggregate['revenue'] or 0
+        aov = total_vendor_revenue / total_orders if total_orders > 0 else 0
+
         return Response({
             "daily_revenue": list(daily_revenue),
             "top_products": list(top_products),
-            "category_distribution": list(category_data)
+            "category_distribution": list(category_data),
+            "total_orders": total_orders,
+            "aov": float(aov)
         })
 
 class VendorCommunityView(APIView):

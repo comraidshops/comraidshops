@@ -1,0 +1,14 @@
+Category: Brands
+Title: MEZAIQ
+URL: https://www.comraidshops.art/brands/mezaiq
+----------------------------------------
+
+Mezaiq is a contemporary Nigerian fashion label rooted in cultural translation. Drawing from ceremonial traditions and heritage design systems, the brand crafts garments that carry symbolic weight while remaining wearable in a modern context. Each piece is developed through a process of refinement, where craftsmanship, material exploration, and narrative converge.
+
+----------------------------------------
+Backup Date: 2026-04-22 05:05:00
+
+Images:
+- https://res.cloudinary.com/dzs15xya8/image/upload/v1/media/brands/heroes/Screenshot_2026-04-20_at_03.53.42_rssii5
+- https://res.cloudinary.com/dzs15xya8/image/upload/v1/media/brands/founders/Screenshot_2026-04-20_at_03.53.08_gyzavt
+- https://res.cloudinary.com/dzs15xya8/image/upload/v1/media/collections/heroes/Screenshot_2026-04-20_at_19.53.56_px4tej

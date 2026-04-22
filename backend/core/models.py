@@ -599,3 +599,17 @@ class BrandCommunityMember(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.brand.name}"
+
+class PlatformEvent(models.Model):
+    EVENT_TYPES = (
+        ('pwa_install', 'PWA Install'),
+        ('signup', 'Signup'),
+        ('checkout_start', 'Checkout Start'),
+    )
+    event_type = models.CharField(max_length=50, choices=EVENT_TYPES, db_index=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='platform_events')
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return f"{self.event_type} at {self.created_at}"
