@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
       // Production backend (Cloudinary serves media, but keep API domain for any direct images)
       {
         protocol: "https",
-        hostname: "api.comraidshops.art",
+        hostname: "ap.comraidshops.art",
         pathname: "/**",
       },
       // Cloudinary — all subdomains

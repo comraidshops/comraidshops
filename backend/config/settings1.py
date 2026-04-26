@@ -20,7 +20,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='localhost').split(',')]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://api.comraidshops.art',
+    'https://ap.comraidshops.art',
     'https://comraidshops.vercel.app',
     'https://comraidshops.art',
     'https://www.comraidshops.art',
