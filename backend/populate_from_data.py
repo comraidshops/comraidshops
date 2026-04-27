@@ -107,8 +107,7 @@ def populate_from_json():
             defaults={
                 'brand': brand,
                 'brand_name': brand.name,
-                'commission_rate': Decimal('0.15'),
-                'is_active': True
+                'commission_rate': Decimal('0.15')
             }
         )
         if not v_created:
