@@ -644,12 +644,18 @@ class AdminCollectionViewSet(viewsets.ModelViewSet):
         self._handle_gallery(collection)
 
     def _handle_gallery(self, collection):
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Try getting files from both FILES and the underlying Django request
         gallery_images = self.request.FILES.getlist('gallery_images')
-        # We also look for captions and order passed as indexed fields like gallery_caption_0, gallery_order_0
+        if not gallery_images:
+            gallery_images = self.request._request.FILES.getlist('gallery_images')
+        
+        logger.info(f"[AdminCollection] _handle_gallery called for '{collection.name}'. Found {len(gallery_images)} gallery image(s).")
+        
         if gallery_images:
             from .models import CollectionImage
-            # Simple approach: clear and recreate
-            # If we wanted to preserve specific IDs, we'd need a more complex logic
             CollectionImage.objects.filter(collection=collection).delete()
             for idx, img in enumerate(gallery_images):
                 caption = self.request.data.get(f'gallery_caption_{idx}', '')
@@ -658,8 +664,9 @@ class AdminCollectionViewSet(viewsets.ModelViewSet):
                     collection=collection,
                     image=img,
                     caption=caption,
-                    order=order
+                    order=int(order)
                 )
+                logger.info(f"[AdminCollection] Created gallery image #{idx} for '{collection.name}'")
 
 class AdminHomepageSlideViewSet(viewsets.ModelViewSet):
     queryset = HomepageSlide.objects.all().order_by('order')

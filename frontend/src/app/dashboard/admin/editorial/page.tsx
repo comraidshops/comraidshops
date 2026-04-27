@@ -158,12 +158,18 @@ function EditorialContent() {
         setActionLoading(true);
         try {
             const formData = new FormData();
+            // Keys that are handled separately or are read-only nested data
+            const skipKeys = ['gallery', 'products', 'collections', 'magazines', 'articles', 'linked_articles', 'items'];
+
             Object.entries(currentItem).forEach(([key, val]) => {
                 let finalKey = key;
                 if (activeTab === 'magazines' && key === 'content') {
                     finalKey = 'article_content';
                 }
                 
+                // Skip keys handled separately
+                if (skipKeys.includes(key)) return;
+
                 // For articles, "name" entered by user is purely labels for this UI, 
                 // backend requires "magazine" and "content".
                 if (activeTab === 'articles' && key === 'name') return;
@@ -175,7 +181,6 @@ function EditorialContent() {
                         val.forEach(v => formData.append(finalKey, v.toString()));
                     }
                 } else if (val !== null && val !== undefined && !Array.isArray(val)) {
-                    // Check if it's a plain object (for JSONFields like social_links)
                     if (typeof val === 'object' && !(val instanceof File) && !(val instanceof Blob)) {
                         formData.append(finalKey, JSON.stringify(val));
                     } else {
@@ -185,12 +190,12 @@ function EditorialContent() {
             });
 
             // Handle Gallery Images separately for collections
-            if (activeTab === 'collections' && currentItem.gallery) {
+            if (activeTab === 'collections' && currentItem.gallery && currentItem.gallery.length > 0) {
                 currentItem.gallery.forEach((g, idx) => {
-                    if (g.image instanceof File) {
-                        formData.append('gallery_images', g.image);
+                    if (typeof g.image !== 'string' && g.image) {
+                        formData.append('gallery_images', g.image as File);
                         formData.append(`gallery_caption_${idx}`, g.caption || '');
-                        formData.append(`gallery_order_${idx}`, g.order.toString());
+                        formData.append(`gallery_order_${idx}`, String(g.order));
                     }
                 });
             }
@@ -229,11 +234,16 @@ function EditorialContent() {
         setActionLoading(true);
         try {
             const formData = new FormData();
+            const skipKeys = ['gallery', 'products', 'collections', 'magazines', 'articles', 'linked_articles', 'items'];
+
             Object.entries(currentItem).forEach(([key, val]) => {
                 let finalKey = key;
                 if (activeTab === 'magazines' && key === 'content') {
                     finalKey = 'article_content';
                 }
+
+                // Skip keys handled separately
+                if (skipKeys.includes(key)) return;
 
                 if (Array.isArray(val) && key.endsWith('_ids')) {
                     if (val.length === 0) {
@@ -244,12 +254,10 @@ function EditorialContent() {
                 } else if (val && (val as any) instanceof File) {
                     formData.append(finalKey, val as any);
                 } else if (val !== undefined && !Array.isArray(val)) {
-                    // Always send article_content and video_url (if not articles tab)
                     const isImageUrl = typeof val === 'string' && (val.startsWith('http') || val.startsWith('/media/'));
                     const isSpecialField = finalKey === 'article_content' || finalKey === 'video_url';
 
                     if (isSpecialField || (!isImageUrl && finalKey !== 'id')) {
-                        // Check if it's a plain object (for JSONFields like social_links)
                         if (typeof val === 'object' && val !== null && !(val instanceof Blob)) {
                             formData.append(finalKey, JSON.stringify(val));
                         } else {
@@ -260,12 +268,12 @@ function EditorialContent() {
             });
 
             // Handle Gallery Images separately for collections
-            if (activeTab === 'collections' && currentItem.gallery) {
+            if (activeTab === 'collections' && currentItem.gallery && currentItem.gallery.length > 0) {
                 currentItem.gallery.forEach((g, idx) => {
-                    if (g.image instanceof File) {
-                        formData.append('gallery_images', g.image);
+                    if (typeof g.image !== 'string' && g.image) {
+                        formData.append('gallery_images', g.image as File);
                         formData.append(`gallery_caption_${idx}`, g.caption || '');
-                        formData.append(`gallery_order_${idx}`, g.order.toString());
+                        formData.append(`gallery_order_${idx}`, String(g.order));
                     }
                 });
             }
