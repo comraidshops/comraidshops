@@ -41,6 +41,7 @@ interface EditorialBase {
     established_year?: number | null;
     origin_country?: string;
     website?: string;
+    season?: string;
     magazine?: number | null;
     article?: { content: string };
     video_url?: string;
@@ -598,10 +599,41 @@ function EditorialContent() {
                                     ...brands.map(b => ({ value: b.id, label: b.name }))
                                 ]}
                             />
+                            <AdminInput 
+                                label="Season"
+                                placeholder="e.g. Spring/Summer 2026"
+                                value={currentItem?.season || ''}
+                                onChange={(e) => setCurrentItem({ ...currentItem, season: e.target.value })}
+                            />
+                            <AdminTextArea 
+                                label="Description"
+                                value={currentItem?.description || ''}
+                                onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })}
+                            />
+                            <AdminInput 
+                                label="Display Order"
+                                type="number"
+                                value={currentItem?.order || ''}
+                                onChange={(e) => setCurrentItem({ ...currentItem, order: parseInt(e.target.value) || 0 })}
+                            />
                             <AdminGalleryManager 
                                 images={currentItem?.gallery}
                                 onChange={(imgs) => setCurrentItem({ ...currentItem, gallery: imgs })}
                             />
+                            <div className="space-y-4 pt-4 border-t border-white/5 mt-4">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">SEO Optimization</h4>
+                                <AdminInput 
+                                    label="Meta Title"
+                                    placeholder="SEO override title"
+                                    value={currentItem?.meta_title || ''}
+                                    onChange={(e) => setCurrentItem({ ...currentItem, meta_title: e.target.value })}
+                                />
+                                <AdminTextArea 
+                                    label="Meta Description"
+                                    value={currentItem?.meta_description || ''}
+                                    onChange={(e) => setCurrentItem({ ...currentItem, meta_description: e.target.value })}
+                                />
+                            </div>
                         </>
                     )}
 
