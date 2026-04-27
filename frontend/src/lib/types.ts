@@ -156,6 +156,13 @@ export interface Product {
     meta_description?: string | null;
 }
 
+export interface CollectionImage {
+    id: number;
+    image: string;
+    caption?: string;
+    order: number;
+}
+
 export interface Collection {
     id: number;
     name: string;
@@ -165,6 +172,7 @@ export interface Collection {
     hero_image?: string | null;
     preview_image?: string | null;
     products?: Product[];
+    gallery?: CollectionImage[];
     is_featured?: boolean;
     order?: number;
     meta_title?: string | null;

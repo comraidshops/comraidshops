@@ -5,6 +5,7 @@ import { MEDIA_BASE } from "@/lib/constants"
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 import ProductCard from "@/components/shop/ProductCard"
+import CollectionGallery from "@/components/collection/CollectionGallery"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -73,10 +74,12 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
     }
 
     const products: Product[] = collection.products || [];
+    const galleryImages = collection.gallery || [];
 
     return (
         <div className="min-h-screen bg-background text-foreground pb-12">
 
+            {/* HERO SECTION - UNTOUCHED */}
             <section className="relative w-full h-[85vh] md:h-[100vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-background">
                 {collection.hero_image ? (
                     <>
@@ -126,23 +129,21 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
                 </div>
             </section>
 
-            <section className="py-16 md:py-24 px-6 md:px-10 lg:px-16 max-w-[1400px] mx-auto">
-                <div className="mb-16 md:mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 text-center md:text-left">
-                    <h2 className="text-xs uppercase tracking-[0.3em] text-secondary">
-                        Collection Pieces
-                    </h2>
-                    <span className="text-[10px] text-secondary tracking-[0.4em] uppercase">
-                        {products.length} Objects
-                    </span>
-                </div>
+            {/* EDITORIAL GALLERY SECTION */}
+            <CollectionGallery images={galleryImages} />
 
-                {products.length === 0 ? (
-                    <div className="py-32 flex justify-center border-t border-border/20">
-                        <p className="text-sm uppercase tracking-[0.3em] text-secondary/60">
-                            No products available in this collection yet.
-                        </p>
+            {/* PRODUCTS SECTION - ONLY RENDER IF PRODUCTS EXIST */}
+            {products.length > 0 && (
+                <section className="py-16 md:py-24 px-6 md:px-10 lg:px-16 max-w-[1400px] mx-auto">
+                    <div className="mb-16 md:mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 text-center md:text-left">
+                        <h2 className="text-xs uppercase tracking-[0.3em] text-secondary">
+                            Collection Pieces
+                        </h2>
+                        <span className="text-[10px] text-secondary tracking-[0.4em] uppercase">
+                            {products.length} Objects
+                        </span>
                     </div>
-                ) : (
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-24">
                         {products.map((product) => (
                             <ProductCard
@@ -156,8 +157,8 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
                             />
                         ))}
                     </div>
-                )}
-            </section>
+                </section>
+            )}
 
         </div>
     )

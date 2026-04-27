@@ -226,6 +226,20 @@ class Collection(models.Model):
     def __str__(self):
         return f"{self.brand.name} - {self.name}"
 
+class CollectionImage(models.Model):
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='gallery')
+    image = models.ImageField(upload_to="collections/gallery/")
+    caption = models.CharField(max_length=255, blank=True)
+    order = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = "Gallery Image"
+        verbose_name_plural = "Gallery Images"
+
+    def __str__(self):
+        return f"{self.collection.name} Gallery Image"
+
 class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor_profile')
     brand = models.OneToOneField(Brand, on_delete=models.CASCADE, related_name='vendor', null=True, blank=True)

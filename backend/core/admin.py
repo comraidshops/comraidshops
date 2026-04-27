@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Category, Brand, Vendor, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, BrandImage, ProductFeature, ProductSpecification, FitFrame, FitItem, HomepageSlide
+from .models import User, Category, Brand, Vendor, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, CollectionImage, BrandImage, ProductFeature, ProductSpecification, FitFrame, FitItem, HomepageSlide
 
 # Register your models here.
 
@@ -122,12 +122,17 @@ class ProductSpecificationInline(admin.TabularInline):
     model = ProductSpecification
     extra = 1
 
+class CollectionImageInline(admin.TabularInline):
+    model = CollectionImage
+    extra = 1
+
 @admin.register(Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ('name', 'brand', 'is_featured', 'order', 'created_at')
     list_filter = ('brand', 'is_featured')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name', 'brand__name')
+    inlines = [CollectionImageInline]
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):

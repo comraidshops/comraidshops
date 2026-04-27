@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Vendor, Brand, Category, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, BrandImage, ProductFeature, ProductSpecification, Commission, GlobalCommission, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember
+from .models import User, Vendor, Brand, Category, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, CollectionImage, BrandImage, ProductFeature, ProductSpecification, Commission, GlobalCommission, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember
 import cloudinary.uploader
 from .utils import detect_video_provider
 
@@ -295,12 +295,19 @@ class MagazineSerializer(serializers.ModelSerializer):
         return instance
 
 
+class CollectionImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CollectionImage
+        fields = ['id', 'image', 'caption', 'order']
+
 class CollectionSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
 
+    gallery = CollectionImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = Collection
-        fields = ['id', 'name', 'slug', 'season', 'description', 'hero_image', 'preview_image', 'products', 'brand', 'is_featured', 'order', 'meta_title', 'meta_description']
+        fields = ['id', 'name', 'slug', 'season', 'description', 'hero_image', 'preview_image', 'products', 'gallery', 'brand', 'is_featured', 'order', 'meta_title', 'meta_description']
         extra_kwargs = {'slug': {'required': False}}
 
     def get_products(self, obj):

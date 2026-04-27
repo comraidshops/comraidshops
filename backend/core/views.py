@@ -37,12 +37,12 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
 
     @method_decorator(cache_page(60 * 15))
     def list(self, request, *args, **kwargs):
-        self.queryset = Collection.objects.prefetch_related('products').all()
+        self.queryset = Collection.objects.prefetch_related('products', 'gallery').all()
         return super().list(request, *args, **kwargs)
 
     @method_decorator(cache_page(60 * 15))
     def retrieve(self, request, *args, **kwargs):
-        self.queryset = Collection.objects.prefetch_related('products').all()
+        self.queryset = Collection.objects.prefetch_related('products', 'gallery').all()
         return super().retrieve(request, *args, **kwargs)
 
 class MagazineViewSet(viewsets.ReadOnlyModelViewSet):
