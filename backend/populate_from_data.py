@@ -36,7 +36,7 @@ def populate_from_json():
             slug=slug,
             defaults={
                 'title': mag_data['title'],
-                'content': mag_data['content'],
+                'description': mag_data['content'],
                 'thumbnail': thumbnail,
                 'is_featured': True
             }
