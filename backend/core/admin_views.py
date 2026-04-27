@@ -638,10 +638,16 @@ class AdminCollectionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         collection = serializer.save()
         self._handle_gallery(collection)
+        # Clear prefetch cache so the response serializer fetches the updated gallery
+        if hasattr(collection, '_prefetched_objects_cache'):
+            collection._prefetched_objects_cache = {}
 
     def perform_update(self, serializer):
         collection = serializer.save()
         self._handle_gallery(collection)
+        # Clear prefetch cache so the response serializer fetches the updated gallery
+        if hasattr(collection, '_prefetched_objects_cache'):
+            collection._prefetched_objects_cache = {}
 
     def _handle_gallery(self, collection):
         import logging

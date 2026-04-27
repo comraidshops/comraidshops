@@ -200,10 +200,10 @@ function EditorialContent() {
                         // Existing image already in DB
                         formData.append(`gallery_type_${idx}`, 'existing');
                         formData.append(`gallery_existing_id_${idx}`, String(g.id));
-                    } else if (g.image && g.image instanceof File) {
+                    } else if (g.image && typeof g.image !== 'string') {
                         // Newly added image
                         formData.append(`gallery_type_${idx}`, 'new');
-                        formData.append(`gallery_image_${idx}`, g.image as File);
+                        formData.append(`gallery_image_${idx}`, g.image as Blob);
                     }
                 });
             }
@@ -286,10 +286,10 @@ function EditorialContent() {
                         // Existing image already in DB
                         formData.append(`gallery_type_${idx}`, 'existing');
                         formData.append(`gallery_existing_id_${idx}`, String(g.id));
-                    } else if (g.image && g.image instanceof File) {
+                    } else if (g.image && typeof g.image !== 'string') {
                         // Newly added image
                         formData.append(`gallery_type_${idx}`, 'new');
-                        formData.append(`gallery_image_${idx}`, g.image as File);
+                        formData.append(`gallery_image_${idx}`, g.image as Blob);
                     }
                 });
             }

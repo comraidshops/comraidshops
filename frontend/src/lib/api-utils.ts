@@ -75,7 +75,7 @@ export async function safeFetch(url: string, options: RequestInit = {}, retries 
     // Auto-inject common headers
     const headers: Record<string, string> = { ...(options.headers as Record<string, string>) };
     
-    const isFormData = typeof window !== 'undefined' && options.body instanceof FormData;
+    const isFormData = typeof window !== 'undefined' && options.body && typeof (options.body as any).append === 'function';
     
     if (options.body && !isFormData && !headers['Content-Type']) {
         headers['Content-Type'] = 'application/json';
