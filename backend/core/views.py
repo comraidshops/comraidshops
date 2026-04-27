@@ -159,7 +159,7 @@ class BrandViewSet(viewsets.ReadOnlyModelViewSet):
                 queryset=Product.objects.filter(status='approved', is_featured=True).order_by('-created_at'),
                 to_attr='precomputed_featured_products'
             ),
-            'editorial_refs__article', 
+            'editorial_refs__articles', 
             'exhibition_refs'
         )
         
