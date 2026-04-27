@@ -631,7 +631,7 @@ class AdminExhibitionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser]
 
 class AdminCollectionViewSet(viewsets.ModelViewSet):
-    queryset = Collection.objects.all().order_by('-created_at')
+    queryset = Collection.objects.all().prefetch_related('products', 'gallery').order_by('-created_at')
     serializer_class = CollectionSerializer
     permission_classes = [permissions.IsAdminUser]
 
