@@ -55,7 +55,7 @@ export default function FounderSection({ name, bio, story, image, establishedYea
                     <div className="space-y-12">
                         {bio && (
                             <div 
-                                className="space-y-6 text-[14px] md:text-[20px] leading-relaxed text-foreground/80 font-light [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
+                                className="space-y-6 text-[14px] md:text-[20px] leading-relaxed text-foreground/80 font-light [&_*]:!text-inherit [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
                                 dangerouslySetInnerHTML={{ __html: (bio || '').replace(/[\u00A0\u202F\u2007\u2008\u2009\u200A]/g, ' ').replace(/&nbsp;/g, ' ') }}
                             />
                         )}
@@ -66,7 +66,7 @@ export default function FounderSection({ name, bio, story, image, establishedYea
                             <div className="pt-12 border-t border-foreground/5">
                                 <h4 className="text-[10px] uppercase tracking-[0.4em] text-secondary mb-8 font-semibold">The Brand Story</h4>
                                 <div 
-                                    className="space-y-6 text-[14px] md:text-[20px] leading-relaxed text-foreground/70 font-light italic [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
+                                    className="space-y-6 text-[14px] md:text-[20px] leading-relaxed text-foreground/70 font-light italic [&_*]:!text-inherit [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
                                     dangerouslySetInnerHTML={{ __html: (story || '').replace(/[\u00A0\u202F\u2007\u2008\u2009\u200A]/g, ' ').replace(/&nbsp;/g, ' ') }}
                                 />
                             </div>

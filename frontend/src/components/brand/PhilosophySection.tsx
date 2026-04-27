@@ -39,7 +39,7 @@ export default function PhilosophySection({ philosophy, awards, manifesto, featu
                     >
                         <h2 className="text-xs uppercase tracking-[0.3em] text-secondary mb-12 text-center md:text-left font-semibold">Philosophy</h2>
                         <div 
-                            className="editorial-content space-y-8 text-[14px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90 [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
+                            className="editorial-content space-y-8 text-[14px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90 [&_*]:!text-inherit [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
                             dangerouslySetInnerHTML={{ __html: (philosophy || '').replace(/[\u00A0\u202F\u2007\u2008\u2009\u200A]/g, ' ').replace(/&nbsp;/g, ' ') }}
                         />
                     </motion.div>
@@ -59,7 +59,7 @@ export default function PhilosophySection({ philosophy, awards, manifesto, featu
 
                         <h2 className="text-xs uppercase tracking-[0.3em] text-secondary mb-12 text-center md:text-left font-semibold">The Manifesto</h2>
                         <div 
-                            className="space-y-8 text-[14px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90 italic [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
+                            className="space-y-8 text-[14px] md:text-[22px] font-light leading-relaxed tracking-wide text-foreground/90 italic [&_*]:!text-inherit [overflow-wrap:anywhere!important] [word-break:break-word!important] [white-space:normal!important] max-w-full overflow-hidden"
                             dangerouslySetInnerHTML={{ __html: (manifesto || '').replace(/[\u00A0\u202F\u2007\u2008\u2009\u200A]/g, ' ').replace(/&nbsp;/g, ' ') }}
                         />
                     </motion.div>
