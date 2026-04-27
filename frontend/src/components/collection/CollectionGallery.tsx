@@ -1,5 +1,5 @@
 "use client"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 import { CollectionImage } from "@/lib/types"
 import Image from "next/image"
 import { MEDIA_BASE } from "@/lib/constants"
@@ -11,7 +11,7 @@ interface CollectionGalleryProps {
 export default function CollectionGallery({ images }: CollectionGalleryProps) {
     if (!images || images.length === 0) return null;
 
-    const container = {
+    const container: Variants = {
         hidden: { opacity: 0 },
         show: {
             opacity: 1,
@@ -22,7 +22,7 @@ export default function CollectionGallery({ images }: CollectionGalleryProps) {
         }
     };
 
-    const item = {
+    const item: Variants = {
         hidden: { opacity: 0, y: 30 },
         show: { 
             opacity: 1, 
