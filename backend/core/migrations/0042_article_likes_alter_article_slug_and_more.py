@@ -4,6 +4,30 @@ from django.conf import settings
 from django.db import migrations, models
 
 
+def populate_slugs(apps, schema_editor):
+    Article = apps.get_model('core', 'Article')
+    from django.utils.text import slugify
+    import uuid
+
+    for article in Article.objects.all():
+        if not article.slug:
+            title_source = article.title
+            if not title_source and article.magazine:
+                title_source = article.magazine.title
+            
+            if not title_source:
+                title_source = f"article-{uuid.uuid4().hex[:8]}"
+                
+            base_slug = slugify(title_source)
+            slug = base_slug
+            counter = 1
+            while Article.objects.filter(slug=slug).exists() and counter < 100:
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            article.slug = slug
+            article.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -11,6 +35,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(populate_slugs),
         migrations.AddField(
             model_name='article',
             name='likes',

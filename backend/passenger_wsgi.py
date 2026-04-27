@@ -1,8 +1,9 @@
+# Updated API URL to ap.comraidshops.art
 import sys
 import os
 
 # Point to your virtualenv's site-packages
-INTERP = "/home/comrxuwl/virtualenv/api/3.9/bin/python"
+INTERP = "/home/comrtcgw/virtualenv/api/3.9/bin/python"
 if sys.executable != INTERP:
     os.execl(INTERP, INTERP, *sys.argv)
 
