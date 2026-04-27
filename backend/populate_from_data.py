@@ -24,6 +24,17 @@ def populate_from_json():
         print(f"Error: Could not find 'data/all_data.json' in {os.getcwd()} or its parent.")
         return
 
+    def clean_image_url(url):
+        if not url:
+            return ''
+        # Cloudinary URLs can exceed the 100 char limit of Django ImageFields.
+        # We extract just the relative path (e.g., 'media/...') which is what CloudinaryStorage expects anyway.
+        if 'image/upload/' in url:
+            path = url.split('image/upload/')[1]
+            import re
+            return re.sub(r'^v\d+/', '', path)
+        return url[:100]
+
     with open(data_path, 'r') as f:
         data = json.load(f)
 
@@ -31,7 +42,8 @@ def populate_from_json():
     mag_objs = []
     for mag_data in data.get('magazines', []):
         slug = slugify(mag_data['title'])
-        thumbnail = mag_data['images'][0] if mag_data['images'] else ''
+        raw_thumbnail = mag_data['images'][0] if mag_data['images'] else ''
+        thumbnail = clean_image_url(raw_thumbnail)
         mag, created = Magazine.objects.update_or_create(
             slug=slug,
             defaults={
@@ -50,7 +62,8 @@ def populate_from_json():
     # 3. Brands & Vendors
     for brand_data in data.get('brands', []):
         slug = brand_data.get('slug') or slugify(brand_data['name'])
-        hero_image = brand_data['images'][0] if brand_data['images'] else ''
+        raw_hero_image = brand_data['images'][0] if brand_data['images'] else ''
+        hero_image = clean_image_url(raw_hero_image)
         
         brand, created = Brand.objects.update_or_create(
             slug=slug,
@@ -70,9 +83,10 @@ def populate_from_json():
 
         # Gallery
         for idx, img_url in enumerate(brand_data.get('images', [])):
+            clean_url = clean_image_url(img_url)
             BrandImage.objects.get_or_create(
                 brand=brand,
-                image=img_url,
+                image=clean_url,
                 defaults={'caption': f"{brand.name} Perspective {idx + 1}", 'order': idx}
             )
 
