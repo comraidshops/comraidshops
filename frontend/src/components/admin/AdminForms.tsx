@@ -299,3 +299,87 @@ export function AdminMultiSelect({
         </div>
     );
 }
+
+export function AdminGalleryManager({ 
+    images = [], 
+    onChange 
+}: { 
+    images?: { id?: number; image: string | File; caption?: string; order: number }[];
+    onChange: (images: { id?: number; image: string | File; caption?: string; order: number }[]) => void;
+}) {
+    const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files) {
+            const newImages = Array.from(files).map((file, idx) => ({
+                image: file,
+                caption: '',
+                order: images.length + idx
+            }));
+            onChange([...images, ...newImages]);
+        }
+        e.target.value = '';
+    };
+
+    const handleRemoveImage = (index: number) => {
+        const updated = images.filter((_, i) => i !== index);
+        onChange(updated);
+    };
+
+    const handleUpdateCaption = (index: number, caption: string) => {
+        const updated = [...images];
+        updated[index] = { ...updated[index], caption };
+        onChange(updated);
+    };
+
+    return (
+        <div className="space-y-4 mb-8">
+            <label className="text-[10px] font-black uppercase tracking-widest text-white/20 block px-1">Editorial Gallery</label>
+            <div className="grid grid-cols-1 gap-4">
+                {images.map((img, idx) => {
+                    const preview = typeof img.image === 'string' 
+                        ? (img.image.startsWith('http') || img.image.startsWith('blob:') || img.image.startsWith('/') ? img.image : `${API_BASE_URL}${img.image}`)
+                        : URL.createObjectURL(img.image);
+
+                    return (
+                        <div key={idx} className="flex gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 items-start">
+                            <div className="relative w-24 aspect-square rounded-xl overflow-hidden shrink-0">
+                                <Image src={preview} alt="Gallery item" fill className="object-cover" />
+                            </div>
+                            <div className="flex-grow space-y-2">
+                                <input 
+                                    type="text" 
+                                    placeholder="Image Caption (Optional)"
+                                    value={img.caption || ''}
+                                    onChange={(e) => handleUpdateCaption(idx, e.target.value)}
+                                    className="w-full bg-black/20 border border-white/5 rounded-xl py-2 px-4 text-[10px] font-bold uppercase tracking-widest text-white focus:outline-none focus:border-primary/50 transition-all"
+                                />
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">Order: {img.order}</span>
+                                    <button 
+                                        type="button"
+                                        onClick={() => handleRemoveImage(idx)}
+                                        className="text-[8px] font-black text-red-400/60 hover:text-red-400 uppercase tracking-widest transition-colors"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+
+                <label className="relative flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed border-white/10 hover:border-primary/50 cursor-pointer group transition-all bg-white/[0.01] hover:bg-white/[0.03]">
+                    <input 
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        onChange={handleAddImage}
+                        className="hidden" 
+                    />
+                    <PlusIcon className="w-6 h-6 text-white/20 group-hover:text-primary transition-colors mb-2" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">Add Gallery Images</span>
+                </label>
+            </div>
+        </div>
+    );
+}

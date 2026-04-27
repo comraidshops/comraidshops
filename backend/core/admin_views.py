@@ -635,6 +635,32 @@ class AdminCollectionViewSet(viewsets.ModelViewSet):
     serializer_class = CollectionSerializer
     permission_classes = [permissions.IsAdminUser]
 
+    def perform_create(self, serializer):
+        collection = serializer.save()
+        self._handle_gallery(collection)
+
+    def perform_update(self, serializer):
+        collection = serializer.save()
+        self._handle_gallery(collection)
+
+    def _handle_gallery(self, collection):
+        gallery_images = self.request.FILES.getlist('gallery_images')
+        # We also look for captions and order passed as indexed fields like gallery_caption_0, gallery_order_0
+        if gallery_images:
+            from .models import CollectionImage
+            # Simple approach: clear and recreate
+            # If we wanted to preserve specific IDs, we'd need a more complex logic
+            CollectionImage.objects.filter(collection=collection).delete()
+            for idx, img in enumerate(gallery_images):
+                caption = self.request.data.get(f'gallery_caption_{idx}', '')
+                order = self.request.data.get(f'gallery_order_{idx}', idx)
+                CollectionImage.objects.create(
+                    collection=collection,
+                    image=img,
+                    caption=caption,
+                    order=order
+                )
+
 class AdminHomepageSlideViewSet(viewsets.ModelViewSet):
     queryset = HomepageSlide.objects.all().order_by('order')
     serializer_class = HomepageSlideSerializer

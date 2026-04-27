@@ -11,7 +11,7 @@ import {
 import { safeFetch, API_BASE_URL } from '@/lib/api';
 import { useNotification } from '@/context/NotificationContext';
 import Image from 'next/image';
-import { AdminModal, AdminInput, AdminTextArea, AdminSelect, AdminRichText, AdminImageUpload, AdminMultiSelect } from '@/components/admin/AdminForms';
+import { AdminModal, AdminInput, AdminTextArea, AdminSelect, AdminRichText, AdminImageUpload, AdminMultiSelect, AdminGalleryManager } from '@/components/admin/AdminForms';
 
 type EditorialType = 'magazines' | 'articles' | 'exhibitions' | 'collections' | 'slides' | 'fitframes' | 'brands';
 
@@ -183,6 +183,17 @@ function EditorialContent() {
                 }
             });
 
+            // Handle Gallery Images separately for collections
+            if (activeTab === 'collections' && currentItem.gallery) {
+                currentItem.gallery.forEach((g, idx) => {
+                    if (g.image instanceof File) {
+                        formData.append('gallery_images', g.image);
+                        formData.append(`gallery_caption_${idx}`, g.caption || '');
+                        formData.append(`gallery_order_${idx}`, g.order.toString());
+                    }
+                });
+            }
+
 
             // Explicit validation for Articles: Magazine ID is REQUIRED
             if (activeTab === 'articles' && !formData.has('magazine')) {
@@ -246,6 +257,17 @@ function EditorialContent() {
                     }
                 }
             });
+
+            // Handle Gallery Images separately for collections
+            if (activeTab === 'collections' && currentItem.gallery) {
+                currentItem.gallery.forEach((g, idx) => {
+                    if (g.image instanceof File) {
+                        formData.append('gallery_images', g.image);
+                        formData.append(`gallery_caption_${idx}`, g.caption || '');
+                        formData.append(`gallery_order_${idx}`, g.order.toString());
+                    }
+                });
+            }
 
 
             const updated = await safeFetch(`/admin-api/${activeTab}/${currentItem.id}/`, {
@@ -566,15 +588,21 @@ function EditorialContent() {
                     )}
 
                     {activeTab === 'collections' && (
-                        <AdminSelect 
-                            label="Brand"
-                            value={currentItem?.brand || ''}
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCurrentItem({ ...currentItem, brand: parseInt(e.target.value) })}
-                            options={[
-                                { value: '', label: 'Select Brand' },
-                                ...brands.map(b => ({ value: b.id, label: b.name }))
-                            ]}
-                        />
+                        <>
+                            <AdminSelect 
+                                label="Brand"
+                                value={currentItem?.brand || ''}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCurrentItem({ ...currentItem, brand: parseInt(e.target.value) })}
+                                options={[
+                                    { value: '', label: 'Select Brand' },
+                                    ...brands.map(b => ({ value: b.id, label: b.name }))
+                                ]}
+                            />
+                            <AdminGalleryManager 
+                                images={currentItem?.gallery}
+                                onChange={(imgs) => setCurrentItem({ ...currentItem, gallery: imgs })}
+                            />
+                        </>
                     )}
 
 
