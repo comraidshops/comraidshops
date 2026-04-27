@@ -60,7 +60,7 @@ interface EditorialBase {
     magazine_ids?: number[];
     article_ids?: number[];
     linked_article_ids?: number[];
-    gallery?: { id: number; image: string; caption?: string; order: number }[];
+    gallery?: { id?: number; image: string | File; caption?: string; order: number }[];
     visibility?: boolean;
     brand?: number | null;
     meta_title?: string;
