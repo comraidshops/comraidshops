@@ -193,7 +193,8 @@ function EditorialContent() {
             if (activeTab === 'collections' && currentItem.gallery && currentItem.gallery.length > 0) {
                 currentItem.gallery.forEach((g, idx) => {
                     if (typeof g.image !== 'string' && g.image) {
-                        formData.append('gallery_images', g.image as File);
+                        // Use indexed names to ensure backend can match captions correctly
+                        formData.append(`gallery_image_${idx}`, g.image as File);
                         formData.append(`gallery_caption_${idx}`, g.caption || '');
                         formData.append(`gallery_order_${idx}`, String(g.order));
                     }
@@ -271,7 +272,8 @@ function EditorialContent() {
             if (activeTab === 'collections' && currentItem.gallery && currentItem.gallery.length > 0) {
                 currentItem.gallery.forEach((g, idx) => {
                     if (typeof g.image !== 'string' && g.image) {
-                        formData.append('gallery_images', g.image as File);
+                        // Use indexed names to ensure backend can match captions correctly
+                        formData.append(`gallery_image_${idx}`, g.image as File);
                         formData.append(`gallery_caption_${idx}`, g.caption || '');
                         formData.append(`gallery_order_${idx}`, String(g.order));
                     }

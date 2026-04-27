@@ -647,26 +647,68 @@ class AdminCollectionViewSet(viewsets.ModelViewSet):
         import logging
         logger = logging.getLogger(__name__)
         
-        # Try getting files from both FILES and the underlying Django request
-        gallery_images = self.request.FILES.getlist('gallery_images')
-        if not gallery_images:
-            gallery_images = self.request._request.FILES.getlist('gallery_images')
+        # We'll support both list-based 'gallery_images' and indexed 'gallery_image_N'
+        # To handle existing vs new, we look at the data sent
         
-        logger.info(f"[AdminCollection] _handle_gallery called for '{collection.name}'. Found {len(gallery_images)} gallery image(s).")
+        from .models import CollectionImage
+        
+        new_gallery_data = []
+        
+        # Check if the frontend sent a 'gallery_count' or just look for indexed fields
+        # For now, let's look for any 'gallery_image_N' or 'gallery_images'
+        
+        gallery_images = self.request.FILES.getlist('gallery_images')
         
         if gallery_images:
-            from .models import CollectionImage
-            CollectionImage.objects.filter(collection=collection).delete()
+            # Traditional list-based upload
+            logger.info(f"[AdminCollection] Saving {len(gallery_images)} images for collection {collection.id}")
+            # If we are replacing, we delete old ones
+            collection.gallery.all().delete()
+            
             for idx, img in enumerate(gallery_images):
+                # Try to find a caption that matches this file index
+                # Note: This still relies on the frontend sending them in order
                 caption = self.request.data.get(f'gallery_caption_{idx}', '')
                 order = self.request.data.get(f'gallery_order_{idx}', idx)
+                try:
+                    order_val = int(order)
+                except (ValueError, TypeError):
+                    order_val = idx
+                
                 CollectionImage.objects.create(
                     collection=collection,
                     image=img,
                     caption=caption,
-                    order=int(order)
+                    order=order_val
                 )
-                logger.info(f"[AdminCollection] Created gallery image #{idx} for '{collection.name}'")
+        else:
+            # Try looking for indexed files gallery_image_0, gallery_image_1...
+            # This is more robust if some items are skipped (e.g. existing images)
+            new_images_count = 0
+            # We don't know the count, so we'll check up to 50
+            for i in range(50):
+                img = self.request.FILES.get(f'gallery_image_{i}')
+                if img:
+                    if new_images_count == 0:
+                        collection.gallery.all().delete()
+                    
+                    caption = self.request.data.get(f'gallery_caption_{i}', '')
+                    order = self.request.data.get(f'gallery_order_{i}', i)
+                    try:
+                        order_val = int(order)
+                    except (ValueError, TypeError):
+                        order_val = i
+                        
+                    CollectionImage.objects.create(
+                        collection=collection,
+                        image=img,
+                        caption=caption,
+                        order=order_val
+                    )
+                    new_images_count += 1
+            
+            if new_images_count > 0:
+                logger.info(f"[AdminCollection] Saved {new_images_count} indexed images for collection {collection.id}")
 
 class AdminHomepageSlideViewSet(viewsets.ModelViewSet):
     queryset = HomepageSlide.objects.all().order_by('order')
