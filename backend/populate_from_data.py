@@ -73,6 +73,7 @@ def populate_from_json():
                 'hero_image': hero_image,
                 'established_year': 2024,
                 'origin_country': 'Nigeria', # Defaulting based on Mezaiq description
+                'is_featured': True
             }
         )
         print(f"{'Created' if created else 'Updated'} Brand: {brand.name}")
