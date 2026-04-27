@@ -189,14 +189,21 @@ function EditorialContent() {
                 }
             });
 
-            // Handle Gallery Images separately for collections
-            if (activeTab === 'collections' && currentItem.gallery && currentItem.gallery.length > 0) {
-                currentItem.gallery.forEach((g, idx) => {
-                    if (typeof g.image !== 'string' && g.image) {
-                        // Use indexed names to ensure backend can match captions correctly
+            // Handle Gallery Images separately for collections (manifest protocol)
+            if (activeTab === 'collections') {
+                const gallery = currentItem.gallery || [];
+                formData.append('gallery_count', String(gallery.length));
+                gallery.forEach((g, idx) => {
+                    formData.append(`gallery_caption_${idx}`, g.caption || '');
+                    formData.append(`gallery_order_${idx}`, String(g.order));
+                    if (typeof g.image === 'string' && g.id) {
+                        // Existing image already in DB
+                        formData.append(`gallery_type_${idx}`, 'existing');
+                        formData.append(`gallery_existing_id_${idx}`, String(g.id));
+                    } else if (g.image && g.image instanceof File) {
+                        // Newly added image
+                        formData.append(`gallery_type_${idx}`, 'new');
                         formData.append(`gallery_image_${idx}`, g.image as File);
-                        formData.append(`gallery_caption_${idx}`, g.caption || '');
-                        formData.append(`gallery_order_${idx}`, String(g.order));
                     }
                 });
             }
@@ -268,14 +275,21 @@ function EditorialContent() {
                 }
             });
 
-            // Handle Gallery Images separately for collections
-            if (activeTab === 'collections' && currentItem.gallery && currentItem.gallery.length > 0) {
-                currentItem.gallery.forEach((g, idx) => {
-                    if (typeof g.image !== 'string' && g.image) {
-                        // Use indexed names to ensure backend can match captions correctly
+            // Handle Gallery Images separately for collections (manifest protocol)
+            if (activeTab === 'collections') {
+                const gallery = currentItem.gallery || [];
+                formData.append('gallery_count', String(gallery.length));
+                gallery.forEach((g, idx) => {
+                    formData.append(`gallery_caption_${idx}`, g.caption || '');
+                    formData.append(`gallery_order_${idx}`, String(g.order));
+                    if (typeof g.image === 'string' && g.id) {
+                        // Existing image already in DB
+                        formData.append(`gallery_type_${idx}`, 'existing');
+                        formData.append(`gallery_existing_id_${idx}`, String(g.id));
+                    } else if (g.image && g.image instanceof File) {
+                        // Newly added image
+                        formData.append(`gallery_type_${idx}`, 'new');
                         formData.append(`gallery_image_${idx}`, g.image as File);
-                        formData.append(`gallery_caption_${idx}`, g.caption || '');
-                        formData.append(`gallery_order_${idx}`, String(g.order));
                     }
                 });
             }

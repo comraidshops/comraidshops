@@ -646,69 +646,95 @@ class AdminCollectionViewSet(viewsets.ModelViewSet):
     def _handle_gallery(self, collection):
         import logging
         logger = logging.getLogger(__name__)
-        
-        # We'll support both list-based 'gallery_images' and indexed 'gallery_image_N'
-        # To handle existing vs new, we look at the data sent
-        
         from .models import CollectionImage
-        
-        new_gallery_data = []
-        
-        # Check if the frontend sent a 'gallery_count' or just look for indexed fields
-        # For now, let's look for any 'gallery_image_N' or 'gallery_images'
-        
-        gallery_images = self.request.FILES.getlist('gallery_images')
-        
-        if gallery_images:
-            # Traditional list-based upload
-            logger.info(f"[AdminCollection] Saving {len(gallery_images)} images for collection {collection.id}")
-            # If we are replacing, we delete old ones
-            collection.gallery.all().delete()
-            
-            for idx, img in enumerate(gallery_images):
-                # Try to find a caption that matches this file index
-                # Note: This still relies on the frontend sending them in order
-                caption = self.request.data.get(f'gallery_caption_{idx}', '')
-                order = self.request.data.get(f'gallery_order_{idx}', idx)
+
+        # ── Manifest-based protocol ─────────────────────────────────────
+        # The frontend sends:
+        #   gallery_count          – total number of gallery slots
+        #   gallery_type_N         – 'existing' | 'new'
+        #   gallery_existing_id_N  – PK of an existing CollectionImage (when type=existing)
+        #   gallery_image_N        – uploaded File (when type=new)
+        #   gallery_caption_N      – caption string
+        #   gallery_order_N        – display order int
+        #
+        # If gallery_count is present we use the manifest. Otherwise we
+        # fall back to the legacy simple list upload for backward compat.
+        # ────────────────────────────────────────────────────────────────
+
+        gallery_count_raw = self.request.data.get('gallery_count')
+
+        if gallery_count_raw is not None:
+            # ── Manifest mode ───────────────────────────────────────────
+            try:
+                gallery_count = int(gallery_count_raw)
+            except (ValueError, TypeError):
+                gallery_count = 0
+
+            keep_ids = set()   # existing CollectionImage PKs to retain
+            new_items = []     # (File, caption, order) tuples to create
+
+            for i in range(gallery_count):
+                item_type = self.request.data.get(f'gallery_type_{i}', 'new')
+                caption = self.request.data.get(f'gallery_caption_{i}', '')
                 try:
-                    order_val = int(order)
+                    order_val = int(self.request.data.get(f'gallery_order_{i}', i))
                 except (ValueError, TypeError):
-                    order_val = idx
-                
+                    order_val = i
+
+                if item_type == 'existing':
+                    existing_id = self.request.data.get(f'gallery_existing_id_{i}')
+                    if existing_id:
+                        try:
+                            eid = int(existing_id)
+                            keep_ids.add(eid)
+                            # Update caption / order on retained images
+                            CollectionImage.objects.filter(
+                                pk=eid, collection=collection
+                            ).update(caption=caption, order=order_val)
+                        except (ValueError, TypeError):
+                            pass
+                else:
+                    img = self.request.FILES.get(f'gallery_image_{i}')
+                    if img:
+                        new_items.append((img, caption, order_val))
+
+            # Delete gallery images that the user removed (not in keep_ids)
+            removed = collection.gallery.exclude(pk__in=keep_ids)
+            removed_count = removed.count()
+            removed.delete()
+
+            # Create newly-uploaded images
+            for img, caption, order_val in new_items:
                 CollectionImage.objects.create(
                     collection=collection,
                     image=img,
                     caption=caption,
-                    order=order_val
+                    order=order_val,
                 )
-        else:
-            # Try looking for indexed files gallery_image_0, gallery_image_1...
-            # This is more robust if some items are skipped (e.g. existing images)
-            new_images_count = 0
-            # We don't know the count, so we'll check up to 50
-            for i in range(50):
-                img = self.request.FILES.get(f'gallery_image_{i}')
-                if img:
-                    if new_images_count == 0:
-                        collection.gallery.all().delete()
-                    
-                    caption = self.request.data.get(f'gallery_caption_{i}', '')
-                    order = self.request.data.get(f'gallery_order_{i}', i)
-                    try:
-                        order_val = int(order)
-                    except (ValueError, TypeError):
-                        order_val = i
-                        
-                    CollectionImage.objects.create(
-                        collection=collection,
-                        image=img,
-                        caption=caption,
-                        order=order_val
-                    )
-                    new_images_count += 1
-            
-            if new_images_count > 0:
-                logger.info(f"[AdminCollection] Saved {new_images_count} indexed images for collection {collection.id}")
+
+            logger.info(
+                f"[AdminCollection] Gallery sync for collection {collection.id}: "
+                f"kept={len(keep_ids)}, new={len(new_items)}, removed={removed_count}"
+            )
+            return  # done — skip legacy fallback
+
+        # ── Legacy fallback: simple list upload ─────────────────────────
+        gallery_images = self.request.FILES.getlist('gallery_images')
+        if gallery_images:
+            logger.info(f"[AdminCollection] Legacy list upload: {len(gallery_images)} images for collection {collection.id}")
+            collection.gallery.all().delete()
+            for idx, img in enumerate(gallery_images):
+                caption = self.request.data.get(f'gallery_caption_{idx}', '')
+                try:
+                    order_val = int(self.request.data.get(f'gallery_order_{idx}', idx))
+                except (ValueError, TypeError):
+                    order_val = idx
+                CollectionImage.objects.create(
+                    collection=collection,
+                    image=img,
+                    caption=caption,
+                    order=order_val,
+                )
 
 class AdminHomepageSlideViewSet(viewsets.ModelViewSet):
     queryset = HomepageSlide.objects.all().order_by('order')
