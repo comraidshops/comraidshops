@@ -24,13 +24,13 @@ export default function MediaGallery({ gallery }: { gallery?: BrandImage[] }) {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-50px" }}
                         transition={{ duration: 1, ease: "easeOut" }}
-                        className="relative flex-none w-[85vw] md:w-[60vw] lg:w-[45vw] aspect-[4/5] md:aspect-[16/10] snap-center group overflow-hidden"
+                        className="relative flex-none w-[85vw] md:w-[60vw] lg:w-[45vw] aspect-[4/5] md:aspect-[4/5] lg:aspect-[3/4] snap-center group overflow-hidden bg-white/[0.02]"
                     >
                         <Image
                             src={img.image.startsWith('http') ? img.image : `${API_BASE_URL}${img.image}`}
                             alt={img.caption || "Brand Media"}
                             fill
-                            className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-[1.03]"
+                            className="object-contain transition-transform duration-[2s] ease-out group-hover:scale-[1.03]"
                         />
                         {img.caption && (
                             <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700">
