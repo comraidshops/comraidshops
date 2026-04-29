@@ -757,6 +757,93 @@ class AdminBrandViewSet(viewsets.ModelViewSet):
     serializer_class = AdminBrandSerializer
     permission_classes = [permissions.IsAdminUser]
 
+    def perform_create(self, serializer):
+        brand = serializer.save()
+        self._handle_gallery(brand)
+        if hasattr(brand, '_prefetched_objects_cache'):
+            brand._prefetched_objects_cache = {}
+
+    def perform_update(self, serializer):
+        brand = serializer.save()
+        self._handle_gallery(brand)
+        if hasattr(brand, '_prefetched_objects_cache'):
+            brand._prefetched_objects_cache = {}
+
+    def _handle_gallery(self, brand):
+        import logging
+        logger = logging.getLogger(__name__)
+        from .models import BrandImage
+
+        gallery_count_raw = self.request.data.get('gallery_count')
+
+        if gallery_count_raw is not None:
+            try:
+                gallery_count = int(gallery_count_raw)
+            except (ValueError, TypeError):
+                gallery_count = 0
+
+            keep_ids = set()
+            new_items = []
+
+            for i in range(gallery_count):
+                item_type = self.request.data.get(f'gallery_type_{i}', 'new')
+                caption = self.request.data.get(f'gallery_caption_{i}', '')
+                try:
+                    order_val = int(self.request.data.get(f'gallery_order_{i}', i))
+                except (ValueError, TypeError):
+                    order_val = i
+
+                if item_type == 'existing':
+                    existing_id = self.request.data.get(f'gallery_existing_id_{i}')
+                    if existing_id:
+                        try:
+                            eid = int(existing_id)
+                            keep_ids.add(eid)
+                            BrandImage.objects.filter(
+                                pk=eid, brand=brand
+                            ).update(caption=caption, order=order_val)
+                        except (ValueError, TypeError):
+                            pass
+                else:
+                    img = self.request.FILES.get(f'gallery_image_{i}')
+                    if img:
+                        new_items.append((img, caption, order_val))
+
+            removed = brand.gallery.exclude(pk__in=keep_ids)
+            removed_count = removed.count()
+            removed.delete()
+
+            for img, caption, order_val in new_items:
+                BrandImage.objects.create(
+                    brand=brand,
+                    image=img,
+                    caption=caption,
+                    order=order_val,
+                )
+
+            logger.info(
+                f"[AdminBrand] Gallery sync for brand {brand.id}: "
+                f"kept={len(keep_ids)}, new={len(new_items)}, removed={removed_count}"
+            )
+            return
+
+        gallery_images = self.request.FILES.getlist('gallery_images')
+        if gallery_images:
+            logger.info(f"[AdminBrand] Legacy list upload: {len(gallery_images)} images for brand {brand.id}")
+            brand.gallery.all().delete()
+            for idx, img in enumerate(gallery_images):
+                caption = self.request.data.get(f'gallery_caption_{idx}', '')
+                try:
+                    order_val = int(self.request.data.get(f'gallery_order_{idx}', idx))
+                except (ValueError, TypeError):
+                    order_val = idx
+                BrandImage.objects.create(
+                    brand=brand,
+                    image=img,
+                    caption=caption,
+                    order=order_val,
+                )
+
 class AdminBroadcastView(APIView):
     permission_classes = [permissions.IsAdminUser]
 

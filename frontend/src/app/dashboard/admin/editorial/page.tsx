@@ -190,7 +190,7 @@ function EditorialContent() {
             });
 
             // Handle Gallery Images separately for collections (manifest protocol)
-            if (activeTab === 'collections') {
+            if (activeTab === 'collections' || activeTab === 'brands') {
                 const gallery = currentItem.gallery || [];
                 formData.append('gallery_count', String(gallery.length));
                 gallery.forEach((g, idx) => {
@@ -276,7 +276,7 @@ function EditorialContent() {
             });
 
             // Handle Gallery Images separately for collections (manifest protocol)
-            if (activeTab === 'collections') {
+            if (activeTab === 'collections' || activeTab === 'brands') {
                 const gallery = currentItem.gallery || [];
                 formData.append('gallery_count', String(gallery.length));
                 gallery.forEach((g, idx) => {
@@ -757,6 +757,14 @@ function EditorialContent() {
                                     label="Preview Image"
                                     preview={currentItem?.preview_image || undefined}
                                     onChange={(file: File) => setCurrentItem({ ...currentItem, preview_image: file as File })}
+                                />
+                            </div>
+
+                            <div className="space-y-4 pt-4 pb-6 border-b border-white/5 mb-6">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">Brand Archives</h4>
+                                <AdminGalleryManager 
+                                    images={currentItem?.gallery}
+                                    onChange={(imgs) => setCurrentItem({ ...currentItem, gallery: imgs })}
                                 />
                             </div>
 
