@@ -319,10 +319,10 @@ class BrandSerializer(serializers.ModelSerializer):
     vendor_id = serializers.SerializerMethodField()
     
     # These will be provided via annotations in the ViewSet for performance
-    approved_product_count = serializers.IntegerField(read_only=True)
-    total_product_count = serializers.IntegerField(read_only=True)
-    community_count = serializers.IntegerField(read_only=True)
-    is_member = serializers.BooleanField(read_only=True)
+    approved_product_count = serializers.IntegerField(read_only=True, default=0)
+    total_product_count = serializers.IntegerField(read_only=True, default=0)
+    community_count = serializers.IntegerField(read_only=True, default=0)
+    is_member = serializers.BooleanField(read_only=True, default=False)
     
     featured_products = serializers.SerializerMethodField()
     

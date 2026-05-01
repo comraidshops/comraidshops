@@ -376,7 +376,7 @@ export default function AdminProducts() {
                     <AdminSelect 
                         label="Category"
                         value={currentProduct?.category || ''}
-                        onChange={(e) => setCurrentProduct({ ...currentProduct, category: parseInt(e.target.value) })}
+                        onChange={(e) => setCurrentProduct({ ...currentProduct, category: e.target.value ? parseInt(e.target.value) : undefined })}
                         options={[
                             { value: '', label: 'Select Category' },
                             ...categories.map(c => ({ value: c.id, label: c.name }))
@@ -386,7 +386,7 @@ export default function AdminProducts() {
                     <AdminSelect 
                         label="Assign Vendor (Curator)"
                         value={currentProduct?.vendor || ''}
-                        onChange={(e) => setCurrentProduct({ ...currentProduct, vendor: parseInt(e.target.value) })}
+                        onChange={(e) => setCurrentProduct({ ...currentProduct, vendor: e.target.value ? parseInt(e.target.value) : undefined })}
                         options={[
                             { value: '', label: 'Select Vendor' },
                             ...vendors.map(v => ({ value: v.id, label: v.brand_name }))
@@ -524,14 +524,14 @@ export default function AdminProducts() {
                     <AdminSelect 
                         label="Category"
                         value={currentProduct?.category || ''}
-                        onChange={(e) => setCurrentProduct({ ...currentProduct, category: parseInt(e.target.value) })}
+                        onChange={(e) => setCurrentProduct({ ...currentProduct, category: e.target.value ? parseInt(e.target.value) : undefined })}
                         options={categories.map(c => ({ value: c.id, label: c.name }))}
                     />
 
                     <AdminSelect 
                         label="Assign Vendor (Curator)"
                         value={currentProduct?.vendor || ''}
-                        onChange={(e) => setCurrentProduct({ ...currentProduct, vendor: parseInt(e.target.value) })}
+                        onChange={(e) => setCurrentProduct({ ...currentProduct, vendor: e.target.value ? parseInt(e.target.value) : undefined })}
                         options={vendors.map(v => ({ value: v.id, label: v.brand_name }))}
                     />
                     
