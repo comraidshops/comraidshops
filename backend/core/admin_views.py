@@ -49,10 +49,7 @@ class AdminBrandSerializer(BrandSerializer):
     Admin-safe serializer that provides sensible defaults for
     annotation-backed fields so create/update responses don't crash.
     """
-    approved_product_count = serializers.IntegerField(read_only=True, default=0)
-    total_product_count = serializers.IntegerField(read_only=True, default=0)
-    community_count = serializers.IntegerField(read_only=True, default=0)
-    is_member = serializers.BooleanField(read_only=True, default=False)
+    pass
 
 # --- Administrative ViewSets ---
 
@@ -192,10 +189,16 @@ class AdminProductViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         product = serializer.save()
         self._handle_media(product)
+        # Clear prefetch cache so response serializer sees new media
+        if hasattr(product, '_prefetched_objects_cache'):
+            product._prefetched_objects_cache = {}
 
     def perform_update(self, serializer):
         product = serializer.save()
         self._handle_media(product)
+        # Clear prefetch cache so response serializer sees new media
+        if hasattr(product, '_prefetched_objects_cache'):
+            product._prefetched_objects_cache = {}
 
     def _handle_media(self, product):
         images = self.request.FILES.getlist('uploaded_images')

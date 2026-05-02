@@ -364,13 +364,19 @@ export default function AdminProducts() {
                             label="Price (₦)" 
                             type="number"
                             value={currentProduct?.price || ''} 
-                            onChange={(e) => setCurrentProduct({ ...currentProduct, price: parseFloat(e.target.value) })}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setCurrentProduct({ ...currentProduct, price: val ? parseFloat(val) : 0 });
+                            }}
                         />
                         <AdminInput 
                             label="Stock Level" 
                             type="number"
                             value={currentProduct?.stock || ''} 
-                            onChange={(e) => setCurrentProduct({ ...currentProduct, stock: parseInt(e.target.value) })}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setCurrentProduct({ ...currentProduct, stock: val ? parseInt(val) : 0 });
+                            }}
                         />
                     </div>
                     <AdminSelect 
@@ -512,27 +518,39 @@ export default function AdminProducts() {
                             label="Price (₦)" 
                             type="number"
                             value={currentProduct?.price || ''} 
-                            onChange={(e) => setCurrentProduct({ ...currentProduct, price: parseFloat(e.target.value) })}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setCurrentProduct({ ...currentProduct, price: val ? parseFloat(val) : 0 });
+                            }}
                         />
                         <AdminInput 
                             label="Stock Level" 
                             type="number"
                             value={currentProduct?.stock || ''} 
-                            onChange={(e) => setCurrentProduct({ ...currentProduct, stock: parseInt(e.target.value) })}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setCurrentProduct({ ...currentProduct, stock: val ? parseInt(val) : 0 });
+                            }}
                         />
                     </div>
                     <AdminSelect 
                         label="Category"
                         value={currentProduct?.category || ''}
                         onChange={(e) => setCurrentProduct({ ...currentProduct, category: e.target.value ? parseInt(e.target.value) : undefined })}
-                        options={categories.map(c => ({ value: c.id, label: c.name }))}
+                        options={[
+                            { value: '', label: 'Select Category' },
+                            ...categories.map(c => ({ value: c.id, label: c.name }))
+                        ]}
                     />
 
                     <AdminSelect 
                         label="Assign Vendor (Curator)"
                         value={currentProduct?.vendor || ''}
                         onChange={(e) => setCurrentProduct({ ...currentProduct, vendor: e.target.value ? parseInt(e.target.value) : undefined })}
-                        options={vendors.map(v => ({ value: v.id, label: v.brand_name }))}
+                        options={[
+                            { value: '', label: 'Select Vendor' },
+                            ...vendors.map(v => ({ value: v.id, label: v.brand_name }))
+                        ]}
                     />
                     
                     <div className="grid grid-cols-2 gap-4">

@@ -319,10 +319,10 @@ class BrandSerializer(serializers.ModelSerializer):
     vendor_id = serializers.SerializerMethodField()
     
     # These will be provided via annotations in the ViewSet for performance
-    approved_product_count = serializers.IntegerField(read_only=True, default=0)
-    total_product_count = serializers.IntegerField(read_only=True, default=0)
-    community_count = serializers.IntegerField(read_only=True, default=0)
-    is_member = serializers.BooleanField(read_only=True, default=False)
+    approved_product_count = serializers.SerializerMethodField()
+    total_product_count = serializers.SerializerMethodField()
+    community_count = serializers.SerializerMethodField()
+    is_member = serializers.SerializerMethodField()
     
     featured_products = serializers.SerializerMethodField()
     
@@ -345,6 +345,18 @@ class BrandSerializer(serializers.ModelSerializer):
             'meta_title', 'meta_description',
         ]
         extra_kwargs = {'slug': {'required': False}}
+
+    def get_approved_product_count(self, obj):
+        return getattr(obj, 'approved_product_count', 0) or 0
+
+    def get_total_product_count(self, obj):
+        return getattr(obj, 'total_product_count', 0) or 0
+
+    def get_community_count(self, obj):
+        return getattr(obj, 'community_count', 0) or 0
+
+    def get_is_member(self, obj):
+        return getattr(obj, 'is_member', False) or False
 
     def get_vendor_username(self, obj):
         if hasattr(obj, 'vendor') and obj.vendor and obj.vendor.user:
