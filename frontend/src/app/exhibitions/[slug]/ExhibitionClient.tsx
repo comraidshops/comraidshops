@@ -3,6 +3,7 @@
 import { Exhibition } from '@/lib/api';
 import Image from 'next/image';
 import Link from 'next/link';
+import { cleanContent } from '@/lib/format';
 
 interface ExhibitionClientProps {
     exhibition: Exhibition;
@@ -41,9 +42,10 @@ export default function ExhibitionClient({ exhibition }: ExhibitionClientProps) 
                     </h1>
                     
                     {exhibition.description && (
-                        <p className="text-lg md:text-2xl font-light leading-relaxed max-w-3xl mx-auto text-secondary/90 text-balance animate-in fade-in duration-1000 delay-300">
-                            {exhibition.description}
-                        </p>
+                        <div 
+                            className="text-lg md:text-2xl font-light leading-relaxed max-w-3xl mx-auto text-secondary/90 text-balance animate-in fade-in duration-1000 delay-300 prose prose-invert max-w-none text-center"
+                            dangerouslySetInnerHTML={{ __html: cleanContent(exhibition.description) }}
+                        />
                     )}
                 </div>
             </header>
@@ -77,9 +79,10 @@ export default function ExhibitionClient({ exhibition }: ExhibitionClientProps) 
                         
                         <div className="prose prose-lg dark:prose-invert prose-p:font-light prose-p:leading-loose text-secondary/90">
                             {exhibition.curator_note ? (
-                                <p className="text-xl md:text-2xl leading-relaxed font-serif italic text-balance">
-                                    &quot;{exhibition.curator_note}&quot;
-                                </p>
+                                <div 
+                                    className="text-xl md:text-2xl leading-relaxed font-serif italic text-balance prose prose-invert max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: `&quot;${cleanContent(exhibition.curator_note)}&quot;` }}
+                                />
                             ) : (
                                 <p className="text-xl md:text-2xl leading-relaxed font-serif italic text-balance">
                                     &quot;Observe the silence between the pieces. The void gives shape to the form.&quot;

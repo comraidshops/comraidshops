@@ -377,6 +377,10 @@ class VendorDashboardAPIView(APIView):
         recent_orders = VendorOrderSerializer(recent_orders_qs, many=True, context={'request': request}).data
         recent_notifications = VendorNotificationSerializer(recent_notifications_qs, many=True).data
         
+        # Prioritize Global Commission if active
+        active_global = GlobalCommission.objects.filter(is_active=True).first()
+        effective_rate = active_global.rate if active_global else vendor.commission_rate
+
         return Response({
             "brand_name": vendor.brand_name,
             "total_products": product_stats['total_products'],
@@ -387,7 +391,7 @@ class VendorDashboardAPIView(APIView):
             "orders_today": order_stats['orders_today'],
             "total_revenue": earning_stats['total_revenue'] or 0,
             "total_commission": earning_stats['total_commission'] or 0,
-            "commission_rate": vendor.commission_rate,
+            "commission_rate": effective_rate,
             "vendor_balance": vendor.payout_balance,
             "pending_payout": earning_stats['pending_payout'] or 0,
             "recent_orders": recent_orders,

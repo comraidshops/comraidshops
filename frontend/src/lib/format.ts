@@ -27,12 +27,13 @@ export function stripHtml(html: string): string {
 }
 
 /**
- * Replaces &nbsp; with regular spaces in HTML content
+ * Replaces &nbsp; and other special spaces with regular spaces in HTML content
  */
 export function cleanContent(html: string): string {
     if (!html) return '';
     return html
         .replace(/&nbsp;/g, ' ')
+        .replace(/[\u00A0\u202F\u2007\u2008\u2009\u200A]/g, ' ')
         .trim();
 }
 

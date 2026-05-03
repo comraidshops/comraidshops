@@ -75,7 +75,12 @@ def handle_order_status_change(sender, instance, created, **kwargs):
                 for item in instance.items.select_related('product__vendor').all():
                     vendor = item.product.vendor
                     retail_total = item.price * item.quantity
-                    commission_rate = vendor.commission_rate
+                    
+                    # Global commission takes priority over individual vendor rates
+                    from .models import GlobalCommission
+                    active_global = GlobalCommission.objects.filter(is_active=True).first()
+                    commission_rate = active_global.rate if active_global else vendor.commission_rate
+                    
                     # Ensure Decimal precision to 2 places to prevent MySQL Strict Mode truncation crash
                     net_amount = round(retail_total / (1 + commission_rate), 2)
                     commission_amount = round(retail_total - net_amount, 2)

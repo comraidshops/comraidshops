@@ -778,10 +778,16 @@ function EditorialContent() {
                     
                     {(activeTab === 'exhibitions' || activeTab === 'fitframes') && (
                         <>
-                            <AdminTextArea 
-                                label="Description"
+                            <AdminRichText 
+                                label="Exhibition Narrative (Description)"
                                 value={currentItem?.description || ''}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCurrentItem({ ...currentItem, description: e.target.value })}
+                                onChange={(val: string) => setCurrentItem({ ...currentItem, description: val })}
+                            />
+                            
+                            <AdminRichText 
+                                label="Curator's Note"
+                                value={currentItem?.curator_note || ''}
+                                onChange={(val: string) => setCurrentItem({ ...currentItem, curator_note: val })}
                             />
                             
                             <AdminMultiSelect 

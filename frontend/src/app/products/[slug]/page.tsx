@@ -1,4 +1,5 @@
 import { fetchProduct, Product, ProductImage, ProductFeature, ProductSpecification, MEDIA_BASE } from "@/lib/api"
+import { cleanContent } from "@/lib/format"
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -224,9 +225,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
                         {/* Short Description */}
                         {short_description && (
-                            <div className="text-sm text-foreground/80 leading-relaxed font-light mb-12 max-w-md">
-                                {short_description}
-                            </div>
+                            <div 
+                                className="text-sm text-foreground/80 leading-relaxed font-light mb-12 max-w-md prose prose-invert prose-sm"
+                                dangerouslySetInnerHTML={{ __html: cleanContent(short_description) }}
+                            />
                         )}
 
                         {/* Interactive Actions & Variants */}
@@ -258,9 +260,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {/* EDITORIAL QUOTE */}
             {editorial_quote && (
                 <section className="py-24 px-6 md:px-10 max-w-5xl mx-auto text-center border-t border-border/10">
-                    <h2 className="text-2xl md:text-4xl font-serif italic text-foreground leading-relaxed tracking-wide">
-                        &quot;{editorial_quote}&quot;
-                    </h2>
+                    <h2 
+                        className="text-2xl md:text-4xl font-serif italic text-foreground leading-relaxed tracking-wide prose prose-invert max-w-none"
+                        dangerouslySetInnerHTML={{ __html: `&quot;${cleanContent(editorial_quote)}&quot;` }}
+                    />
                 </section>
             )}
 
@@ -284,9 +287,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 <h2 className="text-3xl md:text-5xl font-light tracking-wide uppercase leading-tight mb-8 text-foreground">
                                     {feature.title}
                                 </h2>
-                                <p className="text-base text-foreground/70 leading-loose font-light">
-                                    {feature.description}
-                                </p>
+                                <div 
+                                    className="text-base text-foreground/70 leading-loose font-light prose prose-invert prose-sm max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: cleanContent(feature.description) }}
+                                />
                             </div>
                         </div>
                     ))}
@@ -299,9 +303,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         Story
                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[1px] h-4 bg-secondary/50"></div>
                     </h2>
-                    <p className="text-sm md:text-2xl text-foreground font-light leading-loose tracking-wide whitespace-pre-line">
-                        {story}
-                    </p>
+                    <div 
+                        className="text-sm md:text-2xl text-foreground font-light leading-loose tracking-wide prose prose-invert max-w-none text-center"
+                        dangerouslySetInnerHTML={{ __html: cleanContent(story) }}
+                    />
                 </section>
             )}
 
@@ -345,7 +350,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 <h3 className="text-xs uppercase tracking-[0.4em] text-secondary mb-8">Object Description</h3>
                                 <div 
                                     className="text-sm text-foreground/80 leading-relaxed font-light max-w-xl prose prose-invert prose-sm"
-                                    dangerouslySetInnerHTML={{ __html: description }}
+                                    dangerouslySetInnerHTML={{ __html: cleanContent(description) }}
                                 />
                             </div>
                         )}

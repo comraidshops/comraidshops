@@ -393,10 +393,16 @@ class BrandCommunityMemberSerializer(serializers.ModelSerializer):
 
 class VendorSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
+    commission_rate = serializers.SerializerMethodField()
     
     class Meta:
         model = Vendor
         fields = ['id', 'user', 'username', 'brand', 'brand_name', 'commission_rate', 'categories']
+
+    def get_commission_rate(self, obj):
+        from .models import GlobalCommission
+        active_global = GlobalCommission.objects.filter(is_active=True).first()
+        return active_global.rate if active_global else obj.commission_rate
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -548,7 +554,10 @@ class VendorProductSerializer(serializers.ModelSerializer):
         ]
 
     def get_potential_earnings(self, obj):
-        rate = obj.vendor.commission_rate
+        # Prioritize Global Commission if active
+        from .models import GlobalCommission
+        active_global = GlobalCommission.objects.filter(is_active=True).first()
+        rate = active_global.rate if active_global else obj.vendor.commission_rate
         return obj.price / (1 + rate)
 
     def create(self, validated_data):
