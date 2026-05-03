@@ -91,6 +91,8 @@ export default function AdminProducts() {
                 if (key === 'images' || key === 'video_360') return; // Read-only nested fields from backend
                 if (key === 'uploaded_images' && Array.isArray(val)) {
                     val.forEach((file: any) => formData.append('uploaded_images', file));
+                } else if (key === 'collections' && Array.isArray(val)) {
+                    val.forEach((id: any) => formData.append('collections', id));
                 } else if (key === 'uploaded_video_360' && val instanceof File) {
                     formData.append('uploaded_video_360', val);
                 } else if (val !== null && val !== undefined) {
@@ -123,6 +125,8 @@ export default function AdminProducts() {
                 if (key === 'images' || key === 'video_360' || key === 'slug' || key === 'vendor_name' || key === 'category_slug') return;
                 if (key === 'uploaded_images' && Array.isArray(val)) {
                     val.forEach((file: any) => formData.append('uploaded_images', file));
+                } else if (key === 'collections' && Array.isArray(val)) {
+                    val.forEach((id: any) => formData.append('collections', id));
                 } else if (key === 'uploaded_video_360' && val instanceof File) {
                     formData.append('uploaded_video_360', val);
                 } else if (val && (val as any) instanceof File) {
