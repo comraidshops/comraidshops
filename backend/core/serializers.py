@@ -541,7 +541,7 @@ class VendorProductSerializer(serializers.ModelSerializer):
 
     status = serializers.CharField(read_only=True)
     vendor = serializers.PrimaryKeyRelatedField(read_only=True)
-    commission_rate = serializers.DecimalField(source='vendor.commission_rate', max_digits=5, decimal_places=2, read_only=True)
+    commission_rate = serializers.SerializerMethodField()
     potential_earnings = serializers.SerializerMethodField()
 
     class Meta:
@@ -552,6 +552,12 @@ class VendorProductSerializer(serializers.ModelSerializer):
             'weight', 'price', 'stock', 'category', 'collections', 'image', 'status',
             'images', 'video_360', 'brand', 'commission_rate', 'potential_earnings'
         ]
+
+    def get_commission_rate(self, obj):
+        # Prioritize Global Commission if active
+        from .models import GlobalCommission
+        active_global = GlobalCommission.objects.filter(is_active=True).first()
+        return active_global.rate if active_global else obj.vendor.commission_rate
 
     def get_potential_earnings(self, obj):
         # Prioritize Global Commission if active
