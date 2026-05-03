@@ -13,7 +13,7 @@ import hmac
 from django.conf import settings
 from decouple import config
 from .permissions import IsApprovedVendor, IsVendorUser
-from .models import User, Vendor, Brand, Category, Product, Order, OrderItem, Notification, ProductImage, Product360Video, Collection, Magazine, Exhibition, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember
+from .models import User, Vendor, Brand, Category, Product, Order, OrderItem, Notification, ProductImage, Product360Video, Collection, Magazine, Exhibition, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember, GlobalCommission, Article, ProductVariant, ProductSpecification, ProductFeature
 from .serializers import (
     UserSerializer, VendorSerializer, BrandSerializer, CategorySerializer, 
     ProductSerializer, OrderSerializer, NotificationSerializer,
@@ -82,10 +82,8 @@ class MagazineFeaturedView(APIView):
 
         if not magazine:
             return Response(None)
-        from .serializers import MagazineSerializer
         return Response(MagazineSerializer(magazine).data)
 
-from .models import Article
 class ArticleLikeToggleView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -341,7 +339,6 @@ class VendorDashboardAPIView(APIView):
             approved_products=Count('id', filter=Q(status='approved'))
         )
         
-        from .models import ProductVariant, Order, VendorNotification
         from django.utils import timezone
         from datetime import timedelta
 
@@ -368,7 +365,6 @@ class VendorDashboardAPIView(APIView):
         )
         
         # Recent orders — show all so vendors can see incoming orders awaiting confirmation
-        from .serializers import VendorOrderSerializer, VendorNotificationSerializer
         recent_orders_qs = all_vendor_orders.order_by('-created_at')[:5].prefetch_related(
             'items__product', 'customer'
         )
@@ -403,7 +399,6 @@ class VendorAnalyticsAPIView(APIView):
 
     def get(self, request):
         vendor = request.user.vendor_profile
-        from .models import Order, VendorEarning, Product
         from django.db.models import Sum, Count
         from django.db.models.functions import TruncDate
         from django.utils import timezone
@@ -517,7 +512,6 @@ class VendorProductViewSet(viewsets.ModelViewSet):
         # 360 Video - Fix: Extract from request.FILES and handle outside 'if images'
         video_360 = self.request.FILES.get('uploaded_video_360')
         if video_360:
-            from .models import Product360Video
             # Recreate to ensure only one exists (OneToOneField)
             Product360Video.objects.filter(product=product).delete()
             Product360Video.objects.create(
@@ -535,7 +529,6 @@ class VendorProductViewSet(viewsets.ModelViewSet):
                 except:
                     variants_data = []
             
-            from .models import ProductVariant
             product.variants.all().delete()
             for var in variants_data:
                 # Fix: Handle empty stock string from frontend text input
@@ -564,7 +557,6 @@ class VendorProductViewSet(viewsets.ModelViewSet):
                 except:
                     specs_data = []
             
-            from .models import ProductSpecification
             product.specifications.all().delete()
             for spec in specs_data:
                 ProductSpecification.objects.create(
