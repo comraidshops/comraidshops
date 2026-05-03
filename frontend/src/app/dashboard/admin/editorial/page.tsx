@@ -69,6 +69,7 @@ interface EditorialBase {
     manifesto?: string;
     story?: string;
     featured_quote?: string;
+    curator_note?: string;
 }
 interface MagazineOption {
     id: number;
