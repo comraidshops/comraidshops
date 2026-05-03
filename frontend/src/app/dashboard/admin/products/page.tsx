@@ -49,7 +49,7 @@ interface Category {
 export default function AdminProducts() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [vendors, setVendors] = useState<{id: number, brand_name: string}[]>([]);
+    const [vendors, setVendors] = useState<{id: number, brand_name: string, commission_rate: string}[]>([]);
     const [actionLoading, setActionLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved'>('all');
@@ -89,6 +89,16 @@ export default function AdminProducts() {
             const formData = new FormData();
             Object.entries(currentProduct).forEach(([key, val]) => {
                 if (key === 'images' || key === 'video_360') return; // Read-only nested fields from backend
+                
+                // Financial markup logic
+                if (key === 'price' && val) {
+                    const vendor = vendors.find(v => v.id === currentProduct.vendor);
+                    const rate = vendor ? parseFloat(vendor.commission_rate) : 0.10;
+                    const listingPrice = parseFloat(val as string) * (1 + rate);
+                    formData.append('price', listingPrice.toFixed(2));
+                    return;
+                }
+
                 if (key === 'uploaded_images' && Array.isArray(val)) {
                     val.forEach((file: any) => formData.append('uploaded_images', file));
                 } else if (key === 'collections' && Array.isArray(val)) {
@@ -123,6 +133,16 @@ export default function AdminProducts() {
             const formData = new FormData();
             Object.entries(currentProduct).forEach(([key, val]) => {
                 if (key === 'images' || key === 'video_360' || key === 'slug' || key === 'vendor_name' || key === 'category_slug') return;
+                
+                // Financial markup logic
+                if (key === 'price' && val) {
+                    const vendor = vendors.find(v => v.id === currentProduct.vendor);
+                    const rate = vendor ? parseFloat(vendor.commission_rate) : 0.10;
+                    const listingPrice = parseFloat(val as string) * (1 + rate);
+                    formData.append('price', listingPrice.toFixed(2));
+                    return;
+                }
+
                 if (key === 'uploaded_images' && Array.isArray(val)) {
                     val.forEach((file: any) => formData.append('uploaded_images', file));
                 } else if (key === 'collections' && Array.isArray(val)) {
@@ -365,7 +385,7 @@ export default function AdminProducts() {
                     />
                     <div className="grid grid-cols-2 gap-4">
                         <AdminInput 
-                            label="Price (₦)" 
+                            label="Vendor Base Price (₦)" 
                             type="number"
                             value={currentProduct?.price || ''} 
                             onChange={(e) => {
@@ -373,6 +393,17 @@ export default function AdminProducts() {
                                 setCurrentProduct({ ...currentProduct, price: val ? parseFloat(val) : 0 });
                             }}
                         />
+                        <div className="flex flex-col justify-end pb-2">
+                            <p className="text-[10px] uppercase font-bold text-secondary mb-1">Final Retail Price</p>
+                            <p className="text-sm font-bold text-primary">
+                                ₦{((currentProduct?.price || 0) * (1 + (vendors.find(v => v.id === currentProduct?.vendor)?.commission_rate ? parseFloat(vendors.find(v => v.id === currentProduct?.vendor)!.commission_rate) : 0.10))).toLocaleString()}
+                                <span className="ml-2 text-[8px] text-secondary">
+                                    (+{((vendors.find(v => v.id === currentProduct?.vendor)?.commission_rate ? parseFloat(vendors.find(v => v.id === currentProduct?.vendor)!.commission_rate) : 0.10) * 100).toFixed(0)}% Fee)
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
                         <AdminInput 
                             label="Stock Level" 
                             type="number"
@@ -519,14 +550,26 @@ export default function AdminProducts() {
                     />
                     <div className="grid grid-cols-2 gap-4">
                         <AdminInput 
-                            label="Price (₦)" 
+                            label="Vendor Base Price (₦)" 
                             type="number"
-                            value={currentProduct?.price || ''} 
+                            value={
+                                currentProduct?.price && vendors.find(v => v.id === currentProduct.vendor) 
+                                ? (currentProduct.price / (1 + parseFloat(vendors.find(v => v.id === currentProduct.vendor)!.commission_rate))).toFixed(2)
+                                : currentProduct?.price || ''
+                            } 
                             onChange={(e) => {
                                 const val = e.target.value;
                                 setCurrentProduct({ ...currentProduct, price: val ? parseFloat(val) : 0 });
                             }}
                         />
+                        <div className="flex flex-col justify-end pb-2">
+                            <p className="text-[10px] uppercase font-bold text-secondary mb-1">Current Retail Price</p>
+                            <p className="text-sm font-bold text-primary">
+                                ₦{Number(currentProduct?.price || 0).toLocaleString()}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
                         <AdminInput 
                             label="Stock Level" 
                             type="number"
