@@ -12,6 +12,8 @@ export interface Product {
     status: string;
     stock: number;
     slug: string;
+    commission_rate?: string | number;
+    potential_earnings?: string | number;
 }
 
 interface ProductsTableProps {
@@ -49,14 +51,28 @@ export default function ProductsTable({ products, onDelete }: ProductsTableProps
                         {/* Product info */}
                         <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm text-primary truncate leading-snug">{product.name}</p>
-                            <div className="flex items-center gap-2 mt-1.5">
-                                <span className="text-sm font-bold">₦{parseFloat(product.price).toLocaleString()}</span>
-                                <span className="text-[10px] text-secondary">· {product.stock} in stock</span>
+                            
+                            {/* Pricing Preview */}
+                            <div className="mt-2 grid grid-cols-2 gap-y-1 gap-x-4 border-y border-border/50 py-2">
+                                <div className="flex flex-col">
+                                    <span className="text-[8px] text-secondary uppercase tracking-widest font-bold">Base Price</span>
+                                    <span className="text-xs font-medium">₦{parseFloat(product.potential_earnings?.toString() || '0').toLocaleString()}</span>
+                                </div>
+                                <div className="flex flex-col text-right">
+                                    <span className="text-[8px] text-secondary uppercase tracking-widest font-bold">Commission</span>
+                                    <span className="text-xs font-medium">{(parseFloat(product.commission_rate?.toString() || '0') * 100).toFixed(0)}%</span>
+                                </div>
+                                <div className="flex flex-col col-span-2 mt-1">
+                                    <span className="text-[8px] text-primary uppercase tracking-widest font-extrabold">Final Customer Price</span>
+                                    <span className="text-sm font-bold">₦{parseFloat(product.price).toLocaleString()}</span>
+                                </div>
                             </div>
-                            <div className="mt-1.5">
+
+                            <div className="flex items-center justify-between mt-2">
                                 <span className={`inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest ${getStatusStyle(product.status)}`}>
                                     {product.status}
                                 </span>
+                                <span className="text-[10px] text-secondary uppercase tracking-widest font-bold">{product.stock} in stock</span>
                             </div>
                         </div>
                     </div>
@@ -99,21 +115,23 @@ export default function ProductsTable({ products, onDelete }: ProductsTableProps
     const DesktopTableView = () => (
         <div className="hidden md:block bg-background border border-border overflow-x-auto">
             <table className="w-full text-sm text-left">
-                <thead className="text-xs text-secondary uppercase tracking-widest border-b border-border bg-secondary/5">
+                <thead className="text-[10px] text-secondary uppercase tracking-widest border-b border-border bg-secondary/5">
                     <tr>
-                        <th className="px-6 py-4 font-medium">Product</th>
-                        <th className="px-6 py-4 font-medium text-right">Price</th>
-                        <th className="px-6 py-4 font-medium text-right">Stock</th>
-                        <th className="px-6 py-4 font-medium">Status</th>
-                        <th className="px-6 py-4 font-medium text-right">Actions</th>
+                        <th className="px-6 py-4 font-bold">Product</th>
+                        <th className="px-6 py-4 font-bold text-right">Base Price</th>
+                        <th className="px-6 py-4 font-bold text-center">Commission</th>
+                        <th className="px-6 py-4 font-bold text-right text-primary">Final Price</th>
+                        <th className="px-6 py-4 font-bold text-right">Stock</th>
+                        <th className="px-6 py-4 font-bold">Status</th>
+                        <th className="px-6 py-4 font-bold text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                     {products.map((product) => (
-                        <tr key={product.id} className="hover:bg-secondary/5 transition-colors">
+                        <tr key={product.id} className="hover:bg-secondary/5 transition-colors group">
                             <td className="px-6 py-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-secondary/10 relative overflow-hidden flex-shrink-0">
+                                    <div className="w-12 h-12 bg-secondary/10 relative overflow-hidden flex-shrink-0 grayscale group-hover:grayscale-0 transition-all">
                                         {product.image && (
                                             <Image 
                                                 src={product.image.startsWith('http') ? product.image : `${API_BASE_URL}${product.image}`}
@@ -131,8 +149,16 @@ export default function ProductsTable({ products, onDelete }: ProductsTableProps
                                     </div>
                                 </div>
                             </td>
-                             <td className="px-6 py-4 text-right">₦{parseFloat(product.price).toLocaleString()}</td>
-                            <td className="px-6 py-4 text-right">{product.stock}</td>
+                            <td className="px-6 py-4 text-right text-secondary font-medium">
+                                ₦{parseFloat(product.potential_earnings?.toString() || '0').toLocaleString()}
+                            </td>
+                            <td className="px-6 py-4 text-center text-secondary font-medium">
+                                {(parseFloat(product.commission_rate?.toString() || '0') * 100).toFixed(0)}%
+                            </td>
+                            <td className="px-6 py-4 text-right font-bold text-primary">
+                                ₦{parseFloat(product.price).toLocaleString()}
+                            </td>
+                            <td className="px-6 py-4 text-right font-medium">{product.stock}</td>
                             <td className="px-6 py-4">
                                 <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-widest ${getStatusStyle(product.status)}`}>
                                     {product.status}
@@ -158,7 +184,7 @@ export default function ProductsTable({ products, onDelete }: ProductsTableProps
                     ))}
                     {products.length === 0 && (
                         <tr>
-                            <td colSpan={5} className="px-6 py-12 text-center text-secondary">
+                            <td colSpan={7} className="px-6 py-12 text-center text-secondary font-bold uppercase tracking-widest text-xs">
                                 No products found.
                             </td>
                         </tr>
