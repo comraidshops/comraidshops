@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     "cloudinary",
     "cloudinary_storage",
+    'investors',
 ]
 
 MIDDLEWARE = [

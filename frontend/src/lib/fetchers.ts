@@ -74,3 +74,15 @@ export async function fetchCategories(): Promise<any[]> { return safeFetch(`${AP
 export async function fetchVendorCommunity(): Promise<any> { return safeFetch(`${API_BASE_URL}/vendor/community/`); }
 export async function fetchCollection(slug: string): Promise<any> { return safeFetch(`${API_BASE_URL}/collections/${slug}/`); }
 export async function fetchBrandProducts(slug: string): Promise<PaginatedResponse<Product>> { return fetchProducts({ brand: slug }); }
+
+// --- Investor Module ---
+export async function investorLogin(credentials: any): Promise<any> {
+    return safeFetch(`${API_BASE_URL}/investors/login/`, {
+        method: 'POST',
+        body: JSON.stringify(credentials)
+    });
+}
+
+export async function fetchInvestorDashboard(): Promise<any> {
+    return safeFetch(`${API_BASE_URL}/investors/dashboard/`);
+}

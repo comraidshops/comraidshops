@@ -248,3 +248,41 @@ export interface PaginatedResponse<T> {
     previous: string | null;
     results: T[];
 }
+
+export interface InvestorAllocation {
+    id: number;
+    category: string;
+    category_display: string;
+    allocation_percentage: number;
+    description_logs: string;
+}
+
+export interface InvestorProfile {
+    id: number;
+    user: UserProfile;
+    equity_percentage: number;
+    total_investment: string | number;
+    investment_date: string;
+    status: string;
+    status_display: string;
+    company_valuation_snapshot: string | number | null;
+    allocations: InvestorAllocation[];
+}
+
+export interface MilestoneUpdate {
+    id: number;
+    title: string;
+    status: string;
+    status_display: string;
+    date: string;
+    description: string;
+    order: number;
+}
+
+export interface InvestorUpdateFeed {
+    id: number;
+    title: string;
+    content: string;
+    category: string;
+    created_at: string;
+}
