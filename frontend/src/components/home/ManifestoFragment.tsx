@@ -117,12 +117,12 @@ export default function ManifestoFragment() {
                     >
                         <div className="h-px w-24 bg-foreground/10 mb-16" />
                         
-                        <p className="font-baskerville text-[13px] md:text-[15px] uppercase tracking-[0.3em] text-secondary/60 leading-relaxed max-w-md">
+                        <p className="font-baskerville text-[13px] md:text-[15px] uppercase tracking-[0.3em] text-foreground/40 leading-relaxed max-w-md">
                             ComraidShops exists for the <br />
                             <span className="text-foreground font-medium mt-4 block tracking-[0.4em]">creators by curators.</span>
                         </p>
                         
-                        <div className="mt-16 flex items-center gap-4 text-[9px] uppercase tracking-[0.5em] text-secondary/40">
+                        <div className="mt-16 flex items-center gap-4 text-[9px] uppercase tracking-[0.5em] text-foreground/20">
                             <span>Longevity</span>
                             <span className="w-1.5 h-1.5 rounded-full bg-primary/20" />
                             <span>Conviction</span>

@@ -7,9 +7,11 @@ import {
     LayoutDashboard, TrendingUp, PieChart, Milestone, 
     Bell, MessageSquare, LogOut, ArrowUpRight, 
     Calendar, Shield, Info, DollarSign, ExternalLink,
-    Search, Filter, Download, ChevronRight, Globe, Lock, Menu, X
+    Search, Filter, Download, ChevronRight, Globe, Lock, Menu, X,
+    Check
 } from 'lucide-react';
 import { fetchInvestorDashboard } from '@/lib/fetchers';
+import { safeFetch } from '@/lib/api';
 import Image from 'next/image';
 
 export default function InvestorDashboard() {
@@ -18,12 +20,18 @@ export default function InvestorDashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [notifications, setNotifications] = useState<any[]>([]);
+    const [showNotifications, setShowNotifications] = useState(false);
 
     useEffect(() => {
         const loadDashboard = async () => {
             try {
-                const result = await fetchInvestorDashboard();
-                setData(result);
+                const [dashboardResult, notificationsResult] = await Promise.all([
+                    fetchInvestorDashboard(),
+                    safeFetch('/api/investors/notifications/')
+                ]);
+                setData(dashboardResult);
+                setNotifications(notificationsResult || []);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load dashboard.');
             } finally {
@@ -32,6 +40,24 @@ export default function InvestorDashboard() {
         };
         loadDashboard();
     }, []);
+
+    const markAsRead = async (id: number) => {
+        try {
+            await safeFetch(`/api/investors/notifications/${id}/mark_read/`, { method: 'POST' });
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+        } catch (err) {
+            console.error("Failed to mark notification as read:", err);
+        }
+    };
+
+    const markAllAsRead = async () => {
+        try {
+            await safeFetch(`/api/investors/notifications/mark_all_read/`, { method: 'POST' });
+            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        } catch (err) {
+            console.error("Failed to mark all as read:", err);
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('access_token');
@@ -107,6 +133,82 @@ export default function InvestorDashboard() {
                         <a href="#" className="hover:text-white transition-colors">Transparency</a>
                         <a href="#" className="hover:text-white transition-colors">Strategic</a>
                     </div>
+                    <div className="hidden lg:block h-4 w-px bg-white/10"></div>
+                    
+                    {/* Notifications */}
+                    <div className="relative">
+                        <button 
+                            onClick={() => setShowNotifications(!showNotifications)}
+                            className="p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all relative"
+                        >
+                            <Bell className="w-4 h-4 text-white/60" />
+                            {notifications.filter(n => !n.read).length > 0 && (
+                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-black text-[8px] font-black flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]">
+                                    {notifications.filter(n => !n.read).length}
+                                </span>
+                            )}
+                        </button>
+
+                        <AnimatePresence>
+                            {showNotifications && (
+                                <>
+                                    <motion.div 
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        onClick={() => setShowNotifications(false)}
+                                        className="fixed inset-0 z-40"
+                                    />
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        className="absolute right-0 mt-4 w-80 bg-[#0A0A0A] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden z-50 backdrop-blur-3xl"
+                                    >
+                                        <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Secure Alerts</span>
+                                            {notifications.some(n => !n.read) && (
+                                                <button 
+                                                    onClick={markAllAsRead}
+                                                    className="text-[8px] font-bold uppercase tracking-widest text-white/20 hover:text-white"
+                                                >
+                                                    Flush All
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                            {notifications.length > 0 ? notifications.map((n) => (
+                                                <div 
+                                                    key={n.id}
+                                                    onClick={() => !n.read && markAsRead(n.id)}
+                                                    className={`p-6 border-b border-white/5 last:border-0 transition-colors cursor-pointer group ${n.read ? 'opacity-40' : 'bg-white/[0.02]'}`}
+                                                >
+                                                    <div className="flex items-start justify-between gap-4 mb-2">
+                                                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20">
+                                                            {new Date(n.created_at).toLocaleDateString()}
+                                                        </span>
+                                                        {!n.read && <div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]" />}
+                                                    </div>
+                                                    <p className="text-[11px] font-medium leading-relaxed text-white/80 group-hover:text-white transition-colors">
+                                                        {n.message}
+                                                    </p>
+                                                </div>
+                                            )) : (
+                                                <div className="p-12 text-center flex flex-col items-center gap-4 opacity-10">
+                                                    <Bell className="w-8 h-8" />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">No Intelligence Updates</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="p-4 bg-white/[0.01] text-center">
+                                            <span className="text-[8px] font-bold uppercase tracking-widest text-white/10">End of Encrypted Stream</span>
+                                        </div>
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
                     <div className="hidden lg:block h-4 w-px bg-white/10"></div>
                     
                     {/* Logout Button (Hidden on very small mobile, replaced by menu) */}

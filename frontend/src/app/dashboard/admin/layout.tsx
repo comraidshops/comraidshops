@@ -55,6 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
         { name: 'Users & Vendors', href: '/dashboard/admin/users', icon: Users },
         { name: 'Products', href: '/dashboard/admin/products', icon: ShoppingBag },
+        { name: 'Messaging', href: '/dashboard/admin/messaging', icon: MessageSquare },
         { name: 'Categories', href: '/dashboard/admin/categories', icon: Tags },
         { name: 'Brands', href: '/dashboard/admin/editorial?tab=brands', icon: Award },
         { name: 'Orders', href: '/dashboard/admin/orders', icon: FileText },

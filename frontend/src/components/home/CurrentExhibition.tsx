@@ -38,7 +38,7 @@ export default function CurrentExhibition({ initialExhibition }: CurrentExhibiti
                         <h2 className="font-bebas text-4xl sm:text-5xl md:text-8xl uppercase tracking-wide leading-[0.9] mb-4">
                             {exhibition.title}
                         </h2>
-                        <p className="font-source-serif text-sm md:text-xl text-secondary/80 max-w-xl leading-relaxed mb-8 italic">
+                        <p className="font-source-serif text-sm md:text-xl text-foreground/70 max-w-xl leading-relaxed mb-8 italic">
                             {exhibition.description || "Experience the temporal intersection of architecture and human movement in our latest curated showcase."}
                         </p>
 

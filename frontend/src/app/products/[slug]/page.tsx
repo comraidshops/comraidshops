@@ -62,7 +62,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center p-12 border border-border flex flex-col items-center">
                     <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-4">Object Not Found</h1>
-                    <p className="text-secondary tracking-wide uppercase text-sm mb-8">The object slug is missing or undefined.</p>
+                    <p className="text-foreground/50 tracking-wide uppercase text-sm mb-8">The object slug is missing or undefined.</p>
                     <Link href="/" className="px-8 py-3 bg-foreground text-background text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
                         Return Home
                     </Link>
@@ -81,7 +81,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center p-12 border border-border flex flex-col items-center">
                     <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-4">Object Not Found</h1>
-                    <p className="text-secondary tracking-wide uppercase text-sm mb-8">The object &quot;{slug}&quot; could not be located.</p>
+                    <p className="text-foreground/50 tracking-wide uppercase text-sm mb-8">The object &quot;{slug}&quot; could not be located.</p>
                     <Link href="/" className="px-8 py-3 bg-foreground text-background text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
                         Return Home
                     </Link>
@@ -194,7 +194,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 priority
                             />
                         ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-xs uppercase tracking-[0.3em] text-secondary">
+                            <div className="absolute inset-0 flex items-center justify-center text-xs uppercase tracking-[0.3em] text-foreground/40">
                                 No Image Available
                             </div>
                         )}
@@ -207,11 +207,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         {/* Brand Banner */}
                         <div className="mb-12">
                             {brandSlug ? (
-                                <Link href={`/brands/${brandSlug}`} className="text-xs uppercase tracking-[0.4em] text-secondary hover:text-foreground transition-colors">
+                                <Link href={`/brands/${brandSlug}`} className="text-xs uppercase tracking-[0.4em] text-foreground/50 hover:text-foreground transition-colors">
                                     {brandName}
                                 </Link>
                             ) : (
-                                <span className="text-xs uppercase tracking-[0.4em] text-secondary">{brandName}</span>
+                                <span className="text-xs uppercase tracking-[0.4em] text-foreground/50">{brandName}</span>
                             )}
                         </div>
 
@@ -219,7 +219,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         <h1 className="text-4xl md:text-5xl font-light tracking-wide md:leading-[1.1] mb-6 uppercase">
                             {name}
                         </h1>
-                        <p className="text-2xl font-light tracking-wider text-secondary mb-12">
+                        <p className="text-2xl font-light tracking-wider text-foreground/90 mb-12">
                             ₦{Number(price).toLocaleString()}
                         </p>
 
@@ -239,7 +239,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         {/* Collections References */}
                         {collections && collections.length > 0 && (
                             <div className="mb-8">
-                                <h3 className="text-[10px] uppercase tracking-[0.3em] text-secondary mb-6 line-after relative max-w-max pr-8">
+                                <h3 className="text-[10px] uppercase tracking-[0.3em] text-foreground/50 mb-6 line-after relative max-w-max pr-8">
                                     Featured In
                                     <span className="absolute top-1/2 right-0 w-4 h-[1px] bg-border/50"></span>
                                 </h3>
@@ -299,9 +299,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {/* PRODUCT STORY SECTION */}
             {story && (
                 <section className="py-32 px-6 md:px-10 max-w-3xl mx-auto text-center border-t border-border/10">
-                    <h2 className="text-[10px] uppercase tracking-[0.4em] text-secondary mb-16 relative inline-block">
+                    <h2 className="text-[10px] uppercase tracking-[0.4em] text-foreground/50 mb-16 relative inline-block">
                         Story
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[1px] h-4 bg-secondary/50"></div>
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[1px] h-4 bg-border/50"></div>
                     </h2>
                     <div 
                         className="text-sm md:text-2xl text-foreground font-light leading-loose tracking-wide prose prose-invert max-w-none text-center"
@@ -314,10 +314,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {typedImages.length > 0 && (
                 <section className="py-24 max-w-[1400px] mx-auto px-6 md:px-10 lg:px-16 border-t border-border/10">
                     <div className="mb-24 flex flex-col items-center">
-                        <h2 className="text-xs uppercase tracking-[0.4em] text-secondary mb-4">
+                        <h2 className="text-xs uppercase tracking-[0.4em] text-foreground/50 mb-4">
                             Details
                         </h2>
-                        <div className="w-[1px] h-12 bg-secondary/30 mt-4"></div>
+                        <div className="w-[1px] h-12 bg-border/30 mt-4"></div>
                     </div>
                     
                     {/* Asymmetric Grid Example */}
@@ -347,7 +347,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     <div className="flex flex-col gap-16">
                         {description && (
                             <div>
-                                <h3 className="text-xs uppercase tracking-[0.4em] text-secondary mb-8">Object Description</h3>
+                                <h3 className="text-xs uppercase tracking-[0.4em] text-foreground/50 mb-8">Object Description</h3>
                                 <div 
                                     className="text-sm text-foreground/80 leading-relaxed font-light max-w-xl prose prose-invert prose-sm"
                                     dangerouslySetInnerHTML={{ __html: cleanContent(description) }}
@@ -359,13 +359,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                             <div className="pt-12 border-t border-border/20">
                                 {materials && (
                                     <div className="mb-12">
-                                        <h3 className="text-xs uppercase tracking-[0.4em] text-secondary mb-6">Composition</h3>
+                                        <h3 className="text-xs uppercase tracking-[0.4em] text-foreground/50 mb-6">Composition</h3>
                                         <p className="text-sm font-light leading-relaxed">{materials}</p>
                                     </div>
                                 )}
                                 {care_instructions && (
                                     <div>
-                                        <h3 className="text-xs uppercase tracking-[0.4em] text-secondary mb-6">Care Instructions</h3>
+                                        <h3 className="text-xs uppercase tracking-[0.4em] text-foreground/50 mb-6">Care Instructions</h3>
                                         <p className="text-sm font-light leading-relaxed whitespace-pre-line text-foreground/80">{care_instructions}</p>
                                     </div>
                                 )}
@@ -375,29 +375,29 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
                     {/* Right Column: Specifications Grid */}
                     <div className="flex flex-col">
-                        <h3 className="text-xs uppercase tracking-[0.4em] text-secondary mb-12">Specifications</h3>
+                        <h3 className="text-xs uppercase tracking-[0.4em] text-foreground/50 mb-12">Specifications</h3>
                         <div className="flex flex-col border-t border-border/20">
                             {origin_country && (
                                 <div className="grid grid-cols-2 py-6 border-b border-border/20">
-                                    <span className="text-xs uppercase tracking-[0.2em] text-secondary/70">Origin</span>
+                                    <span className="text-xs uppercase tracking-[0.2em] text-foreground/40">Origin</span>
                                     <span className="text-sm font-light text-right">{origin_country}</span>
                                 </div>
                             )}
                             {fit && (
                                 <div className="grid grid-cols-2 py-6 border-b border-border/20">
-                                    <span className="text-xs uppercase tracking-[0.2em] text-secondary/70">Fit</span>
+                                    <span className="text-xs uppercase tracking-[0.2em] text-foreground/40">Fit</span>
                                     <span className="text-sm font-light text-right">{fit}</span>
                                 </div>
                             )}
                             {weight && (
                                 <div className="grid grid-cols-2 py-6 border-b border-border/20">
-                                    <span className="text-xs uppercase tracking-[0.2em] text-secondary/70">Weight</span>
+                                    <span className="text-xs uppercase tracking-[0.2em] text-foreground/40">Weight</span>
                                     <span className="text-sm font-light text-right">{weight}</span>
                                 </div>
                             )}
                             {specifications.map((spec: ProductSpecification, idx: number) => (
                                 <div key={spec.id || `spec-${idx}`} className="grid grid-cols-2 py-6 border-b border-border/20">
-                                    <span className="text-xs uppercase tracking-[0.2em] text-secondary/70">{spec.name}</span>
+                                    <span className="text-xs uppercase tracking-[0.2em] text-foreground/40">{spec.name}</span>
                                     <span className="text-sm font-light text-right">{spec.value}</span>
                                 </div>
                             ))}
@@ -415,7 +415,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         {/* Collection Context */}
                         {collections.length > 0 && (
                             <div className="flex flex-col gap-12">
-                                <span className="text-[10px] uppercase tracking-[0.4em] text-secondary">Collection Context</span>
+                                <span className="text-[10px] uppercase tracking-[0.4em] text-foreground/50">Collection Context</span>
                                 <div>
                                     <h2 className="text-3xl font-light uppercase tracking-tight mb-6">{collections[0].name}</h2>
                                     <p className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md">
@@ -434,7 +434,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         {/* Brand Context */}
                         {brand && (
                             <div className="flex flex-col gap-12">
-                                <span className="text-[10px] uppercase tracking-[0.4em] text-secondary">Brand Ethos</span>
+                                <span className="text-[10px] uppercase tracking-[0.4em] text-foreground/50">Brand Ethos</span>
                                 <div>
                                     <h2 className="text-3xl font-light uppercase tracking-tight mb-6">{brandName}</h2>
                                     <p className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md">
@@ -457,10 +457,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {related_products.length > 0 && (
                 <section className="py-24 mt-0 border-t border-border/10 px-6 md:px-10 lg:px-16 max-w-[1400px] mx-auto">
                     <div className="mb-16 flex flex-col items-center">
-                        <h2 className="text-xs uppercase tracking-[0.4em] text-secondary mb-4">
+                        <h2 className="text-xs uppercase tracking-[0.4em] text-foreground/50 mb-4">
                             More from {brandName}
                         </h2>
-                        <div className="w-[1px] h-12 bg-secondary/30 mt-4"></div>
+                        <div className="w-[1px] h-12 bg-border/30 mt-4"></div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-24">

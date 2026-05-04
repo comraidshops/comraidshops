@@ -64,7 +64,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center p-12 border border-border flex flex-col items-center">
                     <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-4">Collection Not Found</h1>
-                    <p className="text-secondary tracking-wide uppercase text-sm mb-8">The collection &quot;{slug}&quot; could not be located.</p>
+                    <p className="text-foreground/50 tracking-wide uppercase text-sm mb-8">The collection &quot;{slug}&quot; could not be located.</p>
                     <Link href="/" className="px-8 py-3 bg-foreground text-background text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
                         Return Home
                     </Link>
@@ -136,10 +136,10 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
             {products.length > 0 && (
                 <section className="py-16 md:py-24 px-6 md:px-10 lg:px-16 max-w-[1400px] mx-auto">
                     <div className="mb-16 md:mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 text-center md:text-left">
-                        <h2 className="text-xs uppercase tracking-[0.3em] text-secondary">
+                        <h2 className="text-xs uppercase tracking-[0.3em] text-foreground/50">
                             Collection Pieces
                         </h2>
-                        <span className="text-[10px] text-secondary tracking-[0.4em] uppercase">
+                        <span className="text-[10px] text-foreground/40 tracking-[0.4em] uppercase">
                             {products.length} Objects
                         </span>
                     </div>

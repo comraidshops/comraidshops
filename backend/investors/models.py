@@ -65,3 +65,13 @@ class InvestorUpdateFeed(models.Model):
 
     def __str__(self):
         return self.title
+
+class InvestorNotification(models.Model):
+    investor = models.ForeignKey(InvestorProfile, on_delete=models.CASCADE, related_name='investor_notifications')
+    message = models.TextField()
+    type = models.CharField(max_length=50)
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification for {self.investor.user.username}: {self.type}"

@@ -70,7 +70,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center p-12 border border-border">
                     <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-4">Brand Not Found</h1>
-                    <p className="text-secondary tracking-wide uppercase text-sm">The brand &quot;{slug}&quot; could not be located.</p>
+                    <p className="text-foreground/50 tracking-wide uppercase text-sm">The brand &quot;{slug}&quot; could not be located.</p>
                 </div>
             </div>
         );
@@ -131,7 +131,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
             {brand.featured_products?.length > 0 && (
                 <section className="py-16 md:py-24 px-6 md:px-10 lg:px-16 max-w-[1400px] mx-auto border-t border-foreground/5">
                     <div className="mb-16 md:mb-24 text-center md:text-left">
-                        <h2 className="text-xs uppercase tracking-[0.3em] text-secondary font-semibold">
+                        <h2 className="text-xs uppercase tracking-[0.3em] text-foreground/50 font-semibold">
                             Featured Curations
                         </h2>
                     </div>
@@ -169,14 +169,14 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
                     <h2 className="text-xs uppercase tracking-[0.3em] text-secondary font-semibold">
                         The Complete Collection
                     </h2>
-                    <span className="text-[10px] text-secondary tracking-[0.4em] uppercase">
+                    <span className="text-[10px] text-foreground/40 tracking-[0.4em] uppercase">
                         {brand.approved_product_count} Objects
                     </span>
                 </div>
 
                 {products.length === 0 ? (
                     <div className="py-32 flex justify-center">
-                        <p className="text-sm uppercase tracking-[0.3em] text-secondary/60">
+                        <p className="text-sm uppercase tracking-[0.3em] text-foreground/30">
                             No objects available yet
                         </p>
                     </div>

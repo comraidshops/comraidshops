@@ -37,10 +37,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from django.http import HttpResponse
-
 urlpatterns = [
-    path('ping/', lambda r: HttpResponse('pong-core')),
     path('', include(router.urls)),
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/google/', GoogleLogin.as_view(), name='google_login'),

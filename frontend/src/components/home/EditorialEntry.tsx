@@ -60,7 +60,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                             <div className="flex flex-col gap-2">
                                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Volume 01</span>
                                 <div className="h-px w-10 bg-primary/20"></div>
-                                <span className="text-[10px] uppercase tracking-[0.2em] text-secondary">Editorial Archive</span>
+                                <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/40">Editorial Archive</span>
                             </div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                                 </h2>
                             </div>
 
-                            <div className="max-w-xl text-sm md:text-lg text-secondary leading-relaxed font-light italic opacity-80 border-l-2 border-primary/20 pl-6 py-2">
+                            <div className="max-w-xl text-sm md:text-lg text-foreground/70 leading-relaxed font-light italic border-l-2 border-primary/20 pl-6 py-2">
                                 <p className="line-clamp-[12] md:line-clamp-none">
                                     {previewContent}
                                 </p>
@@ -97,7 +97,7 @@ export default function EditorialEntry({ initialArticle }: EditorialEntryProps) 
                                     <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover/btn:w-full transition-all duration-700"></div>
                                 </Link>
 
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/40">
+                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20">
                                     {magazine.created_at ? new Date(magazine.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Est. 2024'}
                                 </span>
                             </div>

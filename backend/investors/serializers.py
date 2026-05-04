@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import InvestorProfile, InvestmentAllocation, MilestoneUpdate, InvestorUpdateFeed
+from .models import InvestorProfile, InvestmentAllocation, MilestoneUpdate, InvestorUpdateFeed, InvestorNotification
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -40,3 +40,8 @@ class InvestorUpdateFeedSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestorUpdateFeed
         fields = ['id', 'title', 'content', 'category', 'created_at']
+
+class InvestorNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvestorNotification
+        fields = ['id', 'message', 'type', 'read', 'created_at']

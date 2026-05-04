@@ -5,13 +5,12 @@ from django.shortcuts import get_object_or_404
 from django.db import models
 from django.conf import settings
 from decouple import config
-from .models import InvestorProfile, InvestmentAllocation, MilestoneUpdate, InvestorUpdateFeed
+from .models import InvestorProfile, InvestmentAllocation, MilestoneUpdate, InvestorUpdateFeed, InvestorNotification
 from .serializers import (
     InvestorProfileSerializer, MilestoneUpdateSerializer, 
-    InvestorUpdateFeedSerializer, InvestmentAllocationSerializer
+    InvestorUpdateFeedSerializer, InvestmentAllocationSerializer,
+    InvestorNotificationSerializer
 )
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class IsInvestor(permissions.BasePermission):
     """
@@ -19,6 +18,29 @@ class IsInvestor(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_authenticated and hasattr(request.user, 'investor_profile'))
+
+class InvestorNotificationViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsInvestor]
+    serializer_class = InvestorNotificationSerializer
+
+    def get_queryset(self):
+        return self.request.user.investor_profile.investor_notifications.all().order_by('-created_at')
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.read = True
+        notification.save()
+        return Response({'status': 'marked as read'})
+
+    @action(detail=False, methods=['post'])
+    def mark_all_read(self, request):
+        investor = request.user.investor_profile
+        investor.investor_notifications.filter(read=False).update(read=True)
+        return Response({'status': 'all marked as read'})
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 
 class InvestorDashboardView(views.APIView):
     permission_classes = [IsInvestor]

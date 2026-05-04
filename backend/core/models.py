@@ -419,6 +419,17 @@ class Notification(models.Model):
     def __str__(self):
         return self.title
 
+class AdminMessage(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_admin_messages')
+    recipients = models.ManyToManyField(User, related_name='received_admin_messages')
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    role_target = models.CharField(max_length=50, blank=True) # e.g. "investor", "vendor", "broadcast_investors", "broadcast_vendors"
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='products/additional/')

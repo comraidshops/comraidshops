@@ -1,13 +1,35 @@
-{% extends "emails/base.html" %}
-
-{% block content %}
-<p class="greeting">Hello {{ recipient_name|default:"Member" }},</p>
-
-<h2>{{ email_subject }}</h2>
-
-<div style="margin-top: 20px; line-height: 1.6; color: #cccccc;">
-    {{ email_body|safe }}
-</div>
-
-<p style="margin-top: 40px;">Best regards,<br>The ComraidShops Team</p>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #111; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+        .header { margin-bottom: 40px; text-align: center; }
+        .logo { font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; font-size: 14px; }
+        .content { background: #f9f9f9; padding: 40px; border-radius: 20px; }
+        .title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #000; }
+        .message { color: #444; white-space: pre-wrap; }
+        .footer { margin-top: 40px; font-size: 10px; color: #999; text-align: center; text-transform: uppercase; letter-spacing: 0.1em; }
+        .divider { height: 1px; bg: #eee; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">COMRAIDSHOPS</div>
+        </div>
+        <div class="content">
+            <h1 class="title">{{ email_subject }}</h1>
+            <p>Hello {{ recipient_name }},</p>
+            <div class="message">
+                {{ email_body }}
+            </div>
+            <div class="divider"></div>
+            <p style="font-size: 11px; color: #888;">This is an administrative notification from the ComraidShops Platform.</p>
+        </div>
+        <div class="footer">
+            © 2026 COMRAIDSHOPS INC. | SECURE ADMINISTRATIVE DISPATCH
+        </div>
+    </div>
+</body>
+</html>

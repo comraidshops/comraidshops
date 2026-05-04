@@ -21,15 +21,23 @@ from .serializers import (
 
 class AdminUserSerializer(UserSerializer):
     vendor_brand_id = serializers.SerializerMethodField()
+    is_investor = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ['is_superuser', 'is_staff', 'is_vendor_approved', 'date_joined', 'last_login', 'vendor_brand_id']
+        fields = UserSerializer.Meta.fields + [
+            'is_superuser', 'is_staff', 'is_vendor_approved', 
+            'date_joined', 'last_login', 'vendor_brand_id',
+            'is_investor', 'is_vendor'
+        ]
         read_only_fields = ['date_joined', 'last_login']
 
     def get_vendor_brand_id(self, obj):
         if obj.is_vendor and hasattr(obj, 'vendor_profile') and obj.vendor_profile.brand:
             return obj.vendor_profile.brand.id
         return None
+
+    def get_is_investor(self, obj):
+        return hasattr(obj, 'investor_profile')
 
 class AdminVendorSerializer(VendorSerializer):
     user_details = AdminUserSerializer(source='user', read_only=True)
@@ -851,36 +859,93 @@ class AdminBroadcastView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
     def post(self, request):
-        subject = request.data.get('subject')
-        message = request.data.get('message')
-        recipients = request.data.get('recipients', []) # list of emails or 'all'
+        title = request.data.get('title') or request.data.get('subject')
+        message = request.data.get('message') or request.data.get('content')
+        recipient_type = request.data.get('recipient_type') # 'investor', 'vendor', 'broadcast_investors', 'broadcast_vendors', 'multiple'
+        selected_users = request.data.get('selected_users', []) # list of user IDs
         
-        if not subject or not message:
-            return Response({'error': 'Subject and message are required.'}, status=400)
+        if not title or not message:
+            return Response({'error': 'Title and message are required.'}, status=400)
             
+        from .models import AdminMessage, Notification, VendorNotification, Vendor
+        from investors.models import InvestorProfile, InvestorNotification
         from .email_service import send_platform_email
-        
-        if recipients == 'all':
-            target_emails = list(User.objects.exclude(email='').values_list('email', flat=True))
-        else:
-            target_emails = recipients
-            
-        if not target_emails:
-            return Response({'error': 'No recipients found.'}, status=400)
-            
-        # Send to each recipient. In a real highly-scaled system, this should be a Celery task.
-        for email in target_emails:
-            user = User.objects.filter(email=email).first()
-            recipient_name = user.username if user else "Member"
-            send_platform_email(
-                subject=subject,
-                template_name="system/admin_broadcast.html",
-                context={
-                    "email_subject": subject,
-                    "email_body": message,
-                    "recipient_name": recipient_name
-                },
-                recipient_list=[email]
+        from django.db import transaction
+
+        with transaction.atomic():
+            admin_msg = AdminMessage.objects.create(
+                sender=request.user,
+                title=title,
+                content=message,
+                role_target=recipient_type or "custom"
             )
+
+            target_users = []
             
-        return Response({'message': f'Broadcast email sent to {len(target_emails)} recipients.'})
+            if recipient_type == 'broadcast_investors':
+                investor_profiles = InvestorProfile.objects.all()
+                for profile in investor_profiles:
+                    target_users.append(profile.user)
+                    InvestorNotification.objects.create(
+                        investor=profile,
+                        message=message,
+                        type='admin_broadcast'
+                    )
+            elif recipient_type == 'broadcast_vendors':
+                vendors = Vendor.objects.all()
+                for vendor in vendors:
+                    target_users.append(vendor.user)
+                    VendorNotification.objects.create(
+                        vendor=vendor,
+                        message=message,
+                        type='admin_broadcast'
+                    )
+            elif recipient_type == 'investor' or recipient_type == 'vendor' or recipient_type == 'multiple':
+                # selected_users is a list of User IDs
+                users = User.objects.filter(id__in=selected_users)
+                for user in users:
+                    target_users.append(user)
+                    # Check if investor
+                    if hasattr(user, 'investor_profile'):
+                        InvestorNotification.objects.create(
+                            investor=user.investor_profile,
+                            message=message,
+                            type='admin_message'
+                        )
+                    # Check if vendor
+                    if hasattr(user, 'vendor_profile'):
+                        VendorNotification.objects.create(
+                            vendor=user.vendor_profile,
+                            message=message,
+                            type='admin_message'
+                        )
+                    # Unified notification anyway
+                    Notification.objects.create(
+                        user=user,
+                        title=title,
+                        body=message
+                    )
+
+            admin_msg.recipients.set(target_users)
+
+        # Send emails outside of transaction
+        for user in target_users:
+            if user.email:
+                try:
+                    send_platform_email(
+                        subject=title,
+                        template_name="system/admin_broadcast.html",
+                        context={
+                            "email_subject": title,
+                            "email_body": message,
+                            "recipient_name": user.username
+                        },
+                        recipient_list=[user.email]
+                    )
+                except Exception as e:
+                    print(f"Failed to send email to {user.email}: {e}")
+
+        return Response({
+            'message': f'Message dispatched to {len(target_users)} recipients.',
+            'message_id': admin_msg.id
+        })
