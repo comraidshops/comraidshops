@@ -4,7 +4,7 @@
  */
 
 import { API_BASE_URL } from './constants';
-import { safeFetch } from './api-utils';
+export { safeFetch } from './api-utils';
 
 import { PaginatedResponse, Product, Brand, UserProfile, Slide, Exhibition, Magazine } from './types';
 
