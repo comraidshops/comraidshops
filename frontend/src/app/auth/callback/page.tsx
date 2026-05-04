@@ -24,9 +24,11 @@ function CallbackHandler() {
                 setStatus('Exchanging credentials...');
                 
                 const isInvestor = searchParams?.get('state') === 'investor';
-                const endpoint = isInvestor ? '/investors/login/google/' : '/auth/google/';
+                const url = isInvestor 
+                    ? `${API_BASE_URL}/investors/login/google/` 
+                    : `${API_BASE_URL}/auth/google/`;
                 
-                const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
