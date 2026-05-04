@@ -1,3 +1,5 @@
+import DOMPurify from 'isomorphic-dompurify';
+
 /**
  * Utility for formatting currency in Naira (₦)
  */
@@ -31,10 +33,14 @@ export function stripHtml(html: string): string {
  */
 export function cleanContent(html: string): string {
     if (!html) return '';
-    return html
+    const cleaned = html
         .replace(/&nbsp;/g, ' ')
         .replace(/[\u00A0\u202F\u2007\u2008\u2009\u200A]/g, ' ')
         .trim();
+    return DOMPurify.sanitize(cleaned, {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'blockquote', 'sup', 'sub'],
+        ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'],
+    });
 }
 
 /**

@@ -15,7 +15,7 @@ export default function ProductFit({ fit }: ProductFitProps) {
                 <div className="bg-secondary/5 p-8 md:p-12 aspect-[4/3] flex flex-col justify-center items-center text-center">
                     {/* Placeholder for size guide illustration if we had one */}
                     <span className="text-6xl font-bold text-secondary/20 uppercase tracking-tighter">
-                        True to Size
+                        {fit}
                     </span>
                 </div>
 

@@ -55,14 +55,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     const resolvedParams = await params;
     const slug = resolvedParams.slug;
 
-    console.log("PRODUCT SLUG RECEIVED:", slug)
+
 
     if (!slug || slug === 'undefined') {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center p-12 border border-border flex flex-col items-center">
-                    <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-4">Object Not Found</h1>
-                    <p className="text-foreground/50 tracking-wide uppercase text-sm mb-8">The object slug is missing or undefined.</p>
+                    <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-4">Product Not Found</h1>
+                    <p className="text-foreground/50 tracking-wide uppercase text-sm mb-8">The product you&apos;re looking for doesn&apos;t exist or has been removed.</p>
                     <Link href="/" className="px-8 py-3 bg-foreground text-background text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
                         Return Home
                     </Link>
@@ -80,8 +80,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center p-12 border border-border flex flex-col items-center">
-                    <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-4">Object Not Found</h1>
-                    <p className="text-foreground/50 tracking-wide uppercase text-sm mb-8">The object &quot;{slug}&quot; could not be located.</p>
+                    <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-4">Product Not Found</h1>
+                    <p className="text-foreground/50 tracking-wide uppercase text-sm mb-8">The product &quot;{slug}&quot; could not be found.</p>
                     <Link href="/" className="px-8 py-3 bg-foreground text-background text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
                         Return Home
                     </Link>
@@ -260,9 +260,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {/* EDITORIAL QUOTE */}
             {editorial_quote && (
                 <section className="py-24 px-6 md:px-10 max-w-5xl mx-auto text-center border-t border-border/10">
-                    <h2 
+                    <blockquote 
                         className="text-2xl md:text-4xl font-serif italic text-foreground leading-relaxed tracking-wide prose prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ __html: `&quot;${cleanContent(editorial_quote)}&quot;` }}
+                        dangerouslySetInnerHTML={{ __html: cleanContent(editorial_quote) }}
                     />
                 </section>
             )}
@@ -347,7 +347,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     <div className="flex flex-col gap-16">
                         {description && (
                             <div>
-                                <h3 className="text-xs uppercase tracking-[0.4em] text-foreground/50 mb-8">Object Description</h3>
+                                <h3 className="text-xs uppercase tracking-[0.4em] text-foreground/50 mb-8">Description</h3>
                                 <div 
                                     className="text-sm text-foreground/80 leading-relaxed font-light max-w-xl prose prose-invert prose-sm"
                                     dangerouslySetInnerHTML={{ __html: cleanContent(description) }}
@@ -418,9 +418,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 <span className="text-[10px] uppercase tracking-[0.4em] text-foreground/50">Collection Context</span>
                                 <div>
                                     <h2 className="text-3xl font-light uppercase tracking-tight mb-6">{collections[0].name}</h2>
-                                    <p className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md">
-                                        {collections[0].description || `Exploring the boundaries of form and function in our ${collections[0].season || 'latest'} series.`}
-                                    </p>
+                                    {collections[0].description && (
+                                        <p className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md">
+                                            {collections[0].description}
+                                        </p>
+                                    )}
                                     <Link 
                                         href={`/collections/${collections[0].slug}`}
                                         className="text-[10px] uppercase tracking-[0.3em] font-medium border-b border-foreground pb-1 inline-block hover:border-transparent transition-colors"
@@ -437,15 +439,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 <span className="text-[10px] uppercase tracking-[0.4em] text-foreground/50">Brand Ethos</span>
                                 <div>
                                     <h2 className="text-3xl font-light uppercase tracking-tight mb-6">{brandName}</h2>
-                                    <p className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md">
-                                        {brandPhilosophy || brandDescription || "Craftsmanship and heritage redefined for the contemporary era."}
-                                    </p>
-                                    <Link 
-                                        href={`/brands/${brandSlug || ''}`}
-                                        className="text-[10px] uppercase tracking-[0.3em] font-medium border-b border-foreground pb-1 inline-block hover:border-transparent transition-colors"
-                                    >
-                                        Visit Studio
-                                    </Link>
+                                    {(brandPhilosophy || brandDescription) && (
+                                        <p className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md">
+                                            {brandPhilosophy || brandDescription}
+                                        </p>
+                                    )}
+                                    {brandSlug && (
+                                        <Link 
+                                            href={`/brands/${brandSlug}`}
+                                            className="text-[10px] uppercase tracking-[0.3em] font-medium border-b border-foreground pb-1 inline-block hover:border-transparent transition-colors"
+                                        >
+                                            Visit Studio
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         )}

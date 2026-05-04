@@ -6,9 +6,10 @@ interface ProductSpecsProps {
     usage?: string;
     features?: { id?: number; title: string; description: string }[];
     materials?: string;
+    careInstructions?: string;
 }
 
-export default function ProductSpecs({ usage, features, materials }: ProductSpecsProps) {
+export default function ProductSpecs({ usage, features, materials, careInstructions }: ProductSpecsProps) {
     if (!usage && !features && !materials) return null;
 
     return (
@@ -59,9 +60,11 @@ export default function ProductSpecs({ usage, features, materials }: ProductSpec
                         <p className="text-base font-medium mb-6">
                             {materials}
                         </p>
-                        <p className="text-xs text-secondary/60 uppercase tracking-wide">
-                            Care: Wash cold. Do not tumble dry. Do not use softener.
-                        </p>
+                        {careInstructions && (
+                            <p className="text-xs text-secondary/60 uppercase tracking-wide">
+                                Care: {careInstructions}
+                            </p>
+                        )}
                     </div>
                 )}
             </div>
