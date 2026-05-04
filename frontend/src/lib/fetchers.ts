@@ -83,6 +83,13 @@ export async function investorLogin(credentials: any): Promise<any> {
     });
 }
 
+export async function investorGoogleLogin(data: any): Promise<any> {
+    return safeFetch(`${API_BASE_URL}/investors/login/google/`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
+}
+
 export async function fetchInvestorDashboard(): Promise<any> {
     return safeFetch(`${API_BASE_URL}/investors/dashboard/`);
 }

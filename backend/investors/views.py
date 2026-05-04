@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db import models
+from django.conf import settings
+from decouple import config
 from .models import InvestorProfile, InvestmentAllocation, MilestoneUpdate, InvestorUpdateFeed
 from .serializers import (
     InvestorProfileSerializer, MilestoneUpdateSerializer, 
@@ -65,3 +67,67 @@ class InvestorLoginSerializer(TokenObtainPairSerializer):
 
 class InvestorLoginView(TokenObtainPairView):
     serializer_class = InvestorLoginSerializer
+
+class InvestorGoogleLogin(views.APIView):
+    """
+    Self-contained Google OAuth2 login for investors.
+    Similar to core GoogleLogin but strictly for investors.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+    GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
+
+    def post(self, request):
+        code = request.data.get('code')
+        if not code:
+            return Response({"error": "Authorization code is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        callback_url = request.data.get('callback_url', '').strip()
+        if not callback_url:
+            callback_url = config("GOOGLE_OAUTH_CALLBACK_URL", default="http://localhost:3000/auth/callback").strip()
+
+        client_id = config("GOOGLE_CLIENT_ID", default="")
+        client_secret = config("GOOGLE_CLIENT_SECRET", default="")
+
+        if not client_id or not client_secret:
+            return Response({"error": "Google OAuth is not configured."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        import requests as http_requests
+        token_response = http_requests.post(self.GOOGLE_TOKEN_URL, data={
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": callback_url,
+            "grant_type": "authorization_code",
+        })
+
+        token_data = token_response.json()
+        if "error" in token_data:
+            return Response({"error": f"Google token exchange failed: {token_data.get('error_description', token_data['error'])}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        access_token = token_data.get("access_token")
+        userinfo_response = http_requests.get(self.GOOGLE_USERINFO_URL, headers={"Authorization": f"Bearer {access_token}"})
+        
+        if userinfo_response.status_code != 200:
+            return Response({"error": "Failed to fetch user info from Google."}, status=status.HTTP_400_BAD_REQUEST)
+
+        userinfo = userinfo_response.json()
+        email = userinfo.get("email")
+
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        try:
+            user = User.objects.get(email__iexact=email)
+            if not hasattr(user, 'investor_profile'):
+                return Response({"error": "This Google account does not have investor access."}, status=status.HTTP_403_FORBIDDEN)
+            
+            from rest_framework_simplejwt.tokens import RefreshToken
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            })
+        except User.DoesNotExist:
+            return Response({"error": "No investor account found for this email."}, status=status.HTTP_403_FORBIDDEN)
