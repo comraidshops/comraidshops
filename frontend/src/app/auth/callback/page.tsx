@@ -23,7 +23,10 @@ function CallbackHandler() {
             try {
                 setStatus('Exchanging credentials...');
                 
-                const res = await fetch(`${API_BASE_URL}/auth/google/`, {
+                const isInvestor = searchParams?.get('state') === 'investor';
+                const endpoint = isInvestor ? '/investors/login/google/' : '/auth/google/';
+                
+                const res = await fetch(`${API_BASE_URL}${endpoint}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -50,10 +53,12 @@ function CallbackHandler() {
                     localStorage.setItem('access_token', data.access_token || data.access);
                     localStorage.setItem('refresh_token', data.refresh_token || data.refresh);
                     
-                    // Small delay for visual feedback
-                    setTimeout(() => {
-                        router.push('/dashboard/user');
-                    }, 1000);
+                    if (searchParams?.get('state') === 'investor') {
+                        localStorage.setItem('user_role', 'investor');
+                        setTimeout(() => router.push('/investor/dashboard'), 1000);
+                    } else {
+                        setTimeout(() => router.push('/dashboard/user'), 1000);
+                    }
                 } else {
                     console.error("Auth failed:", data);
                     setError(data.detail || data.error || 'Authentication with Google failed.');

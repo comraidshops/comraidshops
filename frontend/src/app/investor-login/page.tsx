@@ -12,16 +12,12 @@ import Link from 'next/link';
 function GoogleLoginButton({ text = "Sign in with Google" }: { text?: string }) {
     const handleGoogleLogin = () => {
         const clientID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-        // We use a special state or different callback to differentiate investor login if needed,
-        // but for simplicity we'll use the same callback and the backend will handle the check
-        // based on the endpoint we call later.
-        // Actually, the current callback redirects to /auth/callback which calls the CORE google login.
-        // We need an investor-specific callback or a state.
-        const redirectURI = `${window.location.origin}/investor/auth/callback`;
+        const redirectURI = `${window.location.origin}/auth/callback`;
         const scope = "profile email";
         const responseType = "code";
+        const state = "investor";
         
-        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&redirect_uri=${redirectURI}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent`;
+        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&redirect_uri=${redirectURI}&response_type=${responseType}&scope=${scope}&access_type=offline&prompt=consent&state=${state}`;
         
         window.location.href = googleAuthUrl;
     };
