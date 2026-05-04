@@ -155,7 +155,7 @@ def populate():
                 defaults={
                     'brand': brand,
                     'brand_name': brand.name,
-                    'commission_rate': Decimal('0.15'),
+                    'commission_rate': Decimal('0.10'),
                     'payout_balance': Decimal('12500.00')
                 }
             )
