@@ -1,4 +1,4 @@
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 /**
  * Utility for formatting currency in Naira (₦)
@@ -37,10 +37,11 @@ export function cleanContent(html: string): string {
         .replace(/&nbsp;/g, ' ')
         .replace(/[\u00A0\u202F\u2007\u2008\u2009\u200A]/g, ' ')
         .trim();
-    return DOMPurify.sanitize(cleaned, {
-        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'blockquote', 'sup', 'sub'],
-        ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'],
-        FORBID_ATTR: ['id', 'onclick', 'onerror'],
+    return sanitizeHtml(cleaned, {
+        allowedTags: ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'blockquote', 'sup', 'sub'],
+        allowedAttributes: {
+            '*': ['href', 'target', 'rel', 'class', 'style']
+        }
     }).replace(/style="[^"]*color:[^"]*"/gi, '') // Strip inline color styles that break dark mode
       .replace(/style="[^"]*background-color:[^"]*"/gi, ''); // Strip inline background-color
 }
