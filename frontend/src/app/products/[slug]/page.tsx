@@ -439,11 +439,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 <span className="text-[10px] uppercase tracking-[0.4em] text-foreground/50">Brand Ethos</span>
                                 <div>
                                     <h2 className="text-3xl font-light uppercase tracking-tight mb-6">{brandName}</h2>
-                                    {(brandPhilosophy || brandDescription) && (
-                                        <p className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md">
-                                            {brandPhilosophy || brandDescription}
-                                        </p>
-                                    )}
+                                    {brandPhilosophy || brandDescription ? (
+                                        <div 
+                                            className="text-sm font-light text-foreground/70 leading-relaxed mb-8 max-w-md prose prose-invert prose-sm"
+                                            dangerouslySetInnerHTML={{ __html: cleanContent(brandPhilosophy || brandDescription || "") }}
+                                        />
+                                    ) : null}
                                     {brandSlug && (
                                         <Link 
                                             href={`/brands/${brandSlug}`}

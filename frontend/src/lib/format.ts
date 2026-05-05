@@ -40,7 +40,9 @@ export function cleanContent(html: string): string {
     return DOMPurify.sanitize(cleaned, {
         ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'blockquote', 'sup', 'sub'],
         ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'],
-    });
+        FORBID_ATTR: ['id', 'onclick', 'onerror'],
+    }).replace(/style="[^"]*color:[^"]*"/gi, '') // Strip inline color styles that break dark mode
+      .replace(/style="[^"]*background-color:[^"]*"/gi, ''); // Strip inline background-color
 }
 
 /**
