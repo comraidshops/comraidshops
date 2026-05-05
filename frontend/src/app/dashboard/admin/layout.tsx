@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
     LayoutDashboard, Users, ShoppingBag, FileText, 
     BarChart3, LogOut, ShieldCheck, Tags,
-    ChevronRight, ArrowLeft, Menu, X, Award
+    ChevronRight, ArrowLeft, Menu, X, Award, MessageSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchProfile } from '@/lib/api';
