@@ -70,7 +70,15 @@ function formatErrorMessage(status: number, detail: string): string {
 }
 
 export async function safeFetch(url: string, options: RequestInit = {}, retries = 1, isRetryAfterRefresh = false) {
-    const finalUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : url;
+    let finalUrl = url;
+    if (url.startsWith('/')) {
+        // Prevent double /api prefix if API_BASE_URL ends with /api and url starts with /api
+        if (url.startsWith('/api/') && API_BASE_URL.endsWith('/api')) {
+            finalUrl = `${API_BASE_URL.replace(/\/api$/, '')}${url}`;
+        } else {
+            finalUrl = `${API_BASE_URL}${url}`;
+        }
+    }
     
     // Auto-inject common headers
     const headers: Record<string, string> = { ...(options.headers as Record<string, string>) };
