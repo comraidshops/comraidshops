@@ -94,3 +94,15 @@ export async function investorGoogleLogin(data: any): Promise<any> {
 export async function fetchInvestorDashboard(): Promise<any> {
     return safeFetch(`${API_BASE_URL}/investors/dashboard/`);
 }
+
+export async function fetchInvestorNotifications(): Promise<any[]> {
+    return safeFetch(`${API_BASE_URL}/investors/notifications/`);
+}
+
+export async function markInvestorNotificationRead(id: number): Promise<any> {
+    return safeFetch(`${API_BASE_URL}/investors/notifications/${id}/mark_read/`, { method: 'POST' });
+}
+
+export async function markAllInvestorNotificationsRead(): Promise<any> {
+    return safeFetch(`${API_BASE_URL}/investors/notifications/mark_all_read/`, { method: 'POST' });
+}

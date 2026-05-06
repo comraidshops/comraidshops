@@ -10,7 +10,12 @@ import {
     Search, Filter, Download, ChevronRight, Globe, Lock, Menu, X,
     Check
 } from 'lucide-react';
-import { fetchInvestorDashboard } from '@/lib/fetchers';
+import { 
+    fetchInvestorDashboard, 
+    fetchInvestorNotifications,
+    markInvestorNotificationRead,
+    markAllInvestorNotificationsRead
+} from '@/lib/fetchers';
 import { safeFetch } from '@/lib/api';
 import Image from 'next/image';
 
@@ -28,7 +33,7 @@ export default function InvestorDashboard() {
             try {
                 const [dashboardResult, notificationsResult] = await Promise.all([
                     fetchInvestorDashboard(),
-                    safeFetch('/api/investors/notifications/')
+                    fetchInvestorNotifications()
                 ]);
                 setData(dashboardResult);
                 setNotifications(notificationsResult || []);
@@ -43,7 +48,7 @@ export default function InvestorDashboard() {
 
     const markAsRead = async (id: number) => {
         try {
-            await safeFetch(`/api/investors/notifications/${id}/mark_read/`, { method: 'POST' });
+            await markInvestorNotificationRead(id);
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
         } catch (err) {
             console.error("Failed to mark notification as read:", err);
@@ -52,7 +57,7 @@ export default function InvestorDashboard() {
 
     const markAllAsRead = async () => {
         try {
-            await safeFetch(`/api/investors/notifications/mark_all_read/`, { method: 'POST' });
+            await markAllInvestorNotificationsRead();
             setNotifications(prev => prev.map(n => ({ ...n, read: true })));
         } catch (err) {
             console.error("Failed to mark all as read:", err);
