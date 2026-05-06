@@ -20,7 +20,7 @@ export default async function HomePage() {
   const [slides, user, featuredArticle, featuredBrands, rotationProducts, exhibition, fitsData] = await Promise.all([
     /* eslint-disable @typescript-eslint/no-explicit-any */
     getInitialData<any>(`${API_BASE_URL}/home/slides/`),
-    getInitialData<any>(`${API_BASE_URL}/auth/user/`),
+    getInitialData<any>(`${API_BASE_URL}/user/profile/`),
     getInitialData<any>(`${API_BASE_URL}/magazine/featured/`),
     getInitialData<any>(`${API_BASE_URL}/brands/?featured=true`),
     getInitialData<any>(`${API_BASE_URL}/products/?featured=true`),

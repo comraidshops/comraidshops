@@ -692,10 +692,15 @@ class SavedCardSerializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'authorization_code']
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    is_investor = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_vendor', 'is_customer', 'is_superuser']
-        read_only_fields = ['username', 'is_vendor', 'is_customer', 'is_superuser']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_vendor', 'is_customer', 'is_superuser', 'is_investor']
+        read_only_fields = ['username', 'is_vendor', 'is_customer', 'is_superuser', 'is_investor']
+
+    def get_is_investor(self, obj):
+        return hasattr(obj, 'investor_profile')
 
 class FitProductSerializer(serializers.ModelSerializer):
     brand = serializers.CharField(source='vendor.brand.name', read_only=True)

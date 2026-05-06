@@ -10,6 +10,7 @@ export interface User {
     is_superuser: boolean;
     is_vendor: boolean;
     is_customer: boolean;
+    is_investor?: boolean;
     avatar?: string;
 }
 

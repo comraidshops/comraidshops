@@ -41,6 +41,7 @@ export default function HeroStatement({ initialSlides, initialUser }: HeroStatem
     const getRoleContent = () => {
         if (!user) return { greeting: null, buttonText: 'Shop Collections', href: '/shop' };
         if (user.is_superuser) return { greeting: 'HELLO MASTER', buttonText: 'Visit Admin Panel', href: '/dashboard/admin' };
+        if (user.is_investor) return { greeting: 'Hello Investor', buttonText: 'Visit Dashboard', href: '/investor/dashboard' };
         if (user.is_vendor) return { greeting: 'HELLO CURATOR', buttonText: 'Visit Dashboard', href: '/dashboard/vendor' };
         // "if its a member say HELLO CREATOR visit then SHOP COLLECTIONS"
         if (user.is_customer) return { greeting: 'HELLO CREATOR', buttonText: 'Shop Collections', href: '/shop' };

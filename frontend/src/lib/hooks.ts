@@ -90,7 +90,7 @@ export function useSlides(config?: SWRConfiguration) {
 }
 
 export function useProfile(config?: SWRConfiguration) {
-    return useSWR(`${API_BASE_URL}/auth/user/`, () => fetchProfile(), {
+    return useSWR(`${API_BASE_URL}/user/profile/`, () => fetchProfile(), {
         revalidateOnFocus: false,
         ...config
     });
