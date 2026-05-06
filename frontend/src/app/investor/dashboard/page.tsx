@@ -168,7 +168,7 @@ export default function InvestorDashboard() {
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        className="absolute right-0 mt-4 w-80 bg-[#0A0A0A] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden z-50 backdrop-blur-3xl"
+                                        className="absolute right-0 mt-4 w-[calc(100vw-32px)] max-w-[320px] sm:max-w-none sm:w-80 bg-[#0A0A0A] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden z-50 backdrop-blur-3xl"
                                     >
                                         <div className="p-6 border-b border-white/5 flex items-center justify-between">
                                             <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Secure Alerts</span>
@@ -181,7 +181,7 @@ export default function InvestorDashboard() {
                                                 </button>
                                             )}
                                         </div>
-                                        <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                        <div className="max-h-[60vh] sm:max-h-[400px] overflow-y-auto custom-scrollbar">
                                             {notifications.length > 0 ? notifications.map((n) => (
                                                 <div 
                                                     key={n.id}
@@ -271,7 +271,7 @@ export default function InvestorDashboard() {
                             </span>
                             <span className="text-white/20 text-[9px] font-bold uppercase tracking-widest hidden xs:inline">Node: 0xA12...9B2</span>
                         </div>
-                        <h1 className="text-3xl sm:text-5xl font-bold tracking-tighter uppercase leading-none">
+                        <h1 className="text-3xl sm:text-5xl font-bold tracking-tighter uppercase leading-none break-words">
                             Welcome, <br className="sm:hidden" />
                             <span className="text-white/40">{profile.user.first_name || profile.user.username}</span>
                         </h1>
@@ -374,7 +374,7 @@ export default function InvestorDashboard() {
                             Roadmap Node
                         </h2>
                         <div className="bg-white/[0.02] border border-white/5 rounded-[32px] sm:rounded-[48px] p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-10 bottom-10 left-[43px] sm:left-[55px] w-px bg-white/5"></div>
+                            <div className="absolute top-10 bottom-10 left-[38px] sm:left-[56px] w-px bg-white/5"></div>
                             <div className="space-y-10 sm:space-y-12 relative">
                                 {milestones.map((milestone: any, i: number) => (
                                     <div key={i} className="flex gap-4 sm:gap-8 group">
@@ -412,7 +412,7 @@ export default function InvestorDashboard() {
                         <div className="relative z-10 space-y-6 sm:space-y-8">
                             <div className="space-y-2">
                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40">Equity Valuation Model</span>
-                                <h2 className="text-4xl sm:text-6xl font-bold tracking-tighter leading-none">${parseFloat(company_valuation || 0).toLocaleString()}</h2>
+                                <h2 className="text-4xl sm:text-6xl font-bold tracking-tighter leading-none break-words">${parseFloat(company_valuation || 0).toLocaleString()}</h2>
                             </div>
                             <div className="flex flex-wrap gap-3 sm:gap-4">
                                 <div className="flex items-center gap-2 sm:gap-3 bg-black/5 px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl border border-black/5">
@@ -473,10 +473,10 @@ export default function InvestorDashboard() {
                     </div>
                     
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 relative z-10">
-                        <button className="w-full sm:w-auto bg-white text-black px-10 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-[0_0_40px_rgba(255,255,255,0.15)]">
+                        <button className="w-full sm:w-auto bg-white text-black px-6 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-[0_0_40px_rgba(255,255,255,0.15)]">
                             Direct Contact <ExternalLink className="w-4 h-4" />
                         </button>
-                        <button className="w-full sm:w-auto bg-transparent border border-white/10 text-white/40 px-10 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white/5 hover:text-white transition-all">
+                        <button className="w-full sm:w-auto bg-transparent border border-white/10 text-white/40 px-6 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white/5 hover:text-white transition-all">
                             Opt-in Notifications
                         </button>
                     </div>
