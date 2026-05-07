@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Vendor, Brand, Category, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, CollectionImage, BrandImage, ProductFeature, ProductSpecification, Commission, GlobalCommission, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember
+from .models import User, Vendor, Brand, Category, Product, ProductVariant, Order, OrderItem, Notification, ProductImage, Product360Video, Magazine, Article, Exhibition, Collection, CollectionImage, BrandImage, ProductFeature, ProductSpecification, Commission, GlobalCommission, VendorEarning, WithdrawalRequest, VendorNotification, UserAddress, SavedCard, FitFrame, FitItem, SavedFitFrame, HomepageSlide, BrandCommunityMember, AdminMessage
 import cloudinary.uploader
 from .utils import detect_video_provider
 
@@ -656,12 +656,28 @@ class VendorOrderSerializer(serializers.ModelSerializer):
             return None
 
 class VendorBrandSettingsSerializer(serializers.ModelSerializer):
+    established_year = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
     class Meta:
         model = Brand
         fields = [
-            'name', 'tagline', 'description', 'philosophy', 'story', 
-            'hero_image', 'logo', 'social_links'
+            'name', 'tagline', 'description', 'philosophy', 'story',
+            'hero_image', 'logo', 'social_links', 'website',
+            'founder_name', 'founder_bio', 'founder_image',
+            'established_year', 'origin_country',
+            'awards', 'manifesto', 'featured_quote',
         ]
+
+    def validate_established_year(self, value):
+        if not value or value == '':
+            return None
+        try:
+            year = int(value)
+            if year < 0:
+                raise serializers.ValidationError("Year must be a positive number.")
+            return year
+        except (ValueError, TypeError):
+            raise serializers.ValidationError("Enter a valid year.")
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -759,3 +775,15 @@ class HomepageSlideSerializer(serializers.ModelSerializer):
     class Meta:
         model = HomepageSlide
         fields = ['id', 'image', 'order', 'is_active']
+
+class AdminMessageSerializer(serializers.ModelSerializer):
+    sender_username = serializers.CharField(source='sender.username', read_only=True)
+    recipient_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AdminMessage
+        fields = ['id', 'title', 'content', 'role_target', 'created_at', 'sender_username', 'recipient_count']
+
+    def get_recipient_count(self, obj):
+        return obj.recipients.count()
+

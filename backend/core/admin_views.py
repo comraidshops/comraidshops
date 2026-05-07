@@ -858,6 +858,13 @@ class AdminBrandViewSet(viewsets.ModelViewSet):
 class AdminBroadcastView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
+    def get(self, request):
+        from .models import AdminMessage
+        from .serializers import AdminMessageSerializer
+        messages = AdminMessage.objects.all().order_by('-created_at')
+        serializer = AdminMessageSerializer(messages, many=True)
+        return Response(serializer.data)
+
     def post(self, request):
         title = request.data.get('title') or request.data.get('subject')
         message = request.data.get('message') or request.data.get('content')

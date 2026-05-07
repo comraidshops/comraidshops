@@ -708,17 +708,21 @@ class VendorSettingsView(APIView):
         brand = request.user.vendor_profile.brand
         if not brand:
             return Response({"error": "No brand associated with vendor."}, status=404)
-        serializer = VendorBrandSettingsSerializer(brand)
+        serializer = VendorBrandSettingsSerializer(brand, context={'request': request})
         return Response(serializer.data)
 
     def put(self, request):
         brand = request.user.vendor_profile.brand
         if not brand:
             return Response({"error": "No brand associated with vendor."}, status=404)
-        serializer = VendorBrandSettingsSerializer(brand, data=request.data, partial=True)
+        serializer = VendorBrandSettingsSerializer(brand, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            brand_instance = serializer.save()
+            vendor = request.user.vendor_profile
+            if 'name' in request.data and vendor.brand_name != brand_instance.name:
+                vendor.brand_name = brand_instance.name
+                vendor.save(update_fields=['brand_name'])
+            return Response(VendorBrandSettingsSerializer(brand_instance, context={'request': request}).data)
         return Response(serializer.errors, status=400)
 
 class InitializePaymentView(APIView):

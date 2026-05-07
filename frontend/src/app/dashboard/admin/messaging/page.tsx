@@ -17,8 +17,19 @@ interface User {
     is_vendor: boolean;
 }
 
+interface SentMessage {
+    id: number;
+    title: string;
+    content: string;
+    role_target: string;
+    created_at: string;
+    sender_username: string;
+    recipient_count: number;
+}
+
 export default function AdminMessaging() {
     const [users, setUsers] = useState<User[]>([]);
+    const [history, setHistory] = useState<SentMessage[]>([]);
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [success, setSuccess] = useState<string | null>(null);
@@ -32,17 +43,21 @@ export default function AdminMessaging() {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        async function fetchUsers() {
+        async function fetchData() {
             try {
-                const data = await safeFetch('/admin-api/users/');
-                setUsers(data || []);
+                const [usersData, historyData] = await Promise.all([
+                    safeFetch('/admin-api/users/'),
+                    safeFetch('/admin-api/broadcast/')
+                ]);
+                setUsers(usersData || []);
+                setHistory(historyData || []);
             } catch (err) {
-                console.error("Failed to fetch users:", err);
+                console.error("Failed to fetch data:", err);
             } finally {
                 setLoading(false);
             }
         }
-        fetchUsers();
+        fetchData();
     }, []);
 
     const handleSendMessage = async (e: React.FormEvent) => {
@@ -71,6 +86,13 @@ export default function AdminMessaging() {
             setTitle('');
             setMessage('');
             setSelectedUsers([]);
+            
+            // Refresh history
+            const historyData = await safeFetch('/admin-api/broadcast/');
+            setHistory(historyData || []);
+            
+            // Auto-hide success message after 5 seconds
+            setTimeout(() => setSuccess(null), 5000);
         } catch (err: any) {
             setError(err.message || "Failed to send message.");
         } finally {
@@ -275,6 +297,58 @@ export default function AdminMessaging() {
                             </div>
                         )}
                     </div>
+                </div>
+            </div>
+
+            {/* Message History Section */}
+            <div className="space-y-6 pt-12 border-t border-white/5">
+                <header className="flex items-center justify-between">
+                    <div>
+                        <h2 className="text-xl font-playfair font-medium tracking-tight">Transmission Archive</h2>
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Previously dispatched system broadcasts</p>
+                    </div>
+                </header>
+
+                <div className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+                    {loading ? (
+                        <div className="p-12 flex justify-center opacity-20">
+                            <div className="w-8 h-8 border-2 border-white border-t-transparent animate-spin rounded-full" />
+                        </div>
+                    ) : history.length > 0 ? (
+                        <div className="divide-y divide-white/5">
+                            {history.map((msg) => (
+                                <div key={msg.id} className="p-6 lg:p-8 hover:bg-white/[0.01] transition-colors">
+                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+                                        <div className="space-y-1">
+                                            <h3 className="text-sm font-bold tracking-tight">{msg.title}</h3>
+                                            <div className="flex items-center gap-3 text-[10px] text-white/40 font-black uppercase tracking-widest">
+                                                <span>By {msg.sender_username}</span>
+                                                <span className="w-1 h-1 rounded-full bg-white/20" />
+                                                <span>{new Date(msg.created_at).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-widest text-white/60">
+                                                Target: {msg.role_target}
+                                            </div>
+                                            <div className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-[9px] font-bold uppercase tracking-widest text-primary flex items-center gap-1.5">
+                                                <Users className="w-3 h-3" />
+                                                {msg.recipient_count} Delivered
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="text-xs text-white/60 leading-relaxed whitespace-pre-wrap pl-4 border-l-2 border-white/10">
+                                        {msg.content}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="p-12 text-center flex flex-col items-center">
+                            <MessageSquare className="w-8 h-8 text-white/10 mb-3" />
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">No messages in archive</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
