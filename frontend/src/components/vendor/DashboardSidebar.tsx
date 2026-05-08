@@ -48,22 +48,22 @@ export default function DashboardSidebar() {
     };
 
     return (
-        <aside className="w-64 bg-background border-r border-border fixed h-full hidden md:flex flex-col z-20">
+        <aside className="w-64 bg-background border-r border-white/5 fixed h-full hidden md:flex flex-col z-20 transition-all duration-500">
             {/* Brand header */}
-            <div className="h-16 flex items-center px-6 border-b border-border">
-                <Link href="/" className="font-bold uppercase tracking-tighter text-lg hover:text-primary transition-colors">
-                    ComraidShops
+            <div className="h-16 flex items-center px-8 border-b border-white/5">
+                <Link href="/" className="font-black uppercase tracking-[-0.05em] text-xl hover:text-primary transition-all duration-300 group">
+                    Comraid<span className="text-secondary/40 group-hover:text-primary/60 transition-colors">Shops</span>
                 </Link>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto py-6 px-4">
-                {NAV_SECTIONS.map((section, sectionIndex) => (
-                    <div key={section.label} className={sectionIndex > 0 ? 'mt-6 pt-6 border-t border-border/50' : ''}>
-                        <p className="px-3 text-[9px] font-black text-secondary/40 uppercase tracking-[0.3em] mb-3">
+            <nav className="flex-1 overflow-y-auto py-8 px-6 space-y-8 custom-scrollbar">
+                {NAV_SECTIONS.map((section) => (
+                    <div key={section.label}>
+                        <p className="px-3 text-[9px] font-black text-secondary/30 uppercase tracking-[0.4em] mb-4">
                             {section.label}
                         </p>
-                        <div className="space-y-0.5">
+                        <div className="space-y-1">
                             {section.items.map((item) => {
                                 const Icon = item.icon;
                                 const isActive = item.href === '/dashboard/vendor' 
@@ -75,17 +75,25 @@ export default function DashboardSidebar() {
                                         key={item.href}
                                         href={item.href}
                                         className={`
-                                            group flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium rounded-lg transition-all duration-200
+                                            group flex items-center gap-3.5 px-3 py-2.5 text-[11px] font-bold uppercase tracking-widest transition-all duration-300
                                             ${isActive 
-                                                ? 'bg-primary/5 text-primary border-l-2 border-primary' 
-                                                : 'text-secondary hover:bg-secondary/5 hover:text-foreground border-l-2 border-transparent'
+                                                ? 'text-primary' 
+                                                : 'text-secondary/60 hover:text-primary active:scale-[0.98]'
                                             }
                                         `}
                                     >
-                                        <Icon className={`w-[16px] h-[16px] transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
-                                        <span className="tracking-wide">{item.name}</span>
+                                        <div className={`
+                                            w-8 h-8 flex items-center justify-center transition-all duration-300 border
+                                            ${isActive 
+                                                ? 'bg-primary text-background border-primary shadow-[0_0_15px_rgba(255,255,255,0.1)]' 
+                                                : 'bg-transparent border-transparent group-hover:border-white/10 group-hover:bg-white/5'
+                                            }
+                                        `}>
+                                            <Icon className={`w-[14px] h-[14px] transition-transform duration-300 ${isActive ? '' : 'group-hover:scale-110'}`} />
+                                        </div>
+                                        <span className="transition-colors">{item.name}</span>
                                         {isActive && (
-                                            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
+                                            <div className="ml-auto w-1 h-1 rounded-full bg-primary animate-pulse" />
                                         )}
                                     </Link>
                                 );
@@ -96,12 +104,14 @@ export default function DashboardSidebar() {
             </nav>
 
             {/* Logout */}
-            <div className="p-4 border-t border-border">
+            <div className="p-6 border-t border-white/5">
                 <button 
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium text-secondary hover:text-red-500 w-full rounded-lg hover:bg-red-50 transition-all duration-200 group"
+                    className="flex items-center gap-3.5 px-3 py-3 text-[11px] font-bold uppercase tracking-widest text-secondary/50 hover:text-red-500 w-full transition-all duration-300 group hover:bg-red-500/5 active:scale-95"
                 >
-                    <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <div className="w-8 h-8 flex items-center justify-center bg-transparent border border-transparent group-hover:border-red-500/20 group-hover:bg-red-500/5 transition-all">
+                        <LogOut className="w-[14px] h-[14px] group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                     Sign Out
                 </button>
             </div>

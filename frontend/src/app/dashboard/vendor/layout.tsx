@@ -78,10 +78,10 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
                 <DashboardSidebar />
 
                 <div className="flex-1 md:ml-64 flex flex-col min-h-screen overflow-x-hidden">
-                    {/* Top accent line */}
-                    <div className="h-[2px] bg-gradient-to-r from-primary via-primary/60 to-transparent w-full" />
+                    {/* Top accent line - thinner and more elegant */}
+                    <div className="h-[1px] bg-gradient-to-r from-primary/40 via-primary/20 to-transparent w-full" />
 
-                    <header className="bg-background border-b border-border sticky top-0 z-10 w-full">
+                    <header className="bg-background/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-30 w-full transition-all duration-300">
                         {/* Main header row */}
                         <div className="h-14 md:h-16 flex items-center justify-between px-4 md:px-8">
                             {/* Mobile: greeting + page name */}
@@ -94,17 +94,17 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
                                 </h1>
                             </div>
 
-                            {/* Desktop: breadcrumb */}
-                            <div className="hidden md:flex items-center gap-1.5">
+                            {/* Desktop: breadcrumb - more refined */}
+                            <div className="hidden md:flex items-center gap-2">
                                 {breadcrumbs.map((crumb, i) => (
-                                    <div key={crumb.href} className="flex items-center gap-1.5">
-                                        {i > 0 && <ChevronRight className="w-3 h-3 text-secondary/30" />}
+                                    <div key={crumb.href} className="flex items-center gap-2">
+                                        {i > 0 && <span className="text-secondary/20 font-light">/</span>}
                                         {crumb.isLast ? (
-                                            <span className="text-sm font-bold uppercase tracking-tight">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
                                                 {crumb.label}
                                             </span>
                                         ) : (
-                                            <Link href={crumb.href} className="text-xs font-medium uppercase tracking-wider text-secondary hover:text-primary transition-colors">
+                                            <Link href={crumb.href} className="text-[10px] font-bold uppercase tracking-[0.15em] text-secondary/60 hover:text-primary transition-all duration-300">
                                                 {crumb.label}
                                             </Link>
                                         )}
@@ -138,7 +138,7 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
                         </div>
                     </header>
 
-                    <main className="flex-1 px-4 py-5 pb-28 md:p-8 md:pb-8 max-w-7xl mx-auto w-full">
+                    <main className="flex-1 px-4 py-6 pb-28 md:px-10 md:py-10 md:pb-12 max-w-7xl mx-auto w-full animate-in fade-in duration-700">
                         {children}
                     </main>
                 </div>

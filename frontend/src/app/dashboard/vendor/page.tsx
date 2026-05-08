@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { Package, ShoppingCart, Banknote, CreditCard } from 'lucide-react';
+import { Package, ShoppingCart, Banknote, CreditCard, ArrowUpRight, TrendingUp } from 'lucide-react';
 import StatCard from '@/components/vendor/StatCard';
 import OrdersTable, { Order } from '@/components/vendor/OrdersTable';
 import NotificationsPanel, { Notification } from '@/components/vendor/NotificationsPanel';
@@ -134,14 +134,28 @@ export default function VendorDashboard() {
     }
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'The Morning Edition';
+    if (hour < 17) return 'The Afternoon Update';
+    return 'The Evening Summary';
+  };
+
   if (loading) {
-    return <div className="flex justify-center items-center h-[50vh]"><p className="text-secondary uppercase tracking-widest text-xs">Loading dashboard...</p></div>;
+    return <div className="flex flex-col justify-center items-center h-[60vh] space-y-4">
+        <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-secondary uppercase tracking-[0.3em] text-[10px] font-black animate-pulse">Initializing Dashboard Vector...</p>
+    </div>;
   }
 
   if (error) {
     return (
-      <div className="p-6 md:p-8 bg-red-50 border border-red-200">
-        <p className="text-red-800 text-sm font-bold tracking-widest uppercase">Dashboard Error: {error}</p>
+      <div className="p-8 md:p-12 bg-red-500/5 border border-red-500/20 max-w-2xl mx-auto mt-12">
+        <h2 className="text-red-500 text-xs font-black tracking-[0.3em] uppercase mb-4">Critical System Error</h2>
+        <p className="text-red-500/70 text-sm font-medium leading-relaxed italic font-source-serif">"{error}"</p>
+        <button onClick={() => window.location.reload()} className="mt-8 px-6 py-3 bg-red-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-600 transition-colors">
+            Attempt Re-authentication
+        </button>
       </div>
     );
   }
@@ -166,6 +180,7 @@ export default function VendorDashboard() {
     shipping_state: o.shipping_state,
     shipping_zip_code: o.shipping_zip_code,
     shipping_country: o.shipping_country,
+    items: o.items.map(i => ({ name: i.product_name, quantity: i.quantity, status: o.order_status }))
   }));
 
   const formattedNotifications: Notification[] = (metrics?.recent_notifications || []).map((n: BackendNotification) => ({
@@ -177,66 +192,102 @@ export default function VendorDashboard() {
   }));
 
   return (
-    <div className="space-y-5 md:space-y-8 pb-8 md:pb-12">
-      <div className="flex justify-end">
-        <Link
-          href="/dashboard/vendor/withdrawals"
-          className="bg-primary text-background font-bold uppercase tracking-widest text-[10px] md:text-xs px-5 md:px-6 py-3 md:py-4 rounded-none hover:bg-primary/90 transition-colors shadow-sm w-full md:w-auto text-center active:scale-[0.98]"
-        >
-          Request Withdrawal
-        </Link>
+    <div className="space-y-12 md:space-y-20 pb-20">
+      {/* Editorial Hero Section */}
+      <section className="relative pt-8 md:pt-12 border-b border-white/5 pb-12 md:pb-16 overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/[0.02] to-transparent pointer-events-none" />
+        
+        <div className="relative z-10 space-y-6">
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary/40">Comraid Editorial</span>
+            <div className="h-[1px] w-12 bg-white/10" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">{getGreeting()}</span>
+          </div>
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <h1 className="text-4xl md:text-6xl font-black tracking-tight text-primary font-source-serif italic leading-[0.9]">
+               Performance <br />
+               <span className="text-secondary/40 not-italic font-sans uppercase text-[0.4em] tracking-[0.5em] block mt-4">Overview Portfolio</span>
+            </h1>
+            
+            <div className="flex items-center gap-6">
+               <div className="text-right hidden md:block">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-secondary/30 mb-1">Global Orders Today</p>
+                  <p className="text-2xl font-black text-primary font-source-serif italic">{metrics?.orders_today || 0}</p>
+               </div>
+               <Link
+                href="/dashboard/vendor/withdrawals"
+                className="group flex items-center gap-3 bg-primary text-background px-8 py-5 text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white transition-all active:scale-95 shadow-[0_20px_50px_rgba(255,255,255,0.1)]"
+              >
+                Execute Withdrawal <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Primary Financial Vector */}
+      <div className="space-y-8">
+        <div className="flex items-center gap-3">
+          <TrendingUp className="w-4 h-4 text-primary/40" />
+          <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-secondary/40">Financial Distribution</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <StatCard
+            title="Revenue Vector"
+            value={formatCurrency(metrics?.total_revenue)}
+            icon={<Banknote className="w-5 h-5" />}
+            description="Gross portfolio value"
+          />
+          <StatCard
+            title="Order Volume"
+            value={metrics?.total_orders || 0}
+            icon={<ShoppingCart className="w-5 h-5" />}
+            description={`Velocity: ${metrics?.orders_today} / day`}
+          />
+          <StatCard
+            title="Liquid Balance"
+            value={formatCurrency(metrics?.vendor_balance)}
+            icon={<CreditCard className="w-5 h-5" />}
+            description="Available for execution"
+          />
+          <StatCard
+            title="Escrow Payout"
+            value={formatCurrency(metrics?.pending_payout)}
+            icon={<ClockIcon />}
+            description="In processing cycle"
+          />
+        </div>
       </div>
 
-      {/* Top row: Core sales stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+      {/* Secondary Product Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         <StatCard
-          title="Total Revenue"
-          value={formatCurrency(metrics?.total_revenue)}
-          icon={<Banknote className="w-4 h-4" />}
-          description="Gross sales across all time"
-        />
-        <StatCard
-          title="Total Orders"
-          value={metrics?.total_orders || 0}
-          icon={<ShoppingCart className="w-4 h-4" />}
-          description={`${metrics?.orders_today} orders today`}
-        />
-        <StatCard
-          title="Vendor Balance"
-          value={formatCurrency(metrics?.vendor_balance)}
-          icon={<CreditCard className="w-4 h-4" />}
-          description="Available for withdrawal"
-        />
-        <StatCard
-          title="Pending Payout"
-          value={formatCurrency(metrics?.pending_payout)}
-          icon={<ClockIcon />}
-          description="Currently processing"
-        />
-      </div>
-
-      {/* Second row: Product stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-        <StatCard
-          title="Active Products"
+          title="Live Assets"
           value={metrics?.approved_products || 0}
-          icon={<Package className="w-4 h-4" />}
+          icon={<Package className="w-5 h-5" />}
+          description="Active in marketplace"
         />
         <StatCard
-          title="Pending Review"
+          title="Review Queue"
           value={metrics?.pending_products || 0}
-          description="Awaiting admin approval"
+          description="Awaiting verification"
         />
         <StatCard
-          title="Total Commission Paid"
+          title="Taxation (Fee)"
           value={formatCurrency(metrics?.total_commission)}
+          description={`Rate: ${metrics?.commission_rate || 0}%`}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-8">
-        <div className="lg:col-span-2 space-y-4 md:space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg md:text-xl font-bold uppercase tracking-tighter">Recent Orders</h2>
+      {/* Complex Data Integration */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 md:gap-16 items-start">
+        <div className="lg:col-span-2 space-y-8 md:space-y-10">
+          <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-primary">Recent Acquisitions</h2>
+            <Link href="/dashboard/vendor/orders" className="text-[9px] font-black uppercase tracking-widest text-secondary/40 hover:text-primary transition-colors flex items-center gap-2">
+                View All <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
           <OrdersTable orders={formattedOrders} />
         </div>
@@ -254,7 +305,7 @@ export default function VendorDashboard() {
 
 function ClockIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock w-4 h-4">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock">
       <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
     </svg>
   );
