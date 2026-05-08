@@ -707,18 +707,25 @@ class VendorSettingsView(APIView):
     def get(self, request):
         brand = request.user.vendor_profile.brand
         if not brand:
-            return Response({"error": "No brand associated with vendor."}, status=404)
+            return Response({}, status=200)
         serializer = VendorBrandSettingsSerializer(brand, context={'request': request})
         return Response(serializer.data)
 
     def put(self, request):
-        brand = request.user.vendor_profile.brand
+        vendor = request.user.vendor_profile
+        brand = vendor.brand
+        
+        # If no brand exists for this vendor, create one to allow settings updates
         if not brand:
-            return Response({"error": "No brand associated with vendor."}, status=404)
+            from .models import Brand
+            brand_name = request.data.get('name') or vendor.brand_name or f"Brand {vendor.id}"
+            brand = Brand.objects.create(name=brand_name)
+            vendor.brand = brand
+            vendor.save(update_fields=['brand'])
+
         serializer = VendorBrandSettingsSerializer(brand, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             brand_instance = serializer.save()
-            vendor = request.user.vendor_profile
             if 'name' in request.data and vendor.brand_name != brand_instance.name:
                 vendor.brand_name = brand_instance.name
                 vendor.save(update_fields=['brand_name'])
