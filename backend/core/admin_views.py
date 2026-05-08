@@ -875,6 +875,7 @@ class AdminBroadcastView(APIView):
             return Response({'error': 'Title and message are required.'}, status=400)
             
         from .models import AdminMessage, Notification, VendorNotification, Vendor
+        from django.conf import settings
         from investors.models import InvestorProfile, InvestorNotification
         from .email_service import send_platform_email
         from django.db import transaction
@@ -890,22 +891,32 @@ class AdminBroadcastView(APIView):
             target_users = []
             
             if recipient_type == 'broadcast_investors':
-                investor_profiles = InvestorProfile.objects.all()
+                investor_profiles = InvestorProfile.objects.filter(status='active')
                 for profile in investor_profiles:
                     target_users.append(profile.user)
                     InvestorNotification.objects.create(
                         investor=profile,
-                        message=message,
+                        message=f"[{title}] {message}",
                         type='admin_broadcast'
                     )
+                    Notification.objects.create(
+                        user=profile.user,
+                        title=title,
+                        body=message
+                    )
             elif recipient_type == 'broadcast_vendors':
-                vendors = Vendor.objects.all()
+                vendors = Vendor.objects.filter(user__is_vendor_approved=True)
                 for vendor in vendors:
                     target_users.append(vendor.user)
                     VendorNotification.objects.create(
                         vendor=vendor,
-                        message=message,
+                        message=f"[{title}] {message}",
                         type='admin_broadcast'
+                    )
+                    Notification.objects.create(
+                        user=vendor.user,
+                        title=title,
+                        body=message
                     )
             elif recipient_type == 'investor' or recipient_type == 'vendor' or recipient_type == 'multiple':
                 # selected_users is a list of User IDs
@@ -916,14 +927,14 @@ class AdminBroadcastView(APIView):
                     if hasattr(user, 'investor_profile'):
                         InvestorNotification.objects.create(
                             investor=user.investor_profile,
-                            message=message,
+                            message=f"[{title}] {message}",
                             type='admin_message'
                         )
                     # Check if vendor
                     if hasattr(user, 'vendor_profile'):
                         VendorNotification.objects.create(
                             vendor=user.vendor_profile,
-                            message=message,
+                            message=f"[{title}] {message}",
                             type='admin_message'
                         )
                     # Unified notification anyway

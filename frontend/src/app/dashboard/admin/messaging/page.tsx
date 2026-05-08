@@ -66,6 +66,10 @@ export default function AdminMessaging() {
             setError("Title and message are required.");
             return;
         }
+        if (recipientType === 'multiple' && selectedUsers.length === 0) {
+            setError("Please select at least one recipient.");
+            return;
+        }
 
         setSending(true);
         setError(null);
@@ -87,9 +91,13 @@ export default function AdminMessaging() {
             setMessage('');
             setSelectedUsers([]);
             
-            // Refresh history
-            const historyData = await safeFetch('/admin-api/broadcast/');
-            setHistory(historyData || []);
+            // Refresh history (separate try/catch so success state isn't lost)
+            try {
+                const historyData = await safeFetch('/admin-api/broadcast/');
+                setHistory(historyData || []);
+            } catch (refreshErr) {
+                console.error("Failed to refresh message history:", refreshErr);
+            }
             
             // Auto-hide success message after 5 seconds
             setTimeout(() => setSuccess(null), 5000);
