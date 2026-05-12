@@ -33,6 +33,15 @@ class ArticleAdmin(admin.ModelAdmin):
             'fields': ('video_url', 'video_file', 'video_provider', 'video_thumbnail'),
             'description': 'Enter a YouTube/Vimeo URL or upload a direct video file.'
         }),
+        ('Creator Attribution', {
+            'fields': (
+                'photographer_name', 'photographer_instagram', 
+                'writer_name', 'writer_instagram', 
+                'stylist_name', 'creative_director_name', 
+                'image_source', 'additional_credits'
+            ),
+            'description': 'Editorial credits and social media attribution.'
+        }),
     )
     readonly_fields = ('video_provider', 'video_thumbnail')
 

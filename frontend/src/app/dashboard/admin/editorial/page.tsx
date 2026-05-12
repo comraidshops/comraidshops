@@ -70,6 +70,16 @@ interface EditorialBase {
     story?: string;
     featured_quote?: string;
     curator_note?: string;
+    
+    // Creator Attribution
+    photographer_name?: string;
+    photographer_instagram?: string;
+    writer_name?: string;
+    writer_instagram?: string;
+    stylist_name?: string;
+    creative_director_name?: string;
+    image_source?: string;
+    additional_credits?: string;
 }
 interface MagazineOption {
     id: number;
@@ -700,6 +710,56 @@ function EditorialContent() {
                                 value={currentItem?.product_ids || []}
                                 onChange={(vals) => setCurrentItem({ ...currentItem, product_ids: vals as number[] })}
                             />
+
+                            <div className="pt-8 border-t border-white/5 space-y-6">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Creator Attribution</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <AdminInput 
+                                        label="Photographer Name"
+                                        value={currentItem?.photographer_name || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, photographer_name: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Photographer Instagram"
+                                        placeholder="@username"
+                                        value={currentItem?.photographer_instagram || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, photographer_instagram: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Writer Name"
+                                        value={currentItem?.writer_name || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, writer_name: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Writer Instagram"
+                                        placeholder="@username"
+                                        value={currentItem?.writer_instagram || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, writer_instagram: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Stylist Name"
+                                        value={currentItem?.stylist_name || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, stylist_name: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Creative Director"
+                                        value={currentItem?.creative_director_name || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, creative_director_name: e.target.value })}
+                                    />
+                                </div>
+                                <AdminInput 
+                                    label="Image Source / Archive"
+                                    placeholder="Source or licensing info"
+                                    value={currentItem?.image_source || ''}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, image_source: e.target.value })}
+                                />
+                                <AdminTextArea 
+                                    label="Additional Credits"
+                                    placeholder="Any other credits or special mentions..."
+                                    value={currentItem?.additional_credits || ''}
+                                    onChange={(e) => setCurrentItem({ ...currentItem, additional_credits: e.target.value })}
+                                />
+                            </div>
                         </>
                     )}
 
