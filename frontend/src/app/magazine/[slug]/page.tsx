@@ -249,6 +249,51 @@ export default async function MagazineDetailPage({
                             `) }}
                         />
                     )}
+
+                    {/* Editorial Credits Section */}
+                    {primaryArticle && (primaryArticle.writer_name || primaryArticle.photographer_name || primaryArticle.stylist_name || primaryArticle.creative_director_name || primaryArticle.image_source || primaryArticle.additional_credits) && (
+                        <div className="mt-16 pt-12 border-t border-border/20 text-[10px] uppercase tracking-[0.2em] text-secondary">
+                            <h3 className="font-bold mb-6 text-foreground tracking-[0.3em]">Editorial Credits</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+                                {primaryArticle.writer_name && (
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[8px] text-secondary/50">Words</span>
+                                        <span>{primaryArticle.writer_name} {primaryArticle.writer_instagram && <a href={`https://instagram.com/${primaryArticle.writer_instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline lowercase ml-1">@{primaryArticle.writer_instagram.replace('@', '')}</a>}</span>
+                                    </div>
+                                )}
+                                {primaryArticle.photographer_name && (
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[8px] text-secondary/50">Photography</span>
+                                        <span>{primaryArticle.photographer_name} {primaryArticle.photographer_instagram && <a href={`https://instagram.com/${primaryArticle.photographer_instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline lowercase ml-1">@{primaryArticle.photographer_instagram.replace('@', '')}</a>}</span>
+                                    </div>
+                                )}
+                                {primaryArticle.stylist_name && (
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[8px] text-secondary/50">Styling</span>
+                                        <span>{primaryArticle.stylist_name}</span>
+                                    </div>
+                                )}
+                                {primaryArticle.creative_director_name && (
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[8px] text-secondary/50">Creative Direction</span>
+                                        <span>{primaryArticle.creative_director_name}</span>
+                                    </div>
+                                )}
+                                {primaryArticle.image_source && (
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[8px] text-secondary/50">Image Source / Archive</span>
+                                        <span className="break-words">{primaryArticle.image_source}</span>
+                                    </div>
+                                )}
+                                {primaryArticle.additional_credits && (
+                                    <div className="flex flex-col gap-1 sm:col-span-2">
+                                        <span className="text-[8px] text-secondary/50">Additional Credits</span>
+                                        <span className="whitespace-pre-wrap leading-relaxed">{primaryArticle.additional_credits}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Display Linked Products if any */}

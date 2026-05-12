@@ -72,6 +72,25 @@ class Article(models.Model):
     )
     video_thumbnail = models.URLField(max_length=500, null=True, blank=True)
 
+    # Creator Attribution Fields
+    photographer_name = models.CharField(max_length=255, blank=True, null=True)
+    photographer_instagram = models.CharField(max_length=255, blank=True, null=True)
+    writer_name = models.CharField(max_length=255, blank=True, null=True)
+    writer_instagram = models.CharField(max_length=255, blank=True, null=True)
+    stylist_name = models.CharField(max_length=255, blank=True, null=True)
+    creative_director_name = models.CharField(max_length=255, blank=True, null=True)
+    image_source = models.CharField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text="Original source or licensing reference for editorial image"
+    )
+    additional_credits = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Additional editorial or creative credits"
+    )
+
     products = models.ManyToManyField('Product', related_name='featured_in_articles', blank=True)
     likes = models.ManyToManyField(User, related_name='liked_articles', blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)

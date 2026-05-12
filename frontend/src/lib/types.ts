@@ -218,6 +218,15 @@ export interface Article {
     video_thumbnail?: string;
     created_at: string;
     updated_at: string;
+    
+    photographer_name?: string | null;
+    photographer_instagram?: string | null;
+    writer_name?: string | null;
+    writer_instagram?: string | null;
+    stylist_name?: string | null;
+    creative_director_name?: string | null;
+    image_source?: string | null;
+    additional_credits?: string | null;
 }
 
 export interface Magazine {

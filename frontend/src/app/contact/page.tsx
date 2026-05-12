@@ -60,11 +60,11 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <h3 className="font-bold uppercase tracking-wide">Headquarters</h3>
-                                <p className="text-secondary text-sm">Paris, France</p>
+                                <p className="text-secondary text-sm">Nigeria</p>
                             </div>
                         </div>
                         <p className="text-secondary/80 text-sm leading-relaxed">
-                            While we operate globally and ship worldwide, our curatorial and administrative team is primarily based in Paris. Please note we do not have a physical retail location at this time.
+                            While we operate globally and ship worldwide, our curatorial and administrative team is primarily based in Nigeria. Please note we do not have a physical retail location at this time.
                         </p>
                     </div>
                 </div>

@@ -114,7 +114,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = [
             'id', 'title', 'display_title', 'slug', 'magazine', 'magazine_slug', 'content', 'image', 'products', 'product_ids', 'created_at', 'updated_at',
-            'video_url', 'video_file', 'video_provider', 'video_thumbnail', 'likes_count', 'is_liked_by_user'
+            'video_url', 'video_file', 'video_provider', 'video_thumbnail', 'likes_count', 'is_liked_by_user',
+            'photographer_name', 'photographer_instagram', 'writer_name', 'writer_instagram', 'stylist_name', 'creative_director_name', 'image_source', 'additional_credits'
         ]
         read_only_fields = ['video_provider', 'video_thumbnail']
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ShoppingBag, Search, Menu, X, User, Download } from 'lucide-react';
+import { ShoppingBag, Search, Menu, X, User, Download, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { usePWA } from '@/context/PWAContext';
@@ -43,16 +43,61 @@ export default function Header() {
         }
     };
 
+    const getBackLabel = (path: string) => {
+        const parts = path.split('/').filter(Boolean);
+        if (parts.length > 1) {
+            const parent = parts[parts.length - 2];
+            // Handle some specific mappings if needed
+            if (parent === 'dashboard') return 'Dashboard';
+            if (parent === 'auth') return 'Login';
+            return parent.charAt(0).toUpperCase() + parent.slice(1);
+        }
+        return 'Home';
+    };
+
     return (
         <header className="fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
             <div className="max-w-[1920px] mx-auto px-4 h-16 flex items-center justify-between relative">
-                {/* Left: Mobile Menu Trigger */}
-                <div className="lg:hidden cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {/* Left: Mobile Menu Trigger & Back Button */}
+                <div className="lg:hidden flex items-center gap-4">
+                    <div className="cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                        {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </div>
+                    <AnimatePresence>
+                        {pathname !== '/' && (
+                            <motion.button 
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                onClick={() => router.back()}
+                                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-primary"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                                <span>{getBackLabel(pathname)}</span>
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Left: Desktop Nav */}
                 <nav className="hidden lg:flex items-center gap-8 text-sm font-bold tracking-widest uppercase">
+                    <AnimatePresence mode="wait">
+                        {pathname !== '/' && (
+                            <motion.button 
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                onClick={() => router.back()}
+                                className="flex items-center gap-2 pr-4 border-r border-border hover:text-primary transition-colors group"
+                            >
+                                <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                                <div className="flex flex-col items-start leading-none">
+                                    <span className="text-[8px] text-secondary font-medium uppercase tracking-tighter">Go back to</span>
+                                    <span className="text-[10px] font-black">{getBackLabel(pathname)}</span>
+                                </div>
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
                     <Link href="/articles" className="hover:text-primary transition-colors">Articles</Link>
                     <Link href="/shop" className="hover:text-primary transition-colors">Shop</Link>
                     <Link href="/exhibitions" className="hover:text-primary transition-colors">Exhibitions</Link>
