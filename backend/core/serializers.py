@@ -214,6 +214,16 @@ class MagazineSerializer(serializers.ModelSerializer):
     linked_article_ids = serializers.PrimaryKeyRelatedField(
         many=True, write_only=True, required=False, source='linked_articles', queryset=Article.objects.all()
     )
+
+    # Attribution fields (passed to primary article)
+    photographer_name = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
+    photographer_instagram = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
+    writer_name = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
+    writer_instagram = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
+    stylist_name = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
+    creative_director_name = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
+    image_source = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
+    additional_credits = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
     
     class Meta:
         model = Magazine
@@ -262,23 +272,34 @@ class MagazineSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         article_content = validated_data.pop('article_content', None)
         linked_articles = validated_data.pop('linked_articles', None)
+        
+        # Pop attribution fields
+        attr_fields = ['photographer_name', 'photographer_instagram', 'writer_name', 'writer_instagram', 'stylist_name', 'creative_director_name', 'image_source', 'additional_credits']
+        attr_data = {f: validated_data.pop(f, None) for f in attr_fields}
+        
         magazine = Magazine.objects.create(**validated_data)
         
         if linked_articles is not None:
             magazine.linked_articles.set(linked_articles)
             
-        if article_content is not None:
-            Article.objects.create(magazine=magazine, content=article_content)
+        if article_content is not None or any(attr_data.values()):
+            Article.objects.create(
+                magazine=magazine, 
+                content=article_content or "",
+                **{k: v for k, v in attr_data.items() if v is not None}
+            )
         return magazine
 
     def update(self, instance, validated_data):
         article_content = validated_data.pop('article_content', None)
         linked_articles = validated_data.pop('linked_articles', None)
         
+        # Pop attribution fields
+        attr_fields = ['photographer_name', 'photographer_instagram', 'writer_name', 'writer_instagram', 'stylist_name', 'creative_director_name', 'image_source', 'additional_credits']
+        attr_data = {f: validated_data.pop(f, None) for f in attr_fields}
+        
         # Check if linked_article_ids was present but empty in the request data
         if linked_articles is None and hasattr(self, 'initial_data') and 'linked_article_ids' in self.initial_data:
-            # If it's in initial_data but not in validated_data and linked_articles is None, 
-            # it means it was sent as an empty list or empty value.
             linked_articles = []
 
         instance = super().update(instance, validated_data)
@@ -286,13 +307,21 @@ class MagazineSerializer(serializers.ModelSerializer):
         if linked_articles is not None:
             instance.linked_articles.set(linked_articles)
             
-        if article_content is not None:
+        if article_content is not None or any(attr_data.values()):
             article = instance.articles.first()
             if article:
-                article.content = article_content
+                if article_content is not None:
+                    article.content = article_content
+                for k, v in attr_data.items():
+                    if v is not None:
+                        setattr(article, k, v)
                 article.save()
             else:
-                Article.objects.create(magazine=instance, content=article_content)
+                Article.objects.create(
+                    magazine=instance, 
+                    content=article_content or "",
+                    **{k: v for k, v in attr_data.items() if v is not None}
+                )
         return instance
 
 

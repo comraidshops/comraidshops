@@ -73,7 +73,7 @@ export default function Header() {
                                 className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-primary"
                             >
                                 <ChevronLeft className="w-4 h-4" />
-                                <span>{getBackLabel(pathname)}</span>
+                                <span>{getBackLabel(pathname || '')}</span>
                             </motion.button>
                         )}
                     </AnimatePresence>
@@ -93,7 +93,7 @@ export default function Header() {
                                 <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
                                 <div className="flex flex-col items-start leading-none">
                                     <span className="text-[8px] text-secondary font-medium uppercase tracking-tighter">Go back to</span>
-                                    <span className="text-[10px] font-black">{getBackLabel(pathname)}</span>
+                                    <span className="text-[10px] font-black">{getBackLabel(pathname || '')}</span>
                                 </div>
                             </motion.button>
                         )}

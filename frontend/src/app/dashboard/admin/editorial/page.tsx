@@ -488,7 +488,16 @@ function EditorialContent() {
                                                     if (activeTab === 'magazines') {
                                                         const m = item as any;
                                                         if (m.articles && m.articles.length > 0) {
-                                                            editItem.content = m.articles[0].content;
+                                                            const primary = m.articles[0];
+                                                            editItem.content = primary.content;
+                                                            editItem.photographer_name = primary.photographer_name;
+                                                            editItem.photographer_instagram = primary.photographer_instagram;
+                                                            editItem.writer_name = primary.writer_name;
+                                                            editItem.writer_instagram = primary.writer_instagram;
+                                                            editItem.stylist_name = primary.stylist_name;
+                                                            editItem.creative_director_name = primary.creative_director_name;
+                                                            editItem.image_source = primary.image_source;
+                                                            editItem.additional_credits = primary.additional_credits;
                                                         }
                                                         editItem.linked_article_ids = m.linked_articles?.map((a: any) => a.id) || [];
                                                     }
@@ -572,6 +581,56 @@ function EditorialContent() {
                                 value={currentItem?.linked_article_ids || []}
                                 onChange={(vals) => setCurrentItem({ ...currentItem, linked_article_ids: vals as number[] })}
                             />
+
+                            <div className="pt-8 border-t border-white/5 space-y-6">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Magazine Credits (Primary Article)</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <AdminInput 
+                                        label="Photographer Name"
+                                        value={currentItem?.photographer_name || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, photographer_name: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Photographer Instagram"
+                                        placeholder="@username"
+                                        value={currentItem?.photographer_instagram || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, photographer_instagram: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Writer Name"
+                                        value={currentItem?.writer_name || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, writer_name: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Writer Instagram"
+                                        placeholder="@username"
+                                        value={currentItem?.writer_instagram || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, writer_instagram: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Stylist Name"
+                                        value={currentItem?.stylist_name || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, stylist_name: e.target.value })}
+                                    />
+                                    <AdminInput 
+                                        label="Creative Director"
+                                        value={currentItem?.creative_director_name || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, creative_director_name: e.target.value })}
+                                    />
+                                </div>
+                                <AdminInput 
+                                    label="Image Source / Archive"
+                                    placeholder="Source or licensing info"
+                                    value={currentItem?.image_source || ''}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentItem({ ...currentItem, image_source: e.target.value })}
+                                />
+                                <AdminTextArea 
+                                    label="Additional Credits"
+                                    placeholder="Any other credits or special mentions..."
+                                    value={currentItem?.additional_credits || ''}
+                                    onChange={(e) => setCurrentItem({ ...currentItem, additional_credits: e.target.value })}
+                                />
+                            </div>
                         </>
                     )}
 
