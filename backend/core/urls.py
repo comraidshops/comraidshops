@@ -64,6 +64,7 @@ urlpatterns = [
     path('vendor/notifications/<int:pk>/mark_read/', VendorNotificationViewSet.as_view({'post': 'mark_read'}), name='vendor-notifications-mark-read'),
     path('vendor/notifications/mark_all_read/', VendorNotificationViewSet.as_view({'post': 'mark_all_read'}), name='vendor-notifications-mark-all-read'),
     path('vendor/settings/', VendorSettingsView.as_view(), name='vendor-settings'),
+    path('vendor/settings/gallery/<int:image_id>/', VendorSettingsView.as_view(), name='vendor-settings-gallery-delete'),
     path('vendor/analytics/', VendorAnalyticsAPIView.as_view(), name='vendor-analytics'),
     path('analytics/track/', TrackEventAPIView.as_view(), name='analytics-track'),
     path('auth/diagnostic/', DiagnosticEmailView.as_view(), name='diagnostic-email'),

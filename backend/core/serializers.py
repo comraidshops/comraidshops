@@ -689,6 +689,7 @@ class VendorOrderSerializer(serializers.ModelSerializer):
             return None
 
 class VendorBrandSettingsSerializer(serializers.ModelSerializer):
+    gallery = BrandImageSerializer(many=True, read_only=True)
     established_year = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:
@@ -700,6 +701,7 @@ class VendorBrandSettingsSerializer(serializers.ModelSerializer):
             'established_year', 'origin_country',
             'awards', 'manifesto', 'featured_quote',
             'meta_title', 'meta_description',
+            'gallery',
         ]
 
     def validate_established_year(self, value):

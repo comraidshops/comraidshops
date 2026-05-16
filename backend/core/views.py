@@ -726,11 +726,43 @@ class VendorSettingsView(APIView):
         serializer = VendorBrandSettingsSerializer(brand, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             brand_instance = serializer.save()
+            
+            # Handle Gallery (Archive) Images
+            gallery_images = request.FILES.getlist('uploaded_gallery')
+            if gallery_images:
+                # For now, we append new images. If the user wants to clear, they can.
+                # Or we can implement a specific delete action.
+                # To keep it simple and non-breaking:
+                for idx, img in enumerate(gallery_images):
+                    from .models import BrandImage
+                    BrandImage.objects.create(
+                        brand=brand_instance,
+                        image=img,
+                        order=brand_instance.gallery.count() + idx
+                    )
+
             if 'name' in request.data and vendor.brand_name != brand_instance.name:
                 vendor.brand_name = brand_instance.name
                 vendor.save(update_fields=['brand_name'])
             return Response(VendorBrandSettingsSerializer(brand_instance, context={'request': request}).data)
         return Response(serializer.errors, status=400)
+
+    def delete(self, request, image_id=None):
+        if not image_id:
+            return Response({"error": "Image ID required"}, status=400)
+        
+        vendor = request.user.vendor_profile
+        brand = vendor.brand
+        if not brand:
+            return Response({"error": "Brand not found"}, status=404)
+        
+        try:
+            from .models import BrandImage
+            image = brand.gallery.get(id=image_id)
+            image.delete()
+            return Response({"status": "success"}, status=200)
+        except:
+            return Response({"error": "Image not found"}, status=404)
 
 class InitializePaymentView(APIView):
     permission_classes = [permissions.AllowAny]

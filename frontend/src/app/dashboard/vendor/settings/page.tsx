@@ -24,6 +24,7 @@ interface BrandFormData {
     featured_quote: string;
     meta_title: string;
     meta_description: string;
+    gallery: any[];
 }
 
 interface ExistingImages {
@@ -64,12 +65,14 @@ export default function BrandSettingsPage() {
         featured_quote: '',
         meta_title: '',
         meta_description: '',
+        gallery: [],
     });
 
     // Refs for file inputs so we can reset them
     const logoInputRef = useRef<HTMLInputElement>(null);
     const heroInputRef = useRef<HTMLInputElement>(null);
     const previewInputRef = useRef<HTMLInputElement>(null);
+    const galleryInputRef = useRef<HTMLInputElement>(null);
     const founderInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -102,6 +105,7 @@ export default function BrandSettingsPage() {
                         featured_quote: data.featured_quote || '',
                         meta_title: data.meta_title || '',
                         meta_description: data.meta_description || '',
+                        gallery: data.gallery || [],
                     });
                     setExistingImages({
                         hero_image: data.hero_image || '',
@@ -154,6 +158,14 @@ export default function BrandSettingsPage() {
             if (formData.logo) data.append('logo', formData.logo);
             if (formData.founder_image) data.append('founder_image', formData.founder_image);
 
+            // Handle new gallery images
+            const galleryFiles = galleryInputRef.current?.files;
+            if (galleryFiles && galleryFiles.length > 0) {
+                for (let i = 0; i < galleryFiles.length; i++) {
+                    data.append('uploaded_gallery', galleryFiles[i]);
+                }
+            }
+
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/settings/`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` },
@@ -176,8 +188,10 @@ export default function BrandSettingsPage() {
                     preview_image: null,
                     logo: null,
                     founder_image: null,
+                    gallery: responseData.gallery || [],
                     established_year: responseData.established_year ? String(responseData.established_year) : '',
                 }));
+                if (galleryInputRef.current) galleryInputRef.current.value = '';
                 setStatus({ type: 'success', message: 'Brand settings updated successfully.' });
             } else {
                 const errorData = await res.json().catch(() => null);
@@ -213,6 +227,28 @@ export default function BrandSettingsPage() {
         setFormData(prev => ({ ...prev, [field]: null }));
         const refMap = { hero_image: heroInputRef, preview_image: previewInputRef, logo: logoInputRef, founder_image: founderInputRef };
         if (refMap[field]?.current) refMap[field].current!.value = '';
+    };
+
+    const handleDeleteGalleryImage = async (imageId: number) => {
+        if (!confirm('Are you sure you want to delete this image from your archive?')) return;
+        
+        try {
+            const token = localStorage.getItem('access_token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vendor/settings/gallery/${imageId}/`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                setFormData(prev => ({
+                    ...prev,
+                    gallery: prev.gallery.filter(img => img.id !== imageId)
+                }));
+            } else {
+                alert('Failed to delete image.');
+            }
+        } catch {
+            alert('An error occurred.');
+        }
     };
 
     if (fetching) {
@@ -367,6 +403,52 @@ export default function BrandSettingsPage() {
                                 <p className="text-[9px] text-secondary/50 mt-1.5 uppercase tracking-widest">Current image saved</p>
                             )}
                         </div>
+                    </div>
+                </div>
+
+                {/* ── Brand Archive (Gallery) ─────────────────────── */}
+                <div className="bg-background border border-border p-5 md:p-8 space-y-5 md:space-y-8">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest">Brand Archive</h3>
+                        <div className="relative">
+                            <button type="button" className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-primary border-b border-primary pb-0.5">
+                                Add Images
+                            </button>
+                            <input
+                                ref={galleryInputRef}
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={() => {
+                                    // Optional: handle preview of newly selected files
+                                }}
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                        {formData.gallery.map((img: any) => (
+                            <div key={img.id} className="relative aspect-square bg-secondary/5 border border-border group overflow-hidden">
+                                <img 
+                                    src={img.image} 
+                                    alt={img.caption || 'Archive Image'} 
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                />
+                                <button 
+                                    type="button" 
+                                    onClick={() => handleDeleteGalleryImage(img.id)}
+                                    className="absolute top-2 right-2 bg-black/70 text-white p-1.5 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            </div>
+                        ))}
+                        {(!formData.gallery || formData.gallery.length === 0) && (
+                            <div className="col-span-full py-12 text-center border border-dashed border-border">
+                                <p className="text-[10px] md:text-xs text-secondary/40 uppercase tracking-widest">No archive images uploaded yet</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
