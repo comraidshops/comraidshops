@@ -62,9 +62,6 @@ export default function AdminProducts() {
 
     const { notify } = useNotification();
 
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     async function fetchData() {
         try {
@@ -80,6 +77,10 @@ export default function AdminProducts() {
             console.error("Failed to fetch data:", err);
         }
     }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     async function handleCreateProduct(e: React.FormEvent) {
         e.preventDefault();

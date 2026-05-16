@@ -84,7 +84,7 @@ export default function BillingPage() {
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-sm font-black tracking-[0.2em] group-hover:tracking-[0.25em] transition-all">**** **** **** {card.last4}</p>
-                                            <p className="text-[9px] text-secondary/50 font-black uppercase tracking-[0.2em]">Expires {card.exp_month} // {card.exp_year}</p>
+                                            <p className="text-[9px] text-secondary/50 font-black uppercase tracking-[0.2em]">Expires {card.exp_month} {'// '}{card.exp_year}</p>
                                         </div>
                                     </div>
                                     <button

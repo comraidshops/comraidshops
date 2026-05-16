@@ -26,9 +26,6 @@ export default function AdminCategories() {
 
     const { notify } = useNotification();
 
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     async function fetchData() {
         try {
@@ -38,6 +35,10 @@ export default function AdminCategories() {
             console.error("Failed to fetch data:", err);
         }
     }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     async function handleCreateCategory(e: React.FormEvent) {
         e.preventDefault();

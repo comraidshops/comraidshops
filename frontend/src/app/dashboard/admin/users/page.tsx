@@ -44,10 +44,6 @@ export default function AdminUsers() {
 
     const { notify } = useNotification();
 
-    useEffect(() => {
-        getUsers();
-        getBrands();
-    }, []);
 
     async function getBrands() {
         try {
@@ -68,6 +64,11 @@ export default function AdminUsers() {
             console.error("Failed to fetch users:", error);
         }
     }
+
+    useEffect(() => {
+        getUsers();
+        getBrands();
+    }, []);
 
     async function approveVendor(userId: number) {
         try {

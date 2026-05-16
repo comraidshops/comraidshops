@@ -282,7 +282,7 @@ export default function AdminOrders() {
             {/* Mobile View Placeholder */}
             <div className="lg:hidden space-y-4">
                 {orders.map((order) => (
-                    <div className="p-5 md:p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-4">
+                    <div key={order.id} className="p-5 md:p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-4">
                         <div className="flex justify-between items-start gap-4">
                             <h4 className="text-sm font-bold tracking-tight break-all">Order #{order.id}</h4>
                             {renderPaymentBadge(order.payment_status)}

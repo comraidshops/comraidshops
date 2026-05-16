@@ -170,7 +170,7 @@ export default function UserDashboardPage() {
                                                     <p className="text-[11px] font-black uppercase tracking-tight">Order: #{order.id.toString().padStart(5, '0')}</p>
                                                     <StatusBadge status={order.order_status} variant="minimal" />
                                                 </div>
-                                                <p className="text-[9px] text-secondary/50 uppercase tracking-widest font-bold">{date} // {totalQty} UNITS</p>
+                                                <p className="text-[9px] text-secondary/50 uppercase tracking-widest font-bold">{date} {'// '}{totalQty} UNITS</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
