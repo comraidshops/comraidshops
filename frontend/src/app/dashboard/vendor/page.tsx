@@ -232,7 +232,7 @@ export default function VendorDashboard() {
           <TrendingUp className="w-4 h-4 text-primary/40" />
           <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-secondary/40">Financial Distribution</h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
           <StatCard
             title="Revenue Vector"
             value={formatCurrency(metrics?.total_revenue)}
@@ -261,7 +261,7 @@ export default function VendorDashboard() {
       </div>
 
       {/* Secondary Product Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
         <StatCard
           title="Live Assets"
           value={metrics?.approved_products || 0}
