@@ -232,7 +232,10 @@ class MagazineSerializer(serializers.ModelSerializer):
             'articles', 'article_content', 'linked_articles', 'linked_article_ids',
             'created_at', 'meta_title', 'meta_description',
             # Include these from the primary article for convenience in GET
-            'video_url', 'video_provider', 'video_thumbnail'
+            'video_url', 'video_provider', 'video_thumbnail',
+            'photographer_name', 'photographer_instagram', 'writer_name', 
+            'writer_instagram', 'stylist_name', 'creative_director_name', 
+            'image_source', 'additional_credits'
         ]
         extra_kwargs = {'slug': {'required': False}}
 
@@ -692,10 +695,11 @@ class VendorBrandSettingsSerializer(serializers.ModelSerializer):
         model = Brand
         fields = [
             'name', 'tagline', 'description', 'philosophy', 'story',
-            'hero_image', 'logo', 'social_links', 'website',
+            'hero_image', 'preview_image', 'logo', 'social_links', 'website',
             'founder_name', 'founder_bio', 'founder_image',
             'established_year', 'origin_country',
             'awards', 'manifesto', 'featured_quote',
+            'meta_title', 'meta_description',
         ]
 
     def validate_established_year(self, value):

@@ -10,6 +10,7 @@ interface BrandFormData {
     philosophy: string;
     story: string;
     hero_image: File | null;
+    preview_image: File | null;
     logo: File | null;
     social_links: Record<string, string>;
     website: string;
@@ -21,10 +22,13 @@ interface BrandFormData {
     awards: string;
     manifesto: string;
     featured_quote: string;
+    meta_title: string;
+    meta_description: string;
 }
 
 interface ExistingImages {
     hero_image: string;
+    preview_image: string;
     logo: string;
     founder_image: string;
 }
@@ -35,6 +39,7 @@ export default function BrandSettingsPage() {
     const [status, setStatus] = useState({ type: '', message: '' });
     const [existingImages, setExistingImages] = useState<ExistingImages>({
         hero_image: '',
+        preview_image: '',
         logo: '',
         founder_image: '',
     });
@@ -45,6 +50,7 @@ export default function BrandSettingsPage() {
         philosophy: '',
         story: '',
         hero_image: null,
+        preview_image: null,
         logo: null,
         social_links: {},
         website: '',
@@ -56,11 +62,14 @@ export default function BrandSettingsPage() {
         awards: '',
         manifesto: '',
         featured_quote: '',
+        meta_title: '',
+        meta_description: '',
     });
 
     // Refs for file inputs so we can reset them
     const logoInputRef = useRef<HTMLInputElement>(null);
     const heroInputRef = useRef<HTMLInputElement>(null);
+    const previewInputRef = useRef<HTMLInputElement>(null);
     const founderInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -79,6 +88,7 @@ export default function BrandSettingsPage() {
                         philosophy: data.philosophy || '',
                         story: data.story || '',
                         hero_image: null,
+                        preview_image: null,
                         logo: null,
                         social_links: data.social_links || {},
                         website: data.website || '',
@@ -90,9 +100,12 @@ export default function BrandSettingsPage() {
                         awards: data.awards || '',
                         manifesto: data.manifesto || '',
                         featured_quote: data.featured_quote || '',
+                        meta_title: data.meta_title || '',
+                        meta_description: data.meta_description || '',
                     });
                     setExistingImages({
                         hero_image: data.hero_image || '',
+                        preview_image: data.preview_image || '',
                         logo: data.logo || '',
                         founder_image: data.founder_image || '',
                     });
@@ -119,7 +132,7 @@ export default function BrandSettingsPage() {
             const textFields: (keyof BrandFormData)[] = [
                 'name', 'tagline', 'description', 'philosophy', 'story',
                 'website', 'founder_name', 'founder_bio', 'origin_country',
-                'awards', 'manifesto', 'featured_quote',
+                'awards', 'manifesto', 'featured_quote', 'meta_title', 'meta_description',
             ];
             textFields.forEach(key => {
                 data.append(key, String(formData[key] ?? ''));
@@ -137,6 +150,7 @@ export default function BrandSettingsPage() {
 
             // File fields — only send if a new file was selected
             if (formData.hero_image) data.append('hero_image', formData.hero_image);
+            if (formData.preview_image) data.append('preview_image', formData.preview_image);
             if (formData.logo) data.append('logo', formData.logo);
             if (formData.founder_image) data.append('founder_image', formData.founder_image);
 
@@ -151,6 +165,7 @@ export default function BrandSettingsPage() {
                 // Refresh existing image URLs from response
                 setExistingImages({
                     hero_image: responseData.hero_image || '',
+                    preview_image: responseData.preview_image || '',
                     logo: responseData.logo || '',
                     founder_image: responseData.founder_image || '',
                 });
@@ -158,6 +173,7 @@ export default function BrandSettingsPage() {
                 setFormData(prev => ({
                     ...prev,
                     hero_image: null,
+                    preview_image: null,
                     logo: null,
                     founder_image: null,
                     established_year: responseData.established_year ? String(responseData.established_year) : '',
@@ -193,9 +209,9 @@ export default function BrandSettingsPage() {
         return null;
     };
 
-    const clearFileSelection = (field: 'hero_image' | 'logo' | 'founder_image') => {
+    const clearFileSelection = (field: 'hero_image' | 'preview_image' | 'logo' | 'founder_image') => {
         setFormData(prev => ({ ...prev, [field]: null }));
-        const refMap = { hero_image: heroInputRef, logo: logoInputRef, founder_image: founderInputRef };
+        const refMap = { hero_image: heroInputRef, preview_image: previewInputRef, logo: logoInputRef, founder_image: founderInputRef };
         if (refMap[field]?.current) refMap[field].current!.value = '';
     };
 
@@ -282,6 +298,39 @@ export default function BrandSettingsPage() {
                                 />
                             </div>
                             {existingImages.hero_image && !formData.hero_image && (
+                                <p className="text-[9px] text-secondary/50 mt-1.5 uppercase tracking-widest">Current image saved</p>
+                            )}
+                        </div>
+
+                        {/* Preview Image (Discovery) */}
+                        <div>
+                            <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-3 md:mb-4">Discovery Image (Grid)</label>
+                            <div className="relative h-24 md:h-32 bg-secondary/5 border border-dashed border-border flex items-center justify-center overflow-hidden">
+                                {(() => {
+                                    const src = getImagePreview(formData.preview_image, existingImages.preview_image);
+                                    return src ? (
+                                        <>
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={src} alt="Discovery Preview" className="w-full h-full object-cover" />
+                                            {formData.preview_image && (
+                                                <button type="button" onClick={() => clearFileSelection('preview_image')} className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-0.5 hover:bg-black transition-colors z-10">
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <Camera className="w-5 h-5 md:w-6 md:h-6 text-secondary/30" />
+                                    );
+                                })()}
+                                <input
+                                    ref={previewInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setFormData({ ...formData, preview_image: e.target.files?.[0] || null })}
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                />
+                            </div>
+                            {existingImages.preview_image && !formData.preview_image && (
                                 <p className="text-[9px] text-secondary/50 mt-1.5 uppercase tracking-widest">Current image saved</p>
                             )}
                         </div>
@@ -470,6 +519,33 @@ export default function BrandSettingsPage() {
                     </div>
                 </div>
 
+                {/* ── SEO Settings ────────────────────────────────── */}
+                <div className="bg-background border border-border p-5 md:p-8 space-y-4 md:space-y-6">
+                    <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest mb-1 md:mb-2">SEO Settings</h3>
+
+                    <div>
+                        <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">Meta Title</label>
+                        <input
+                            type="text"
+                            value={formData.meta_title}
+                            onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
+                            className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm"
+                            placeholder="Brand Name | Luxury Craftsmanship"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">Meta Description</label>
+                        <textarea
+                            rows={3}
+                            value={formData.meta_description}
+                            onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
+                            className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors resize-none text-sm"
+                            placeholder="Briefly describe your brand for search engines..."
+                        />
+                    </div>
+                </div>
+
                 {/* ── Links & Socials ─────────────────────────────── */}
                 <div className="bg-background border border-border p-5 md:p-8 space-y-4 md:space-y-6">
                     <h3 className="text-[11px] md:text-sm font-bold uppercase tracking-widest mb-1 md:mb-2">Links &amp; Socials</h3>
@@ -510,6 +586,35 @@ export default function BrandSettingsPage() {
                                 })}
                                 className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm"
                                 placeholder="@yourbrand"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        <div>
+                            <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">TikTok</label>
+                            <input
+                                type="text"
+                                value={formData.social_links.tiktok || ''}
+                                onChange={(e) => setFormData({
+                                    ...formData,
+                                    social_links: { ...formData.social_links, tiktok: e.target.value }
+                                })}
+                                className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm"
+                                placeholder="@yourbrand"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary mb-1.5 md:mb-2">LinkedIn</label>
+                            <input
+                                type="text"
+                                value={formData.social_links.linkedin || ''}
+                                onChange={(e) => setFormData({
+                                    ...formData,
+                                    social_links: { ...formData.social_links, linkedin: e.target.value }
+                                })}
+                                className="w-full bg-secondary/5 border border-border px-3 md:px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm"
+                                placeholder="company/yourbrand"
                             />
                         </div>
                     </div>
