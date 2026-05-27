@@ -8,7 +8,7 @@ const getRawApiUrl = () => {
     return raw.trim().replace(/[\u200B-\u200D\uFEFF]/g, '');
 };
 
-export const API_BASE_URL = getRawApiUrl() || 'https://ap.comraidshops.art/api';
+export const API_BASE_URL = getRawApiUrl() || 'https://be.comraidshops.art/api';
 export const MEDIA_BASE = API_BASE_URL.replace('/api', '');
 
 if (!API_BASE_URL || !API_BASE_URL.startsWith('http')) {
